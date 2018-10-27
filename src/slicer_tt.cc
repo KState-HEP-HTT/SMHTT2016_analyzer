@@ -32,6 +32,7 @@
 // my includes
 #include "../include/myHelper.h"
 #include "../include/tt_Tree.h"
+#include "../include/SkimmedTree_tt.h"
 #include "../include/ScaleFactor.h"
 #include "../include/LumiReweightingStandAlone.h"
 #include "../include/lumiMap.h"
@@ -51,80 +52,137 @@ int main(int argc, char** argv) {
 
     TFile *f_Double = new TFile(input.c_str());
     std::cout<<"XXXXXXXXXXXXX "<<input.c_str()<<" XXXXXXXXXXXX"<<std::endl;
-    TTree* arbre = (TTree*) f_Double->Get("tt_tree");
+    TTree* treePtr = (TTree*) f_Double->Get("tt_tree");
     TH1F* nbevt = (TH1F*) f_Double->Get("nevents");
     float ngen = nbevt->GetBinContent(2);
+    SkimmedTree_tt* tree = new SkimmedTree_tt (treePtr);
     std::cout.precision(11);
-    TTree* namu = new TTree("tt_tree", "tt_tree");
+
+    TTree* namu = new TTree("tautau_tree", "tautau_tree");
     namu->SetDirectory(0);
 
-    namu->Branch("evtwt",&evtwt);
+    namu->Branch("evtwt",               &evtwt,               "evtwt/F"              );
 
-    namu->Branch("t1_pt",&t1_pt);
-    namu->Branch("t1_eta", &t1_eta);
-    namu->Branch("t1_phi", &t1_phi);
-    namu->Branch("t1_mass", &t1_mass);
-    namu->Branch("t1_charge", &t1_charge);
-    namu->Branch("t1_decayMode", &t1_decayMode);
-    namu->Branch("t2_pt", &t2_pt);
-    namu->Branch("t2_eta", &t2_eta);
-    namu->Branch("t2_phi", &t2_phi);
-    namu->Branch("t2_mass", &t2_mass);
-    namu->Branch("t2_charge", &t2_charge);
-    namu->Branch("t2_decayMode", &t2_decayMode);
+    namu->Branch("el_pt",               &el_pt,               "el_pt/F"              );
+    namu->Branch("el_eta",              &el_eta,              "el_eta/F"             );
+    namu->Branch("el_phi",              &el_phi,              "el_phi/F"             );
+    namu->Branch("el_mass",             &el_mass,             "el_mass/F"            );
+    namu->Branch("el_charge",           &el_charge,           "el_charge/F"          );
+    namu->Branch("el_iso",              &el_iso,              "el_iso/F"             );
+    namu->Branch("mu_pt",               &mu_pt,               "mu_pt/F"              );
+    namu->Branch("mu_eta",              &mu_eta,              "mu_eta/F"             );
+    namu->Branch("mu_phi",              &mu_phi,              "mu_phi/F"             );
+    namu->Branch("mu_mass",             &mu_mass,             "mu_mass/F"            );
+    namu->Branch("mu_charge",           &mu_charge,           "mu_charge/F"          );
+    namu->Branch("t1_pt",               &t1_pt,               "t1_pt/F"              );
+    namu->Branch("t1_eta",              &t1_eta,              "t1_eta/F"             );
+    namu->Branch("t1_phi",              &t1_phi,              "t1_phi/F"             );
+    namu->Branch("t1_mass",             &t1_mass,             "t1_mass/F"            );
+    namu->Branch("t1_charge",           &t1_charge,           "t1_charge/F"          );
+    namu->Branch("t1_decayMode",        &t1_decayMode,        "t1_decayMode/F"       );
+    namu->Branch("t1_tightIso",         &t1_tightIso,         "t1_tightIso/F"        );//
+    namu->Branch("t1_mediumIso",        &t1_mediumIso,        "t1_mediumIso/F"       );//
+    namu->Branch("t1_dmf",              &t1_dmf,              "t1_dmf/F"             );
+    namu->Branch("t1_dmf_new",          &t1_dmf_new,          "t1_dmf_new/F"         );
+    namu->Branch("t1_iso_VL",           &t1_iso_VL,           "t1_iso_VL/F"          );
+    namu->Branch("t1_iso_L",            &t1_iso_L,            "t1_iso_L/F"           );
+    namu->Branch("t1_iso_M",            &t1_iso_M,            "t1_iso_M/F"           );
+    namu->Branch("t1_iso_T",            &t1_iso_T,            "t1_iso_T/F"           );
+    namu->Branch("t1_iso_VT",           &t1_iso_VT,           "t1_iso_VT/F"          );
+    namu->Branch("t1_iso",              &t1_iso,              "t1_iso/F"             );
+    namu->Branch("t1_newiso_VL",        &t1_newiso_VL,        "t1_newiso_VL/F"       );
+    namu->Branch("t1_newiso_L",         &t1_newiso_L,         "t1_newiso_L/F"        );
+    namu->Branch("t1_newiso_M",         &t1_newiso_M,         "t1_newiso_M/F"        );
+    namu->Branch("t1_newiso_T",         &t1_newiso_T,         "t1_newiso_T/F"        );
+    namu->Branch("t1_newiso_VT",        &t1_newiso_VT,        "t1_newiso_VT/F"       );
+    namu->Branch("t1_newiso",           &t1_newiso,           "t1_newiso/F"          );
 
-    namu->Branch("j1_pt",&j1_pt);
-    namu->Branch("j1_eta", &j1_eta);
-    namu->Branch("j1_phi", &j1_phi);
-    namu->Branch("j2_pt", &j2_pt);
-    namu->Branch("j2_eta", &j2_eta);
-    namu->Branch("j2_phi", &j2_phi);
+    namu->Branch("t2_dmf",              &t2_dmf,              "t2_dmf/F"             );
+    namu->Branch("t2_dmf_new",          &t2_dmf_new,          "t2_dmf_new/F"         );
+    namu->Branch("t2_pt",               &t2_pt,               "t2_pt/F"              );
+    namu->Branch("t2_eta",              &t2_eta,              "t2_eta/F"             );
+    namu->Branch("t2_phi",              &t2_phi,              "t2_phi/F"             );
+    namu->Branch("t2_mass",             &t2_mass,             "t2_mass/F"            );
+    namu->Branch("t2_charge",           &t2_charge,           "t2_charge/F"          );
+    namu->Branch("t2_decayMode",        &t2_decayMode,        "t2_decayMode/F"       );
+    namu->Branch("t2_iso_VL",           &t2_iso_VL,           "t2_iso_VL/F"          );
+    namu->Branch("t2_iso_L",            &t2_iso_L,            "t2_iso_L/F"           );
+    namu->Branch("t2_iso_M",            &t2_iso_M,            "t2_iso_M/F"           );
+    namu->Branch("t2_iso_T",            &t2_iso_T,            "t2_iso_T/F"           );
+    namu->Branch("t2_iso_VT",           &t2_iso_VT,           "t2_iso_VT/F"          );
+    namu->Branch("t2_iso",              &t2_iso,              "t2_iso/F"             );
+    namu->Branch("t2_newiso_VL",        &t2_newiso_VL,        "t2_newiso_VL/F"       );
+    namu->Branch("t2_newiso_L",         &t2_newiso_L,         "t2_newiso_L/F"        );
+    namu->Branch("t2_newiso_M",         &t2_newiso_M,         "t2_newiso_M/F"        );
+    namu->Branch("t2_newiso_T",         &t2_newiso_T,         "t2_newiso_T/F"        );
+    namu->Branch("t2_newiso_VT",        &t2_newiso_VT,        "t2_newiso_VT/F"       );
+    namu->Branch("t2_newiso",           &t2_newiso,           "t2_newiso/F"          );
 
-    namu->Branch("b1_pt",&b1_pt);
-    namu->Branch("b1_eta", &b1_eta);
-    namu->Branch("b1_phi", &b1_phi);
-    namu->Branch("b2_pt", &b2_pt);
-    namu->Branch("b2_eta", &b2_eta);
-    namu->Branch("b2_phi", &b2_phi);
-    namu->Branch("nbtag", &nbtag);
+    namu->Branch("njets",               &njets,               "njets"                );
+    namu->Branch("nbjets",              &nbjets,              "nbjets"               ); 
+    namu->Branch("j1_pt",               &j1_pt,               "j1_pt/F"              );
+    namu->Branch("j1_eta",              &j1_eta,              "j1_eta/F"             );
+    namu->Branch("j1_phi",              &j1_phi,              "j1_phi/F"             );
+    namu->Branch("j2_pt",               &j2_pt,               "j2_pt/F"              );
+    namu->Branch("j2_eta",              &j2_eta,              "j2_eta/F"             );
+    namu->Branch("j2_phi",              &j2_phi,              "j2_phi/F"             );
+    namu->Branch("b1_pt",               &b1_pt,               "b1_pt/F"              );
+    namu->Branch("b1_eta",              &b1_eta,              "b1_eta/F"             );
+    namu->Branch("b1_phi",              &b1_phi,              "b1_phi/F"             );
+    namu->Branch("b2_pt",               &b2_pt,               "b2_pt/F"              );
+    namu->Branch("b2_eta",              &b2_eta,              "b2_eta/F"             );
+    namu->Branch("b2_phi",              &b2_phi,              "b2_phi/F"             );
 
-    namu->Branch("met",&met);
-    namu->Branch("metphi",&metphi);
-    namu->Branch("mjj",&mjj);
-    
-    namu->Branch("njets", &njets);
-    namu->Branch("numGenJets",&numGenJets);
+    namu->Branch("met",                 &met,                 "met/F"                );
+    namu->Branch("metphi",              &metphi,              "metphi/F"             );
+    namu->Branch("mjj",                 &mjj,                 "mjj/F"                );
+    namu->Branch("mt",                  &mt,                  "mt/F"                 );
 
-    namu->Branch("pt_sv", &pt_sv);
-    namu->Branch("m_sv",&m_sv);
-    namu->Branch("Dbkg_VBF",&Dbkg_VBF);
-    namu->Branch("Dbkg_ggH",&Dbkg_ggH);
-    
-    namu->Branch("Phi"         , &Phi);
-    namu->Branch("Phi1"        , &Phi1);
-    namu->Branch("costheta1"   , &costheta1);
-    namu->Branch("costheta2"   , &costheta2);
-    namu->Branch("costhetastar", &costhetastar);
-    namu->Branch("Q2V1"        , &Q2V1);
-    namu->Branch("Q2V2"        , &Q2V2);
+    namu->Branch("numGenJets",          &numGenJets,          "numGenJets/F"         );
 
-    namu->Branch("ME_sm_VBF"   , &ME_sm_VBF);
-    namu->Branch("ME_sm_ggH"   , &ME_sm_ggH);
-    namu->Branch("ME_bkg"   , &ME_bkg);
+    namu->Branch("pt_sv",               &pt_sv,               "pt_sv/F"              );
+    namu->Branch("m_sv",                &m_sv,                "m_sv/F"               );
+    namu->Branch("Dbkg_VBF",            &Dbkg_VBF,            "Dbkg_VBF/F"           );
+    namu->Branch("Dbkg_ggH",            &Dbkg_ggH,            "Dbkg_ggH/F"           );
 
-    namu->Branch("higgs_pT",      &higgs_pT);
-    namu->Branch("higgs_m",       &higgs_m);
-    namu->Branch("hjj_pT",        &hjj_pT);
-    namu->Branch("hjj_m",         &hjj_m);
-    namu->Branch("dEtajj",        &dEtajj);
-    namu->Branch("dPhijj",        &dPhijj);
-    namu->Branch("cat_0jet",      &cat_0jet);
-    namu->Branch("cat_boosted",   &cat_boosted);
-    namu->Branch("cat_vbf",       &cat_vbf);
-    namu->Branch("cat_inclusive", &cat_inclusive);
+    namu->Branch("Phi"         ,        &Phi         ,        "Phi/F"                );
+    namu->Branch("Phi1"        ,        &Phi1        ,        "Phi1/F"               );
+    namu->Branch("costheta1"   ,        &costheta1   ,        "costheta1/F"          );
+    namu->Branch("costheta2"   ,        &costheta2   ,        "costheta2/F"          );
+    namu->Branch("costhetastar",        &costhetastar,        "costhetastar/F"       );
+    namu->Branch("Q2V1"        ,        &Q2V1        ,        "Q2V1/F"               );
+    namu->Branch("Q2V2"        ,        &Q2V2        ,        "Q2V2/F"               );
+    namu->Branch("ME_sm_VBF"   ,        &ME_sm_VBF   ,        "ME_sm_/F"             );
+    namu->Branch("ME_sm_ggH"   ,        &ME_sm_ggH   ,        "ME_sm_/F"             );
+    namu->Branch("ME_sm_WH"    ,        &ME_sm_WH    ,        "ME_sm_WH/F"           );
+    namu->Branch("ME_sm_ZH"    ,        &ME_sm_ZH    ,        "ME_sm_ZH/F"           );
+    namu->Branch("ME_bkg"      ,        &ME_bkg      ,        "MEbkg_/F"             );
+    namu->Branch("ME_bkg1"     ,        &ME_bkg1     ,        "MEbkg1_/F"            );
+    namu->Branch("ME_bkg2"     ,        &ME_bkg2     ,        "MEbkg2_/F"            );
 
-    namu->Branch("is_signal", &is_signal);
-    namu->Branch("is_ai", &is_ai);
+
+    namu->Branch("higgs_pT",            &higgs_pT,            "higgs_pT/F"           );
+    namu->Branch("higgs_m",             &higgs_m,             "higgs_m/F"            );
+    namu->Branch("hjj_pT",              &hjj_pT,              "hjj_pT/F"             );
+    namu->Branch("hjj_m",               &hjj_m,               "hjj_m/F"              );
+    namu->Branch("vis_mass",            &vis_mass,            "vis_mass/F"           );
+    namu->Branch("dEtajj",              &dEtajj,              "dEtajj/F"             );
+    namu->Branch("dPhijj",              &dPhijj,              "dPhijj/F"             );
+    namu->Branch("cat_0jet",            &cat_0jet,            "cat_0jet/I"           );
+    namu->Branch("cat_boosted",         &cat_boosted,         "cat_boosted/I"        );
+    namu->Branch("cat_vbf",             &cat_vbf,             "cat_vbf/I"            );
+    namu->Branch("cat_inclusive",       &cat_inclusive,       "cat_inclusive/I"      );
+    namu->Branch("cat_antiiso",         &cat_antiiso,         "cat_antiiso/I"        );
+    namu->Branch("cat_antiiso_0jet",    &cat_antiiso_0jet,    "cat_antiiso_0jet/I"   );
+    namu->Branch("cat_antiiso_boosted", &cat_antiiso_boosted, "cat_antiiso_boosted/I");
+    namu->Branch("cat_antiiso_vbf",     &cat_antiiso_vbf,     "cat_antiiso_vbf/I"    );
+    namu->Branch("cat_qcd",             &cat_qcd,             "cat_qcd/I"            );
+    namu->Branch("cat_qcd_0jet",        &cat_qcd_0jet,        "cat_qcd_0jet/I"       );
+    namu->Branch("cat_qcd_boosted",     &cat_qcd_boosted,     "cat_qcd_boosted/I"    );
+    namu->Branch("cat_qcd_vbf",         &cat_qcd_vbf,         "cat_qcd_vbf/I"        );
+
+    namu->Branch("is_signal",           &is_signal,           "is_signal/I"          );
+    namu->Branch("is_ai",               &is_ai,               "is_ai/I"              );
 
     ////////////////////////////////////
     //                                //
@@ -140,20 +198,20 @@ int main(int argc, char** argv) {
     //
     /////////////////////////////////
     reweight::LumiReWeighting* LumiWeights_12;
-    LumiWeights_12 = new reweight::LumiReWeighting("../../../CommonAN/weightROOTs/MC_Moriond17_PU25ns_V1.root", "../../../CommonAN/weightROOTs/Data_Pileup_2016_271036-284044_80bins.root", "pileup", "pileup");
+    LumiWeights_12 = new reweight::LumiReWeighting("../weightROOTs/MC_Moriond17_PU25ns_V1.root", "../weightROOTs/Data_Pileup_2016_271036-284044_80bins.root", "pileup", "pileup");
     
-    TFile *fZ=new TFile("../../../CommonAN/weightROOTs/zpt_weights_2016_BtoH.root");
+    TFile *fZ=new TFile("../weightROOTs/zpt_weights_2016_BtoH.root");
     TH2F *histZ=(TH2F*) fZ->Get("zptmass_histo");
     
-    TFile fw("../../../CommonAN/weightROOTs/htt_scalefactors_v16_3.root");
+    TFile fw("../weightROOTs/htt_scalefactors_v16_3.root");
     RooWorkspace *w = (RooWorkspace*)fw.Get("w");
     fw.Close();
     
-    TFile fw2("../../../CommonAN/weightROOTs/htt_scalefactors_sm_moriond_v1.root");
+    TFile fw2("../weightROOTs/htt_scalefactors_sm_moriond_v1.root");
     RooWorkspace *w2 = (RooWorkspace*)fw2.Get("w");
     fw2.Close();
 
-    TFile fem("../../../CommonAN/weightROOTs/htt_scalefactors_v16_9_embedded.root");
+    TFile fem("../weightROOTs/htt_scalefactors_v16_9_embedded.root");
     RooWorkspace *wEmbed = (RooWorkspace*)fem.Get("w");
     fem.Close();
 
@@ -176,121 +234,7 @@ int main(int argc, char** argv) {
     std::cout.setf(std::ios::fixed, std::ios::floatfield);
     std::cout.precision(10);
 
-    // event
-    arbre->SetBranchAddress("run", &run);
-    arbre->SetBranchAddress("lumi", &lumi);
-    arbre->SetBranchAddress("evt", &evt);
-    arbre->SetBranchAddress("npv", &npv);
-    arbre->SetBranchAddress("npu",&npu);
-    arbre->SetBranchAddress("genpT",&genpT);
-    arbre->SetBranchAddress("genM",&genM);
-    arbre->SetBranchAddress("numGenJets",&numGenJets);
-    arbre->SetBranchAddress("amcatNLO_weight", &amcatNLO_weight);
-    // triggers
-    arbre->SetBranchAddress("passDoubleTau35", &passDoubleTau35);
-    arbre->SetBranchAddress("matchDoubleTau35_1", &matchDoubleTau35_1);
-    arbre->SetBranchAddress("matchDoubleTau35_2", &matchDoubleTau35_2);
-    arbre->SetBranchAddress("filterDoubleTau35_1", &filterDoubleTau35_1);
-    arbre->SetBranchAddress("filterDoubleTau35_2", &filterDoubleTau35_2);
-    arbre->SetBranchAddress("passDoubleTauCmbIso35", &passDoubleTauCmbIso35);
-    arbre->SetBranchAddress("matchDoubleTauCmbIso35_1", &matchDoubleTauCmbIso35_1);
-    arbre->SetBranchAddress("matchDoubleTauCmbIso35_2", &matchDoubleTauCmbIso35_2);
-    arbre->SetBranchAddress("filterDoubleTauCmbIso35_1", &filterDoubleTauCmbIso35_1);
-    arbre->SetBranchAddress("filterDoubleTauCmbIso35_2", &filterDoubleTauCmbIso35_2);
-    // taus
-    arbre->SetBranchAddress("px_1", &px_1);
-    arbre->SetBranchAddress("py_1", &py_1);
-    arbre->SetBranchAddress("pz_1", &pz_1);
-    arbre->SetBranchAddress("pt_1", &pt_1);
-    arbre->SetBranchAddress("phi_1", &phi_1);
-    arbre->SetBranchAddress("eta_1", &eta_1);
-    arbre->SetBranchAddress("iso_1", &iso_1);
-    arbre->SetBranchAddress("m_1", &m_1);
-    arbre->SetBranchAddress("q_1", &q_1);
-    arbre->SetBranchAddress("q_2", &q_2);
-    arbre->SetBranchAddress("px_2", &px_2);
-    arbre->SetBranchAddress("py_2", &py_2);
-    arbre->SetBranchAddress("pz_2", &pz_2);
-    arbre->SetBranchAddress("pt_2", &pt_2);
-    arbre->SetBranchAddress("eta_2", &eta_2);
-    arbre->SetBranchAddress("iso_2", &iso_2);
-    arbre->SetBranchAddress("m_2", &m_2);
-    arbre->SetBranchAddress("phi_2", &phi_2);
-    arbre->SetBranchAddress("t1_decayMode",&t1_decayMode);
-    arbre->SetBranchAddress("t2_decayMode",&t2_decayMode);
-    arbre->SetBranchAddress("gen_match_1",&gen_match_1);
-    arbre->SetBranchAddress("gen_match_2",&gen_match_2);
-    arbre->SetBranchAddress("byVLooseIsolationMVArun2v1DBoldDMwLT_1",&byVLooseIsolationMVArun2v1DBoldDMwLT_1);
-    arbre->SetBranchAddress("byLooseIsolationMVArun2v1DBoldDMwLT_1",&byLooseIsolationMVArun2v1DBoldDMwLT_1);
-    arbre->SetBranchAddress("byMediumIsolationMVArun2v1DBoldDMwLT_1",&byMediumIsolationMVArun2v1DBoldDMwLT_1);
-    arbre->SetBranchAddress("byTightIsolationMVArun2v1DBoldDMwLT_1",&byTightIsolationMVArun2v1DBoldDMwLT_1);
-    arbre->SetBranchAddress("byVTightIsolationMVArun2v1DBoldDMwLT_1",&byVTightIsolationMVArun2v1DBoldDMwLT_1);
-    arbre->SetBranchAddress("againstElectronVLooseMVA6_1",&againstElectronVLooseMVA6_1);
-    arbre->SetBranchAddress("againstElectronLooseMVA6_1",&againstElectronLooseMVA6_1);
-    arbre->SetBranchAddress("againstElectronMediumMVA6_1",&againstElectronMediumMVA6_1);
-    arbre->SetBranchAddress("againstElectronTightMVA6_1",&againstElectronTightMVA6_1);
-    arbre->SetBranchAddress("againstElectronVTightMVA6_1",&againstElectronVTightMVA6_1);
-    arbre->SetBranchAddress("againstMuonLoose3_1",&againstMuonLoose3_1);
-    arbre->SetBranchAddress("againstMuonTight3_1",&againstMuonTight3_1);
-    arbre->SetBranchAddress("byVLooseIsolationMVArun2v1DBoldDMwLT_2",&byVLooseIsolationMVArun2v1DBoldDMwLT_2);
-    arbre->SetBranchAddress("byLooseIsolationMVArun2v1DBoldDMwLT_2",&byLooseIsolationMVArun2v1DBoldDMwLT_2);
-    arbre->SetBranchAddress("byMediumIsolationMVArun2v1DBoldDMwLT_2",&byMediumIsolationMVArun2v1DBoldDMwLT_2);
-    arbre->SetBranchAddress("byTightIsolationMVArun2v1DBoldDMwLT_2",&byTightIsolationMVArun2v1DBoldDMwLT_2);
-    arbre->SetBranchAddress("byVTightIsolationMVArun2v1DBoldDMwLT_2",&byVTightIsolationMVArun2v1DBoldDMwLT_2);
-    arbre->SetBranchAddress("againstElectronVLooseMVA6_2",&againstElectronVLooseMVA6_2);
-    arbre->SetBranchAddress("againstElectronLooseMVA6_2",&againstElectronLooseMVA6_2);
-    arbre->SetBranchAddress("againstElectronMediumMVA6_2",&againstElectronMediumMVA6_2);
-    arbre->SetBranchAddress("againstElectronTightMVA6_2",&againstElectronTightMVA6_2);
-    arbre->SetBranchAddress("againstElectronVTightMVA6_2",&againstElectronVTightMVA6_2);
-    arbre->SetBranchAddress("againstMuonLoose3_2",&againstMuonLoose3_2);
-    arbre->SetBranchAddress("againstMuonTight3_2",&againstMuonTight3_2);
-    // jets
-    //arbre->SetBranchAddress("jpt_1", &jpt_1);
-    arbre->SetBranchAddress("jeta_1", &jeta_1);
-    arbre->SetBranchAddress("jphi_1", &jphi_1);
-    arbre->SetBranchAddress("jcsv_1", &jcsv_1);
-    //arbre->SetBranchAddress("jpt_2", &jpt_2);
-    arbre->SetBranchAddress("jeta_2", &jeta_2);
-    arbre->SetBranchAddress("jphi_2", &jphi_2);
-    arbre->SetBranchAddress("jcsv_2", &jcsv_2);
-    //arbre->SetBranchAddress("njets", &njets);
-    arbre->SetBranchAddress("njets_JESDown", &njets_JESDown);
-    arbre->SetBranchAddress("njets_JESUp", &njets_JESUp);
-    // bjets
-    arbre->SetBranchAddress("bpt_1",&bpt_1);
-    arbre->SetBranchAddress("beta_1",&beta_1);
-    arbre->SetBranchAddress("bphi_1",&bphi_1);
-    arbre->SetBranchAddress("bpt_2",&bpt_2);
-    arbre->SetBranchAddress("beta_2",&beta_2);
-    arbre->SetBranchAddress("bphi_2",&bphi_2);
-    arbre->SetBranchAddress("nbtag",&nbtag);
-    // met
-    //arbre->SetBranchAddress("met", &met);
-    //arbre->SetBranchAddress("metphi", &metphi);
-    arbre->SetBranchAddress("metphi_JESDown", &metphi_JESDown);
-    arbre->SetBranchAddress("metphi_JESUp", &metphi_JESUp);
-    arbre->SetBranchAddress("met_JESDown", &met_JESDown);
-    arbre->SetBranchAddress("met_JESUp", &met_JESUp);
-    arbre->SetBranchAddress("metphi_UESDown", &metphi_UESDown);
-    arbre->SetBranchAddress("metphi_UESUp", &metphi_UESUp);
-    arbre->SetBranchAddress("met_UESDown", &met_UESDown);
-    arbre->SetBranchAddress("met_UESUp", &met_UESUp);
-    // top
-    arbre->SetBranchAddress("pt_top1",&pt_top1);
-    arbre->SetBranchAddress("pt_top2",&pt_top2);
-    arbre->SetBranchAddress("Dbkg_VBF",&Dbkg_VBF);
-    arbre->SetBranchAddress("Dbkg_ggH",&Dbkg_ggH);
-
-    arbre->SetBranchAddress("Phi"         , &Phi);
-    arbre->SetBranchAddress("Phi1"        , &Phi1);
-    arbre->SetBranchAddress("costheta1"   , &costheta1);
-    arbre->SetBranchAddress("costheta2"   , &costheta2);
-    arbre->SetBranchAddress("costhetastar", &costhetastar);
-    arbre->SetBranchAddress("Q2V1"        , &Q2V1);
-    arbre->SetBranchAddress("Q2V2"        , &Q2V2);
-
-
-    scenario_info scenario(arbre, shape);
+    scenario_info scenario(treePtr, shape);
 
     // D.Kim : AN line 791~795
     //Binning for 0jet cat. 1D: Msv. In AN it was 10GeV binning / official data card combined 0~50 as one bin
@@ -300,21 +244,10 @@ int main(int argc, char** argv) {
     float bins1X[] = {0,100,170,300,10000};
     //Binning for 1jet cat, y-axis: Msv
     float bins1Y[] = {0,40,60,70,80,90,100,110,120,130,150,200,250};
-    //float bins1Y[] = {0,1000000};
     //Binning for 2jet cat, x-axis: Mjj
     float bins2X[] = {0,300,500,800,10000};
-    //float bins2X[] = {0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0};
-    //float bins2X[] = {0.0,0.02,0.04,0.06,0.08,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0};//0.92,0.94,0.96,0.98,1.0};
-    //plot binning for 2jet cat 
-    //float bins2X[] = {0,50,100,150,200,250,300,350,400,450,500,550,600,650,700,750,800,850,900,950,1000};
-
-    //binning for 2jet cat, x-axis: Dbkg_VBF
-    //float bins2X[] = {0.0,0.3,0.6,0.9,1.0};
     //Binning for 2jet cat, y-axis: Msv
     float bins2Y[] = {0,40,60,70,80,90,100,110,120,130,150,200,250};
-    //float bins2Y[] = {0,1000000};
-    // plot binning for 2jet cat
-    //float bins2Y[] = {0.0,0.5,1.0,1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0,6.5,7.0};
 
     int  binnum0 = sizeof(bins0)/sizeof(Float_t) - 1;
     int  binnum1 = sizeof(bins1)/sizeof(Float_t) - 1;
@@ -434,30 +367,30 @@ int main(int argc, char** argv) {
     }
     
     // Loop over all events
-    Int_t nentries_wtn = (Int_t) arbre->GetEntries();
+    Int_t nentries_wtn = (Int_t) treePtr->GetEntries();
     for (Int_t i = 0; i < nentries_wtn; i++) {
-      arbre->GetEntry(i);
+      treePtr->GetEntry(i);
       if (i % 1000 == 0) fprintf(stdout, "\r  Processed events: %8d of %8d ", i, nentries_wtn);
       fflush(stdout);
       // DoubleTau trigger
       if (sample=="data_obs" && input=="myntuples/data_H.root") {
-	if(!passDoubleTauCmbIso35) continue;
-	if(!matchDoubleTauCmbIso35_1  || !matchDoubleTauCmbIso35_2) continue;
-	if(!filterDoubleTauCmbIso35_1 || !filterDoubleTauCmbIso35_2) continue;
+	if(!tree->passDoubleTauCmbIso35) continue;
+	if(!tree->matchDoubleTauCmbIso35_1  || !tree->matchDoubleTauCmbIso35_2) continue;
+	if(!tree->filterDoubleTauCmbIso35_1 || !tree->filterDoubleTauCmbIso35_2) continue;
       }
       if (sample=="data_obs" && input=="myntuples/data_H.root") {
-	if (!passDoubleTau35) continue;
-	if (!matchDoubleTau35_1  || !matchDoubleTau35_2) continue;
-	if (!filterDoubleTau35_1 || !filterDoubleTau35_2) continue;
+	if (!tree->passDoubleTau35) continue;
+	if (!tree->matchDoubleTau35_1  || !tree->matchDoubleTau35_2) continue;
+	if (!tree->filterDoubleTau35_1 || !tree->filterDoubleTau35_2) continue;
       }
       if (sample!="data_obs" && sample!="embedded") {
-	bool t35     =  passDoubleTau35 && filterDoubleTau35_1 && filterDoubleTau35_2 && matchDoubleTau35_1 && matchDoubleTau35_2;
-	bool tcomb35 =  passDoubleTauCmbIso35 && filterDoubleTauCmbIso35_1 && filterDoubleTauCmbIso35_2 && matchDoubleTauCmbIso35_1 && matchDoubleTauCmbIso35_2;
+	bool t35     =  tree->passDoubleTau35 && tree->filterDoubleTau35_1 && tree->filterDoubleTau35_2 && tree->matchDoubleTau35_1 && tree->matchDoubleTau35_2;
+	bool tcomb35 =  tree->passDoubleTauCmbIso35 && tree->filterDoubleTauCmbIso35_1 && tree->filterDoubleTauCmbIso35_2 && tree->matchDoubleTauCmbIso35_1 && tree->matchDoubleTauCmbIso35_2;
 	if (  !t35 && !tcomb35 ) continue;
       }
       
       // Reject problomatic one event data G
-      if (TMath::IsNaN(Q2V2)) continue;
+      if (TMath::IsNaN(tree->Q2V2)) continue;
 
 
       float jpt_1 = scenario.get_jpt_1();
@@ -473,33 +406,33 @@ int main(int argc, char** argv) {
       float ME_bkg = scenario.get_ME_bkg();
 
       // mytau1 is the highest pT tau
-      float charge1=q_1;
-      float charge2=q_2;
+      float charge1=tree->q_1;
+      float charge2=tree->q_2;
       bool OS = false;
       bool SS = false;
       if (charge1*charge2>0.0) SS = true;
       else if (charge1*charge2<0.0) OS = true;
 
       TLorentzVector mytau1;
-      mytau1.SetPtEtaPhiM(pt_1,eta_1,phi_1,m_1);
+      mytau1.SetPtEtaPhiM(tree->pt_1,tree->eta_1,tree->phi_1,tree->m_1);
       TLorentzVector mytau2;
-      mytau2.SetPtEtaPhiM(pt_2,eta_2,phi_2,m_2);
-      if (pt_1<pt_2){
-	charge2=q_1;
-	charge1=q_2;
-	mytau2.SetPtEtaPhiM(pt_1,eta_1,phi_1,m_1);
-	mytau1.SetPtEtaPhiM(pt_2,eta_2,phi_2,m_2);
+      mytau2.SetPtEtaPhiM(tree->pt_2,tree->eta_2,tree->phi_2,tree->m_2);
+      if (tree->pt_1<tree->pt_2){
+	charge2=tree->q_1;
+	charge1=tree->q_2;
+	mytau2.SetPtEtaPhiM(tree->pt_1,tree->eta_1,tree->phi_1,tree->m_1);
+	mytau1.SetPtEtaPhiM(tree->pt_2,tree->eta_2,tree->phi_2,tree->m_2);
       }
       
       if (mytau1.DeltaR(mytau2) < 0.5) continue;
-      if (againstElectronVLooseMVA6_1 < 0.5) continue; // L773
-      if (againstElectronVLooseMVA6_2 < 0.5) continue;
-      if (againstMuonLoose3_1 < 0.5) continue; //774
-      if (againstMuonLoose3_2 < 0.5) continue;
+      if (tree->againstElectronVLooseMVA6_1 < 0.5) continue; // L773
+      if (tree->againstElectronVLooseMVA6_2 < 0.5) continue;
+      if (tree->againstMuonLoose3_1 < 0.5) continue; //774
+      if (tree->againstMuonLoose3_2 < 0.5) continue;
       // Change && -> ||
-      if (byLooseIsolationMVArun2v1DBoldDMwLT_1 < 0.5 || byLooseIsolationMVArun2v1DBoldDMwLT_2 < 0.5) continue; // Fig 43(a)
-      if (extramuon_veto) continue;
-      if (extraelec_veto) continue;
+      if (tree->byLooseIsolationMVArun2v1DBoldDMwLT_1 < 0.5 || tree->byLooseIsolationMVArun2v1DBoldDMwLT_2 < 0.5) continue; // Fig 43(a)
+      if (tree->extramuon_veto) continue;
+      if (tree->extraelec_veto) continue;
       //float sf_trg=1.0;
       float sf_id=1.0;
       //float eff_tau=1.0;
@@ -513,27 +446,27 @@ int main(int argc, char** argv) {
       float sf_trg_FF = 1.0;
       PyObject* trgSF = PyObject_CallFunction(compute_sf,(char*)"[f,i]",0.0,0);
       if (sample!="data_obs"){
-	if (t1_decayMode==0) trgSF = PyObject_CallFunction(compute_sf,(char*)"[f,i]",mytau1.Pt(),0);
-	else if (t1_decayMode==1) trgSF = PyObject_CallFunction(compute_sf,(char*)"[f,i]",mytau1.Pt(),1);
-	else if (t1_decayMode==10) trgSF = PyObject_CallFunction(compute_sf,(char*)"[f,i]",mytau1.Pt(),10);
+	if (tree->t1_decayMode==0) trgSF = PyObject_CallFunction(compute_sf,(char*)"[f,i]",mytau1.Pt(),0);
+	else if (tree->t1_decayMode==1) trgSF = PyObject_CallFunction(compute_sf,(char*)"[f,i]",mytau1.Pt(),1);
+	else if (tree->t1_decayMode==10) trgSF = PyObject_CallFunction(compute_sf,(char*)"[f,i]",mytau1.Pt(),10);
 	sf_trg1 = PyFloat_AsDouble(trgSF);
-	if (gen_match_1==5)  {
+	if (tree->gen_match_1==5)  {
 	  sf_trg_RR = PyFloat_AsDouble(trgSF);
 	  sf_trg_RF = PyFloat_AsDouble(trgSF);
 	}
-	if (gen_match_1==6) {
+	if (tree->gen_match_1==6) {
 	  sf_trg_FR = PyFloat_AsDouble(trgSF);
 	  sf_trg_FF = PyFloat_AsDouble(trgSF);
 	}
-	if (t2_decayMode==0) trgSF = PyObject_CallFunction(compute_sf,(char*)"[f,i]",mytau2.Pt(),0);
-	else if (t2_decayMode==1) trgSF = PyObject_CallFunction(compute_sf,(char*)"[f,i]",mytau2.Pt(),1);
-	else if (t2_decayMode==10) trgSF = PyObject_CallFunction(compute_sf,(char*)"[f,i]",mytau2.Pt(),10);
+	if (tree->t2_decayMode==0) trgSF = PyObject_CallFunction(compute_sf,(char*)"[f,i]",mytau2.Pt(),0);
+	else if (tree->t2_decayMode==1) trgSF = PyObject_CallFunction(compute_sf,(char*)"[f,i]",mytau2.Pt(),1);
+	else if (tree->t2_decayMode==10) trgSF = PyObject_CallFunction(compute_sf,(char*)"[f,i]",mytau2.Pt(),10);
 	sf_trg2 = PyFloat_AsDouble(trgSF);
-	if (gen_match_2==5)  {
+	if (tree->gen_match_2==5)  {
 	  sf_trg_RR = sf_trg_RR*PyFloat_AsDouble(trgSF);
           sf_trg_FR = sf_trg_FR*PyFloat_AsDouble(trgSF);
         }
-        if (gen_match_2==6) {
+        if (tree->gen_match_2==6) {
           sf_trg_RF = sf_trg_RF*PyFloat_AsDouble(trgSF);
           sf_trg_FF = sf_trg_FF*PyFloat_AsDouble(trgSF);
 	}
@@ -541,58 +474,58 @@ int main(int argc, char** argv) {
       }
           
       // Regions
-      float signalRegion = byTightIsolationMVArun2v1DBoldDMwLT_1 && byTightIsolationMVArun2v1DBoldDMwLT_2;
-      float aiRegion = ((byMediumIsolationMVArun2v1DBoldDMwLT_1 && !byTightIsolationMVArun2v1DBoldDMwLT_2 && byLooseIsolationMVArun2v1DBoldDMwLT_2) || (byMediumIsolationMVArun2v1DBoldDMwLT_2 && !byTightIsolationMVArun2v1DBoldDMwLT_1 && byLooseIsolationMVArun2v1DBoldDMwLT_1));
+      float signalRegion = tree->byTightIsolationMVArun2v1DBoldDMwLT_1 && tree->byTightIsolationMVArun2v1DBoldDMwLT_2;
+      float aiRegion = ((tree->byMediumIsolationMVArun2v1DBoldDMwLT_1 && !tree->byTightIsolationMVArun2v1DBoldDMwLT_2 && tree->byLooseIsolationMVArun2v1DBoldDMwLT_2) || (tree->byMediumIsolationMVArun2v1DBoldDMwLT_2 && !tree->byTightIsolationMVArun2v1DBoldDMwLT_1 && tree->byLooseIsolationMVArun2v1DBoldDMwLT_1));
       
       // Weights depending in the generated jet multiplicity
       if (sample=="W"){
 	weight=25.446;
-	if (numGenJets==1) weight=6.8176;
-	else if (numGenJets==2) weight=2.1038;
-	else if (numGenJets==3) weight=0.6889;
-	else if (numGenJets==4) weight=0.6900;
+	if (tree->numGenJets==1) weight=6.8176;
+	else if (tree->numGenJets==2) weight=2.1038;
+	else if (tree->numGenJets==3) weight=0.6889;
+	else if (tree->numGenJets==4) weight=0.6900;
 	//std::cout << weight << std::endl;
       }
       
       if (sample=="DY" or sample=="ZTT" or sample=="ZLL" or sample=="ZL" or sample=="ZJ"){
 	weight=1.41957039;
-	if (numGenJets==1 || input=="myntuples/DY1.root")
+	if (tree->numGenJets==1 || input=="myntuples/DY1.root")
 	  weight=0.457675455;
-	else if (numGenJets==2 || input=="myntuples/DY2.root")
+	else if (tree->numGenJets==2 || input=="myntuples/DY2.root")
 	  weight=0.467159142;
-	else if (numGenJets==3 || input=="myntuples/DY3.root")
+	else if (tree->numGenJets==3 || input=="myntuples/DY3.root")
 	  weight=0.480349711;
-	else if (numGenJets==4 || input=="myntuples/DY4.root")
+	else if (tree->numGenJets==4 || input=="myntuples/DY4.root")
 	  weight=0.3938184351;
       }
       
       // Multiply some weights and scale factors together
       // ID and iso corrections
       float correction=sf_id;
-      if (sample!="data_obs") correction=correction*LumiWeights_12->weight(npu);
-      float aweight=amcatNLO_weight*weight*correction;
+      if (sample!="data_obs") correction=correction*LumiWeights_12->weight(tree->npu);
+      float aweight=tree->amcatNLO_weight*weight*correction;
       if (sample!="data_obs"){
 	//Tau ID SF (Tight WP)
-	if (gen_match_1==5) aweight=aweight*0.95;
-	if (gen_match_2==5) aweight=aweight*0.95;
+	if (tree->gen_match_1==5) aweight=aweight*0.95;
+	if (tree->gen_match_2==5) aweight=aweight*0.95;
 	//e->tau fakes VLoose
-	if (gen_match_1==1 or gen_match_1==3){
+	if (tree->gen_match_1==1 or tree->gen_match_1==3){
 	  if (std::abs(mytau1.Eta())<1.460) aweight=aweight*1.213;
 	  else if (std::abs(mytau1.Eta())>1.558) aweight=aweight*1.375;
 	}
-	if (gen_match_2==1 or gen_match_2==3){
+	if (tree->gen_match_2==1 or tree->gen_match_2==3){
 	  if (std::abs(mytau2.Eta())<1.460) aweight=aweight*1.213;
 	  else if (std::abs(mytau2.Eta())>1.558) aweight=aweight*1.375;
 	}
 	// mu->tau fakes Loose
-	else if (gen_match_1==2 or gen_match_1==4){
+	else if (tree->gen_match_1==2 or tree->gen_match_1==4){
 	  if (std::abs(mytau1.Eta())<0.4) aweight=aweight*1.010;
 	  else if (std::abs(mytau1.Eta())<0.8) aweight=aweight*1.007;
 	  else if (std::abs(mytau1.Eta())<1.2) aweight=aweight*0.870;
 	  else if (std::abs(mytau1.Eta())<1.7) aweight=aweight*1.154;
 	  else aweight=aweight*2.281;
 	}
-	else if (gen_match_2==2 or gen_match_2==4){
+	else if (tree->gen_match_2==2 or tree->gen_match_2==4){
 	  if (std::abs(mytau2.Eta())<0.4) aweight=aweight*1.010;
 	  else if (std::abs(mytau2.Eta())<0.8) aweight=aweight*1.007;
 	  else if (std::abs(mytau2.Eta())<1.2) aweight=aweight*0.870;
@@ -604,7 +537,7 @@ int main(int argc, char** argv) {
       
       // Z pt reweighting for DY events
       if (sample=="DY" || sample=="EWKZLL" || sample=="EWKZNuNu" || sample=="ZTT" || sample=="ZLL" || sample=="ZL" || sample=="ZJ"){
-	float zpt_corr=histZ->GetBinContent(histZ->GetXaxis()->FindBin(genM),histZ->GetYaxis()->FindBin(genpT));
+	float zpt_corr=histZ->GetBinContent(histZ->GetXaxis()->FindBin(tree->genM),histZ->GetYaxis()->FindBin(tree->genpT));
 	if (shape=="dyShape_Up") // up
 	  aweight=aweight*(1+1.10*(zpt_corr-1));
 	else if (shape=="dyShape_Down") // down
@@ -614,9 +547,9 @@ int main(int argc, char** argv) {
       }
       
       //  Top pT reweighting for ttbar events
-      float pttop1=pt_top1;
+      float pttop1=tree->pt_top1;
       if (pttop1>400) pttop1=400;
-      float pttop2=pt_top2;
+      float pttop2=tree->pt_top2;
       if (pttop2>400) pttop2=400;
       if ((sample=="TTL" or sample=="TTJ" or sample=="TTT" or sample=="TT") && (shape!="ttbarShape_Up" && shape!="ttbarShape_Down")) aweight*=sqrt(exp(0.0615-0.0005*pttop1)*exp(0.0615-0.0005*pttop2));
       //aweight*=sqrt(exp(0.156-0.00137*pttop1)*exp(0.156-0.00137*pttop2));
@@ -628,12 +561,12 @@ int main(int argc, char** argv) {
       //************************ Jet to tau FR shape **************************
       if (shape=="jetToTauFake_Up" && (sample=="TTJ" or sample=="ZJ" or sample=="W")) {
 	  float jtotau1=1.0;
-	  if (gen_match_1==6) {
+	  if (tree->gen_match_1==6) {
 	    jtotau1=1-(0.2*mytau1.Pt()/100);
 	    if (mytau1.Pt()>200) jtotau1=1-(0.2*200.0/100);
 	  }
 	  float jtotau2=1.0;
-	  if (gen_match_2==6) {
+	  if (tree->gen_match_2==6) {
 	    jtotau2=1-(0.2*mytau2.Pt()/100);
 	    if (mytau2.Pt()>200) jtotau2=1-(0.2*200.0/100);
 	  }
@@ -642,12 +575,12 @@ int main(int argc, char** argv) {
 
 	if (shape=="jetToTauFake_Down" && (sample=="TTJ" or sample=="ZJ" or sample=="W")) {
 	  float jtotau1=1.0;
-	  if (gen_match_1==6) {
+	  if (tree->gen_match_1==6) {
 	    jtotau1=1+(0.2*mytau1.Pt()/100);
 	    if (mytau1.Pt()>200) jtotau1=1+(0.2*200.0/100);
 	  }
 	  float jtotau2=1.0;
-	  if (gen_match_2==6) {
+	  if (tree->gen_match_2==6) {
 	    jtotau2=1+(0.2*mytau2.Pt()/100);
 	    if (mytau2.Pt()>200) jtotau2=1+(0.2*200.0/100);
 	  }
@@ -660,26 +593,26 @@ int main(int argc, char** argv) {
       bool isZTT=false;
       bool isZL=false;
       bool isZJ=false;
-      if (gen_match_1==5 && gen_match_2==5) isZTT=true;
-      if (gen_match_1<6&&gen_match_2<6&&!(gen_match_1==5&&gen_match_2==5)) isZL=true;
-      if (gen_match_2==6 || gen_match_1==6) isZJ=true;
+      if (tree->gen_match_1==5 && tree->gen_match_2==5) isZTT=true;
+      if (tree->gen_match_1<6 && tree->gen_match_2<6&&!(tree->gen_match_1==5 && tree->gen_match_2==5)) isZL=true;
+      if (tree->gen_match_2==6 || tree->gen_match_1==6) isZJ=true;
       if ((name=="ZTT") && !isZTT) continue;
       if ((name=="ZL") && !isZL) continue;
       if ((name=="ZJ") && !isZJ) continue;
 
       // TT & VV : line 895~897
-      if (!(gen_match_1==5 && gen_match_2==5) && (name=="VVT"|| name=="TTT")) continue;
-      if ((gen_match_1==5 && gen_match_2==5) && (name=="VVJ" || name=="TTJ")) continue;
+      if (!(tree->gen_match_1==5 && tree->gen_match_2==5) && (name=="VVT"|| name=="TTT")) continue;
+      if ((tree->gen_match_1==5 && tree->gen_match_2==5) && (name=="VVJ" || name=="TTJ")) continue;
 
       for (int k=0; k<nbhist; ++k){
 	// njets count only jets with pT > 30
-        if (jpt_1<30) {jpt_1=-9999.0; jeta_1=-9999.0; jphi_1=-9999.0;}
-        if (jpt_2<30) {jpt_2=-9999.0; jeta_2=-9999.0; jphi_2=-9999.0;}
+        if (jpt_1<30) {jpt_1=-9999.0; tree->jeta_1=-9999.0; tree->jphi_1=-9999.0;}
+        if (jpt_2<30) {jpt_2=-9999.0; tree->jeta_2=-9999.0; tree->jphi_2=-9999.0;}
 	TLorentzVector myjet1;
-	myjet1.SetPtEtaPhiM(jpt_1,jeta_1,jphi_1,0);
+	myjet1.SetPtEtaPhiM(jpt_1,tree->jeta_1,tree->jphi_1,0);
 	//myjet1.SetPtEtaPhiM(scenario.get_jpt_1(),jeta_1,jphi_1,0);
 	TLorentzVector myjet2;
-	myjet2.SetPtEtaPhiM(jpt_2,jeta_2,jphi_2,0);
+	myjet2.SetPtEtaPhiM(jpt_2,tree->jeta_2,tree->jphi_2,0);
 	//myjet2.SetPtEtaPhiM(scenario.get_jpt_2(),jeta_2,jphi_2,0);
 	TLorentzVector jets=myjet2+myjet1;
 	//mjj = jets.M();
@@ -698,20 +631,20 @@ int main(int argc, char** argv) {
         float normtest = ME_sm_VBF/(ME_sm_VBF+35*ME_bkg);
 
 	// TES 
-	if (gen_match_2==5 && gen_match_1==5) {
-	  if (shape=="DM0_DOWN" && t1_decayMode==0) {mytau1*=0.988; mymet=mymet+(0.012/0.988)*mytau1;}
-	  if (shape=="DM1_DOWN" && t1_decayMode==1) {mytau1*=0.988; mymet=mymet+(0.012/0.988)*mytau1;}
-	  if (shape=="DM10_DOWN" && t1_decayMode==10) {mytau1*=0.988; mymet=mymet+(0.012/0.988)*mytau1;}
-	  if (shape=="DM0_DOWN" && t2_decayMode==0) {mytau2*=0.988; mymet=mymet+(0.012/0.988)*mytau2;}
-	  if (shape=="DM1_DOWN" && t2_decayMode==1) {mytau2*=0.988; mymet=mymet+(0.012/0.988)*mytau2;}
-	  if (shape=="DM10_DOWN" && t2_decayMode==10) {mytau2*=0.988; mymet=mymet+(0.012/0.988)*mytau2;}
+	if (tree->gen_match_2==5 && tree->gen_match_1==5) {
+	  if (shape=="DM0_DOWN" && tree->t1_decayMode==0) {mytau1*=0.988; mymet=mymet+(0.012/0.988)*mytau1;}
+	  if (shape=="DM1_DOWN" && tree->t1_decayMode==1) {mytau1*=0.988; mymet=mymet+(0.012/0.988)*mytau1;}
+	  if (shape=="DM10_DOWN" && tree->t1_decayMode==10) {mytau1*=0.988; mymet=mymet+(0.012/0.988)*mytau1;}
+	  if (shape=="DM0_DOWN" && tree->t2_decayMode==0) {mytau2*=0.988; mymet=mymet+(0.012/0.988)*mytau2;}
+	  if (shape=="DM1_DOWN" && tree->t2_decayMode==1) {mytau2*=0.988; mymet=mymet+(0.012/0.988)*mytau2;}
+	  if (shape=="DM10_DOWN" && tree->t2_decayMode==10) {mytau2*=0.988; mymet=mymet+(0.012/0.988)*mytau2;}
 
-	  if (shape=="DM0_UP" && t1_decayMode==0) {mytau1*=1.012; mymet=mymet-(0.012/1.012)*mytau1;}
-	  if (shape=="DM1_UP" && t1_decayMode==1) {mytau1*=1.012; mymet=mymet-(0.012/1.012)*mytau1;}
-	  if (shape=="DM10_UP" && t1_decayMode==10) {mytau1*=1.012; mymet=mymet-(0.012/1.012)*mytau1;}
-	  if (shape=="DM0_UP" && t2_decayMode==0) {mytau2*=1.012; mymet=mymet-(0.012/1.012)*mytau2;}
-	  if (shape=="DM1_UP" && t2_decayMode==1) {mytau2*=1.012; mymet=mymet-(0.012/1.012)*mytau2;}
-	  if (shape=="DM10_UP" && t2_decayMode==10) {mytau2*=1.012; mymet=mymet-(0.012/1.012)*mytau2;}
+	  if (shape=="DM0_UP" && tree->t1_decayMode==0) {mytau1*=1.012; mymet=mymet-(0.012/1.012)*mytau1;}
+	  if (shape=="DM1_UP" && tree->t1_decayMode==1) {mytau1*=1.012; mymet=mymet-(0.012/1.012)*mytau1;}
+	  if (shape=="DM10_UP" && tree->t1_decayMode==10) {mytau1*=1.012; mymet=mymet-(0.012/1.012)*mytau1;}
+	  if (shape=="DM0_UP" && tree->t2_decayMode==0) {mytau2*=1.012; mymet=mymet-(0.012/1.012)*mytau2;}
+	  if (shape=="DM1_UP" && tree->t2_decayMode==1) {mytau2*=1.012; mymet=mymet-(0.012/1.012)*mytau2;}
+	  if (shape=="DM10_UP" && tree->t2_decayMode==10) {mytau2*=1.012; mymet=mymet-(0.012/1.012)*mytau2;}
 	}
 
 	if (mytau1.Pt() < 40 || mytau2.Pt() < 40 ) continue;
@@ -759,23 +692,24 @@ int main(int argc, char** argv) {
 	// Embedded weights //
 	//////////////////////
 	if (sample=="embedded") {
-	  if( amcatNLO_weight > 1) continue;
+	  if( tree->amcatNLO_weight > 1) continue;
 	  aweight=1.0; weight2=1.0;
 	  //float Stitching_Weight= 1.0/0.899;
           float Stitching_Weight= 1.0;
           float Total_Embed_Weight=0;
-	  if((run >= 272007) && (run < 275657)) Stitching_Weight=(1.0/0.897 * 1.02* 1.02);
-	  if((run >= 275657) && (run < 276315))  Stitching_Weight=(1.0/0.908* 1.02* 1.02);
-	  if((run >= 276315) && (run < 276831))  Stitching_Weight=(1.0/0.950* 1.02* 1.02);
-	  if((run >= 276831) && (run < 277772))  Stitching_Weight=(1.0/0.861* 1.02* 1.02);
-	  if((run >= 277772) && (run < 278820))  Stitching_Weight=(1.0/0.941* 1.02* 1.02);
-	  if((run >= 278820) && (run < 280919))  Stitching_Weight=(1.0/0.908* 1.02* 1.02);
-	  if((run >= 280919) && (run < 284045))  Stitching_Weight=(1.0/0.949* 1.02* 1.02);
+	  if((tree->run >= 272007) && (tree->run < 275657)) Stitching_Weight=(1.0/0.897 * 1.02* 1.02);
+	  if((tree->run >= 275657) && (tree->run < 276315))  Stitching_Weight=(1.0/0.908* 1.02* 1.02);
+	  if((tree->run >= 276315) && (tree->run < 276831))  Stitching_Weight=(1.0/0.950* 1.02* 1.02);
+	  if((tree->run >= 276831) && (tree->run < 277772))  Stitching_Weight=(1.0/0.861* 1.02* 1.02);
+	  if((tree->run >= 277772) && (tree->run < 278820))  Stitching_Weight=(1.0/0.941* 1.02* 1.02);
+	  if((tree->run >= 278820) && (tree->run < 280919))  Stitching_Weight=(1.0/0.908* 1.02* 1.02);
+	  if((tree->run >= 280919) && (tree->run < 284045))  Stitching_Weight=(1.0/0.949* 1.02* 1.02);
           double EmbedWeight=  sf_trg1*sf_trg2 ;
           float WEIGHT_sel_trg_ratio= m_sel_trg_ratio(wEmbed,mytau1.Pt(),mytau1.Eta(),mytau2.Pt(),mytau2.Eta());
-	  aweight=EmbedWeight * amcatNLO_weight * Stitching_Weight * WEIGHT_sel_trg_ratio;
+	  aweight=EmbedWeight * tree->amcatNLO_weight * Stitching_Weight * WEIGHT_sel_trg_ratio;
 	  //std::cout << "embedded weight : " << aweight << std::endl;
 	}
+	//std::cout << aweight << "\t" << weight2 << "\t" << weight2*aweight << std::endl;
 
 	// book the NN                                                                                                        
 	TMVAClassification_TMlpANN* t = new TMVAClassification_TMlpANN();
@@ -866,23 +800,20 @@ int main(int argc, char** argv) {
 	  // ################### trg SF ####################
 	  h_trgSF1[k]->Fill(sf_trg1);
 	  h_trgSF2[k]->Fill(sf_trg2);
-	  if (gen_match_1==5 && gen_match_2==5) h_trgSF_RR[k]->Fill(sf_trg_RR);
-	  if (gen_match_1==6 && gen_match_2==5) h_trgSF_FR[k]->Fill(sf_trg_FR);
-	  if (gen_match_1==5 && gen_match_2==6) h_trgSF_RF[k]->Fill(sf_trg_RF);
-	  if (gen_match_1==6 && gen_match_2==6) h_trgSF_FF[k]->Fill(sf_trg_FF);
+	  if (tree->gen_match_1==5 && tree->gen_match_2==5) h_trgSF_RR[k]->Fill(sf_trg_RR);
+	  if (tree->gen_match_1==6 && tree->gen_match_2==5) h_trgSF_FR[k]->Fill(sf_trg_FR);
+	  if (tree->gen_match_1==5 && tree->gen_match_2==6) h_trgSF_RF[k]->Fill(sf_trg_RF);
+	  if (tree->gen_match_1==6 && tree->gen_match_2==6) h_trgSF_FF[k]->Fill(sf_trg_FF);
 	  
-	  fillNNTree(namu,
-		     mytau1,charge1,t1_decayMode,
-		     mytau2,charge2,t2_decayMode,
-		     myjet1,myjet2,mymet,mjj,
-		     pt_sv,m_sv,
-		     njets,
-		     bpt_1,beta_1,bphi_1,
-		     bpt_2,beta_2,bphi_2,nbtag,
-		     Higgs,
-		     is_0jet,is_boosted,is_studyVBF,
-		     signalRegion,aiRegion,weight2*aweight,
-		     ME_sm_VBF,ME_sm_ggH,ME_bkg);
+	  // Anything related to systematics should be included i.e. picked by scenario
+	  fillTree(namu, tree, i,
+		   Higgs, mytau1, mytau2, myjet1, myjet2,
+		   mjj, met, metphi, m_sv, pt_sv, njets,
+		   Dbkg_VBF, Dbkg_ggH,
+		   ME_sm_VBF,ME_sm_ggH,ME_sm_WH,ME_sm_ZH,ME_bkg,ME_bkg1,ME_bkg2,
+		   Phi,Phi1,costheta1,costheta2,costhetastar,Q2V1,Q2V2,
+		   signalRegion, aiRegion,weight2*aweight
+		   );
 	}
       }
     } // end of loop over events
@@ -891,141 +822,7 @@ int main(int argc, char** argv) {
     fout->cd();
     namu->Write();
     nbevt->Write();
-    /*
-    TDirectory *OS0jet_tt =fout->mkdir("tt_0jet");
-    TDirectory *OSboosted_tt =fout->mkdir("tt_boosted");
-    TDirectory *OSvbf_tt =fout->mkdir("tt_vbf");
-    
-    TDirectory *OS0jet =fout->mkdir("ttOS_0jet");
-    TDirectory *OSboosted =fout->mkdir("ttOS_boosted");
-    TDirectory *OSvbf =fout->mkdir("ttOS_vbf");
-    TDirectory *OSvh =fout->mkdir("ttOS_vh");
-    TDirectory *OS =fout->mkdir("ttOS_inclusive");
-    TDirectory*  OScat = fout->mkdir("tt_categories");
 
-    TDirectory *SS0jet =fout->mkdir("ttSS_0jet");
-    TDirectory *SSboosted =fout->mkdir("ttSS_boosted");
-    TDirectory *SSvbf =fout->mkdir("ttSS_vbf");
-    TDirectory *SSvh =fout->mkdir("ttSS_vh");
-    TDirectory *SS =fout->mkdir("ttSS_inclusive");
-    
-    TDirectory *AIOS0jet =fout->mkdir("AIOS_0jet");
-    TDirectory *AIOSboosted =fout->mkdir("AIOS_boosted");
-    TDirectory *AIOSvbf =fout->mkdir("AIOS_vbf");
-    TDirectory *AIOSvh =fout->mkdir("AIOS_vh");
-    TDirectory *AIOS =fout->mkdir("AIOS_inclusive");
-    
-    TDirectory *AISS0jet =fout->mkdir("AISS_0jet");
-    TDirectory *AISSboosted =fout->mkdir("AISS_boosted");
-    TDirectory *AISSvbf =fout->mkdir("AISS_vbf");
-    TDirectory *AISSvh =fout->mkdir("AISS_vh");
-    TDirectory *AISS =fout->mkdir("AISS_inclusive");
-
-    TDirectory *TRG_SF = fout->mkdir("trgSF");
-
-    for (int k=0; k<nbhist; ++k){
-      // These will be the final root files
-      TRG_SF->cd();
-      h_trgSF1[k]->SetName("trgSF1");
-      h_trgSF1[k]->Write();
-      h_trgSF2[k]->SetName("trgSF2");
-      h_trgSF2[k]->Write();
-      h_trgSF_RR[k]->SetName("trgSF_RR");
-      h_trgSF_RR[k]->Write();
-      h_trgSF_FR[k]->SetName("trgSF_FR");
-      h_trgSF_FR[k]->Write();
-      h_trgSF_RF[k]->SetName("trgSF_RF");
-      h_trgSF_RF[k]->Write();
-      h_trgSF_FF[k]->SetName("trgSF_FF");
-      h_trgSF_FF[k]->Write();
-
-      OS0jet_tt->cd();
-      h0_OS[k]->SetName(name.c_str()+postfix);
-      h0_OS[k]->Write();
-      OSboosted_tt->cd();
-      h1_OS[k]->SetName(name.c_str()+postfix);
-      h1_OS[k]->Write();
-      OSvbf_tt->cd();
-      h2_OS[k]->SetName(name.c_str()+postfix);
-      h2_OS[k]->Write();        
-      
-      OS0jet->cd();
-      h0_OS[k]->SetName(name.c_str()+postfix);
-      h0_OS[k]->Write();
-      OSboosted->cd();
-      h1_OS[k]->SetName(name.c_str()+postfix);
-      h1_OS[k]->Write();
-      OSvbf->cd();
-      h2_OS[k]->SetName(name.c_str()+postfix);
-      h2_OS[k]->Write();
-
-      OSvh->cd();
-      h3_OS[k]->SetName(name.c_str()+postfix);
-      h3_OS[k]->Write();
-      OS->cd();
-      h_OS[k]->SetName(name.c_str()+postfix);
-      h_OS[k]->Write();
-      
-      //KK
-      OScat->cd();
-      h_0jet->Write();
-      hx_boosted->Write();
-      hy_boosted->Write();
-      hx_vbf->Write();
-      hy_vbf->Write();
-      
-      SS0jet->cd();
-      h0_SS[k]->SetName(name.c_str()+postfix);
-      h0_SS[k]->Write();
-      SSboosted->cd();
-      h1_SS[k]->SetName(name.c_str()+postfix);
-      h1_SS[k]->Write();
-      SSvbf->cd();
-      h2_SS[k]->SetName(name.c_str()+postfix);
-      h2_SS[k]->Write();
-
-      SSvh->cd();
-      h3_SS[k]->SetName(name.c_str()+postfix);
-      h3_SS[k]->Write();
-      SS->cd();
-      h_SS[k]->SetName(name.c_str()+postfix);
-      h_SS[k]->Write();
-      
-      AIOS0jet->cd();
-      h0_AIOS[k]->SetName(name.c_str()+postfix);
-      h0_AIOS[k]->Write();
-      AIOSboosted->cd();
-      h1_AIOS[k]->SetName(name.c_str()+postfix);
-      h1_AIOS[k]->Write();
-      AIOSvbf->cd();
-      h2_AIOS[k]->SetName(name.c_str()+postfix);
-      h2_AIOS[k]->Write();
-
-      AIOSvh->cd();
-      h3_AIOS[k]->SetName(name.c_str()+postfix);
-      h3_AIOS[k]->Write();
-      AIOS->cd();
-      h_AIOS[k]->SetName(name.c_str()+postfix);
-      h_AIOS[k]->Write();
-      
-      AISS0jet->cd();
-      h0_AISS[k]->SetName(name.c_str()+postfix);
-      h0_AISS[k]->Write();
-      AISSboosted->cd();
-      h1_AISS[k]->SetName(name.c_str()+postfix);
-      h1_AISS[k]->Write();
-      AISSvbf->cd();
-      h2_AISS[k]->SetName(name.c_str()+postfix);
-      h2_AISS[k]->Write();
-
-      AISSvh->cd();
-      h3_AISS[k]->SetName(name.c_str()+postfix);
-      h3_AISS[k]->Write();
-      AISS->cd();
-      h_AISS[k]->SetName(name.c_str()+postfix);
-      h_AISS[k]->Write();
-    }
-    */
     fout->Close();
     Py_Finalize();
 } 

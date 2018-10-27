@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
 
     TFile *f_Double = new TFile(input.c_str());
     std::cout<<"XXXXXXXXXXXXX "<<input.c_str()<<" XXXXXXXXXXXX"<<std::endl;
-    TTree* arbre = (TTree*) f_Double->Get("tt_tree");
+    TTree* arbre = (TTree*) f_Double->Get("tautau_tree");
     TH1F* nbevt = (TH1F*) f_Double->Get("nevents");
     float ngen = nbevt->GetBinContent(2);
     std::cout.precision(11);
@@ -37,13 +37,13 @@ int main(int argc, char** argv) {
     arbre->SetBranchAddress("t1_phi", &t1_phi);
     arbre->SetBranchAddress("t1_mass", &t1_mass);
     arbre->SetBranchAddress("t1_charge", &t1_charge);
-    arbre->SetBranchAddress("t1_decaymode", &t1_decaymode);
+    arbre->SetBranchAddress("t1_decayMode", &t1_decayMode);
     arbre->SetBranchAddress("t2_pt", &t2_pt);
     arbre->SetBranchAddress("t2_eta", &t2_eta);
     arbre->SetBranchAddress("t2_phi", &t2_phi);
     arbre->SetBranchAddress("t2_mass", &t2_mass);
     arbre->SetBranchAddress("t2_charge", &t2_charge);
-    arbre->SetBranchAddress("t2_decaymode", &t2_decaymode);
+    arbre->SetBranchAddress("t2_decayMode", &t2_decayMode);
 
     arbre->SetBranchAddress("j1_pt",&j1_pt);
     arbre->SetBranchAddress("j1_eta", &j1_eta);
@@ -58,7 +58,7 @@ int main(int argc, char** argv) {
     arbre->SetBranchAddress("b2_pt", &b2_pt);
     arbre->SetBranchAddress("b2_eta", &b2_eta);
     arbre->SetBranchAddress("b2_phi", &b2_phi);
-    arbre->SetBranchAddress("nbtag", &nbtag);
+    arbre->SetBranchAddress("nbjets", &nbjets);
 
     arbre->SetBranchAddress("met",&met);
     arbre->SetBranchAddress("metphi",&metphi);
