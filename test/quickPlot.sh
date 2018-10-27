@@ -16,7 +16,7 @@ for i in `ls $1/*.root`; do
     fileName="${input%.*}"
     fileName="${fileName##*/}"
     #echo $fileName                                                                                                                                 
-    ./$6_quickplot.exe $input plots/Quick/$fileName.root $fileName $2 $3 $4 $5
+    ./plotter_$6.exe $input plots/Quick/$fileName.root $fileName $2 $3 $4 $5
 done
 
 python python/QCDcreator_$6.py -i plots/Quick/ -q

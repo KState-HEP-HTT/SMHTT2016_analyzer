@@ -25,78 +25,136 @@ int main(int argc, char** argv) {
 
     TFile *f_Double = new TFile(input.c_str());
     std::cout<<"XXXXXXXXXXXXX "<<input.c_str()<<" XXXXXXXXXXXX"<<std::endl;
-    TTree* arbre = (TTree*) f_Double->Get("tautau_tree");
+    TTree* namu = (TTree*) f_Double->Get("tautau_tree");
     TH1F* nbevt = (TH1F*) f_Double->Get("nevents");
     float ngen = nbevt->GetBinContent(2);
     std::cout.precision(11);
 
-    arbre->SetBranchAddress("evtwt",&evtwt);
+    namu->SetBranchAddress("evtwt",               &evtwt                );
 
-    arbre->SetBranchAddress("t1_pt",&t1_pt);
-    arbre->SetBranchAddress("t1_eta", &t1_eta);
-    arbre->SetBranchAddress("t1_phi", &t1_phi);
-    arbre->SetBranchAddress("t1_mass", &t1_mass);
-    arbre->SetBranchAddress("t1_charge", &t1_charge);
-    arbre->SetBranchAddress("t1_decayMode", &t1_decayMode);
-    arbre->SetBranchAddress("t2_pt", &t2_pt);
-    arbre->SetBranchAddress("t2_eta", &t2_eta);
-    arbre->SetBranchAddress("t2_phi", &t2_phi);
-    arbre->SetBranchAddress("t2_mass", &t2_mass);
-    arbre->SetBranchAddress("t2_charge", &t2_charge);
-    arbre->SetBranchAddress("t2_decayMode", &t2_decayMode);
+    namu->SetBranchAddress("el_pt",               &el_pt                );     
+    namu->SetBranchAddress("el_eta",              &el_eta               );        
+    namu->SetBranchAddress("el_phi",              &el_phi               );        
+    namu->SetBranchAddress("el_mass",             &el_mass              );       
+    namu->SetBranchAddress("el_charge",           &el_charge            );     
+    namu->SetBranchAddress("el_iso",              &el_iso               );
+    namu->SetBranchAddress("mu_pt",               &mu_pt                );         
+    namu->SetBranchAddress("mu_eta",              &mu_eta               );  
+    namu->SetBranchAddress("mu_phi",              &mu_phi               );
+    namu->SetBranchAddress("mu_mass",             &mu_mass              ); 
+    namu->SetBranchAddress("mu_charge",           &mu_charge            );
+    namu->SetBranchAddress("t1_pt",               &t1_pt                ); 
+    namu->SetBranchAddress("t1_eta",              &t1_eta               );
+    namu->SetBranchAddress("t1_phi",              &t1_phi               );
+    namu->SetBranchAddress("t1_mass",             &t1_mass              );
+    namu->SetBranchAddress("t1_charge",           &t1_charge            );
+    namu->SetBranchAddress("t1_decayMode",        &t1_decayMode         );
+    namu->SetBranchAddress("t1_tightIso",         &t1_tightIso          ); 
+    namu->SetBranchAddress("t1_mediumIso",        &t1_mediumIso         );
+    namu->SetBranchAddress("t1_dmf",              &t1_dmf               );
+    namu->SetBranchAddress("t1_dmf_new",          &t1_dmf_new           );
+    namu->SetBranchAddress("t1_iso_VL",           &t1_iso_VL            );
+    namu->SetBranchAddress("t1_iso_L",            &t1_iso_L             );  
+    namu->SetBranchAddress("t1_iso_M",            &t1_iso_M             );
+    namu->SetBranchAddress("t1_iso_T",            &t1_iso_T             ); 
+    namu->SetBranchAddress("t1_iso_VT",           &t1_iso_VT            );
+    namu->SetBranchAddress("t1_iso",              &t1_iso               );
+    namu->SetBranchAddress("t1_newiso_VL",        &t1_newiso_VL         );
+    namu->SetBranchAddress("t1_newiso_L",         &t1_newiso_L          );
+    namu->SetBranchAddress("t1_newiso_M",         &t1_newiso_M          );
+    namu->SetBranchAddress("t1_newiso_T",         &t1_newiso_T          );
+    namu->SetBranchAddress("t1_newiso_VT",        &t1_newiso_VT         );
+    namu->SetBranchAddress("t1_newiso",           &t1_newiso            );
 
-    arbre->SetBranchAddress("j1_pt",&j1_pt);
-    arbre->SetBranchAddress("j1_eta", &j1_eta);
-    arbre->SetBranchAddress("j1_phi", &j1_phi);
-    arbre->SetBranchAddress("j2_pt", &j2_pt);
-    arbre->SetBranchAddress("j2_eta", &j2_eta);
-    arbre->SetBranchAddress("j2_phi", &j2_phi);
+    namu->SetBranchAddress("t2_dmf",              &t2_dmf               );
+    namu->SetBranchAddress("t2_dmf_new",          &t2_dmf_new           );
+    namu->SetBranchAddress("t2_pt",               &t2_pt                );
+    namu->SetBranchAddress("t2_eta",              &t2_eta               );
+    namu->SetBranchAddress("t2_phi",              &t2_phi               );
+    namu->SetBranchAddress("t2_mass",             &t2_mass              );
+    namu->SetBranchAddress("t2_charge",           &t2_charge            );
+    namu->SetBranchAddress("t2_decayMode",        &t2_decayMode         );
+    namu->SetBranchAddress("t2_iso_VL",           &t2_iso_VL            );
+    namu->SetBranchAddress("t2_iso_L",            &t2_iso_L             );
+    namu->SetBranchAddress("t2_iso_M",            &t2_iso_M             );
+    namu->SetBranchAddress("t2_iso_T",            &t2_iso_T             );
+    namu->SetBranchAddress("t2_iso_VT",           &t2_iso_VT            );
+    namu->SetBranchAddress("t2_iso",              &t2_iso               );
+    namu->SetBranchAddress("t2_newiso_VL",        &t2_newiso_VL         );
+    namu->SetBranchAddress("t2_newiso_L",         &t2_newiso_L          );
+    namu->SetBranchAddress("t2_newiso_M",         &t2_newiso_M          );
+    namu->SetBranchAddress("t2_newiso_T",         &t2_newiso_T          );
+    namu->SetBranchAddress("t2_newiso_VT",        &t2_newiso_VT         );
+    namu->SetBranchAddress("t2_newiso",           &t2_newiso            );
 
-    arbre->SetBranchAddress("b1_pt",&b1_pt);
-    arbre->SetBranchAddress("b1_eta", &b1_eta);
-    arbre->SetBranchAddress("b1_phi", &b1_phi);
-    arbre->SetBranchAddress("b2_pt", &b2_pt);
-    arbre->SetBranchAddress("b2_eta", &b2_eta);
-    arbre->SetBranchAddress("b2_phi", &b2_phi);
-    arbre->SetBranchAddress("nbjets", &nbjets);
+    namu->SetBranchAddress("njets",               &njets                );
+    namu->SetBranchAddress("nbjets",              &nbjets               );
+    namu->SetBranchAddress("j1_pt",               &j1_pt                );
+    namu->SetBranchAddress("j1_eta",              &j1_eta               );
+    namu->SetBranchAddress("j1_phi",              &j1_phi               );
+    namu->SetBranchAddress("j2_pt",               &j2_pt                );
+    namu->SetBranchAddress("j2_eta",              &j2_eta               );
+    namu->SetBranchAddress("j2_phi",              &j2_phi               );
+    namu->SetBranchAddress("b1_pt",               &b1_pt                );
+    namu->SetBranchAddress("b1_eta",              &b1_eta               );
+    namu->SetBranchAddress("b1_phi",              &b1_phi               );
+    namu->SetBranchAddress("b2_pt",               &b2_pt                );         
+    namu->SetBranchAddress("b2_eta",              &b2_eta               );
+    namu->SetBranchAddress("b2_phi",              &b2_phi               );
 
-    arbre->SetBranchAddress("met",&met);
-    arbre->SetBranchAddress("metphi",&metphi);
-    arbre->SetBranchAddress("mjj",&mjj);
-    
-    arbre->SetBranchAddress("njets", &njets);
-    arbre->SetBranchAddress("numGenJets",&numGenJets);
+    namu->SetBranchAddress("met",                 &met                  );
+    namu->SetBranchAddress("metphi",              &metphi               );
+    namu->SetBranchAddress("mjj",                 &mjj                  );
+    namu->SetBranchAddress("mt",                  &mt                   );
 
-    arbre->SetBranchAddress("pt_sv", &pt_sv);
-    arbre->SetBranchAddress("m_sv",&m_sv);
-    arbre->SetBranchAddress("Dbkg_VBF",&Dbkg_VBF);
-    arbre->SetBranchAddress("Dbkg_ggH",&Dbkg_ggH);
-    
-    arbre->SetBranchAddress("Phi"         , &Phi);
-    arbre->SetBranchAddress("Phi1"        , &Phi1);
-    arbre->SetBranchAddress("costheta1"   , &costheta1);
-    arbre->SetBranchAddress("costheta2"   , &costheta2);
-    arbre->SetBranchAddress("costhetastar", &costhetastar);
-    arbre->SetBranchAddress("Q2V1"        , &Q2V1);
-    arbre->SetBranchAddress("Q2V2"        , &Q2V2);
+    namu->SetBranchAddress("numGenJets",          &numGenJets           );
 
-    arbre->SetBranchAddress("ME_sm_VBF"   , &ME_sm_VBF);
-    arbre->SetBranchAddress("ME_sm_ggH"   , &ME_sm_ggH);
-    arbre->SetBranchAddress("ME_bkg"   , &ME_bkg);
+    namu->SetBranchAddress("pt_sv",               &pt_sv                );
+    namu->SetBranchAddress("m_sv",                &m_sv                 );
+    namu->SetBranchAddress("Dbkg_VBF",            &Dbkg_VBF             );
+    namu->SetBranchAddress("Dbkg_ggH",            &Dbkg_ggH             );
 
-    arbre->SetBranchAddress("higgs_pT",      &higgs_pT);
-    arbre->SetBranchAddress("higgs_m",       &higgs_m);
-    arbre->SetBranchAddress("hjj_pT",        &hjj_pT);
-    arbre->SetBranchAddress("hjj_m",         &hjj_m);
-    arbre->SetBranchAddress("dEtajj",        &dEtajj);
-    arbre->SetBranchAddress("dPhijj",        &dPhijj);
-    arbre->SetBranchAddress("cat_0jet",      &cat_0jet);
-    arbre->SetBranchAddress("cat_boosted",   &cat_boosted);
-    arbre->SetBranchAddress("cat_vbf",       &cat_vbf);
-    arbre->SetBranchAddress("cat_inclusive", &cat_inclusive);
+    namu->SetBranchAddress("Phi"         ,        &Phi                  );
+    namu->SetBranchAddress("Phi1"        ,        &Phi1                 );
+    namu->SetBranchAddress("costheta1"   ,        &costheta1            );
+    namu->SetBranchAddress("costheta2"   ,        &costheta2            );
+    namu->SetBranchAddress("costhetastar",        &costhetastar         );
+    namu->SetBranchAddress("Q2V1"        ,        &Q2V1                 );
+    namu->SetBranchAddress("Q2V2"        ,        &Q2V2                 );
+    namu->SetBranchAddress("ME_sm_VBF"   ,        &ME_sm_VBF            );
+    namu->SetBranchAddress("ME_sm_ggH"   ,        &ME_sm_ggH            );
+    namu->SetBranchAddress("ME_sm_WH"    ,        &ME_sm_WH             );
+    namu->SetBranchAddress("ME_sm_ZH"    ,        &ME_sm_ZH             );
+    namu->SetBranchAddress("ME_bkg"      ,        &ME_bkg               );
+    namu->SetBranchAddress("ME_bkg1"     ,        &ME_bkg1              );  
+    namu->SetBranchAddress("ME_bkg2"     ,        &ME_bkg2              ); 
 
-    arbre->SetBranchAddress("is_signal", &is_signal);
-    arbre->SetBranchAddress("NN_disc", &NN_disc);
+
+    namu->SetBranchAddress("higgs_pT",            &higgs_pT             );
+    namu->SetBranchAddress("higgs_m",             &higgs_m              );       
+    namu->SetBranchAddress("hjj_pT",              &hjj_pT               );
+    namu->SetBranchAddress("hjj_m",               &hjj_m                );
+    namu->SetBranchAddress("vis_mass",            &vis_mass             );
+    namu->SetBranchAddress("dEtajj",              &dEtajj               );
+    namu->SetBranchAddress("dPhijj",              &dPhijj               );
+    namu->SetBranchAddress("cat_0jet",            &cat_0jet             );
+    namu->SetBranchAddress("cat_boosted",         &cat_boosted          );
+    namu->SetBranchAddress("cat_vbf",             &cat_vbf              );
+    namu->SetBranchAddress("cat_inclusive",       &cat_inclusive        ); 
+    namu->SetBranchAddress("cat_antiiso",         &cat_antiiso          );
+    namu->SetBranchAddress("cat_antiiso_0jet",    &cat_antiiso_0jet     );
+    namu->SetBranchAddress("cat_antiiso_boosted", &cat_antiiso_boosted  );
+    namu->SetBranchAddress("cat_antiiso_vbf",     &cat_antiiso_vbf      );
+    namu->SetBranchAddress("cat_qcd",             &cat_qcd              );            
+    namu->SetBranchAddress("cat_qcd_0jet",        &cat_qcd_0jet         );       
+    namu->SetBranchAddress("cat_qcd_boosted",     &cat_qcd_boosted      );    
+    namu->SetBranchAddress("cat_qcd_vbf",         &cat_qcd_vbf          );        
+
+    namu->SetBranchAddress("is_signal",           &is_signal            );          
+    namu->SetBranchAddress("is_ai",               &is_ai                );              
+
+    namu->SetBranchAddress("NN_disc",             &NN_disc              );
+
     //Binning for 0jet cat. 1D: Msv. In AN it was 10GeV binning / official data card combined 0~50 as one bin
     float bins0[] = {0,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,260,270,280,290,300};
     //Binning for 1jet cat, x-axis: HpT
@@ -104,7 +162,7 @@ int main(int argc, char** argv) {
     //Binning for 1jet cat, y-axis: Msv
     float bins1Y[] = {0,40,60,70,80,90,100,110,120,130,150,200,250};
     //Binning for 2jet cat, x-axis: Mjj
-    float bins2X[] = {0, 0.1, 0.5, 0.9, 1.0};//{0,300,500,800,10000};
+    float bins2X[] = {0,300,500,800,10000};//{0, 0.1, 0.5, 0.9, 1.0};//
     //Binning for 2jet cat, y-axis: Msv
     float bins2Y[] = {0,40,60,70,80,90,100,110,120,130,150,200,250};
 
@@ -162,9 +220,9 @@ int main(int argc, char** argv) {
     }
     
     // Loop over all events
-    Int_t nentries_wtn = (Int_t) arbre->GetEntries();
+    Int_t nentries_wtn = (Int_t) namu->GetEntries();
     for (Int_t i = 0; i < nentries_wtn; i++) {
-      arbre->GetEntry(i);
+      namu->GetEntry(i);
       if (i % 1000 == 0) fprintf(stdout, "\r  Processed events: %8d of %8d ", i, nentries_wtn);
       fflush(stdout);
       // book the NN                                                                                                        
@@ -193,7 +251,7 @@ int main(int argc, char** argv) {
       float var_0jet = m_sv;
       float var_boostedX = higgs_pT;
       float var_boostedY = m_sv;
-      float var_vbfX = normMELAvbf;
+      float var_vbfX =  mjj;
       float var_vbfY = m_sv;
 
       for (int k=0; k<nbhist; ++k){
@@ -206,13 +264,13 @@ int main(int argc, char** argv) {
 	if (is_boosted && is_signal && t1_charge*t2_charge>0)	    h1_SS[k]->Fill(var_boostedX,var_boostedY,evtwt);
 	if (is_VBF && is_signal && t1_charge*t2_charge>0) 	    h2_SS[k]->Fill(var_vbfX,var_vbfY,evtwt);
 	// ################### ai-Region && OS ####################
-	if (is_0jet && t1_charge*t2_charge<0 && !is_signal)         	    h0_AIOS[k]->Fill(var_0jet,evtwt);
+	if (is_0jet && t1_charge*t2_charge<0 && !is_signal)         h0_AIOS[k]->Fill(var_0jet,evtwt);
 	if (is_boosted && t1_charge*t2_charge<0 && !is_signal)	    h1_AIOS[k]->Fill(var_boostedX,var_boostedY,evtwt);
-	if (is_VBF && t1_charge*t2_charge<0 && !is_signal)         	    h2_AIOS[k]->Fill(var_vbfX,var_vbfY,evtwt);
+	if (is_VBF && t1_charge*t2_charge<0 && !is_signal)          h2_AIOS[k]->Fill(var_vbfX,var_vbfY,evtwt);
 	// ################### ai-Region && SS ####################
-	if (is_0jet && t1_charge*t2_charge>0 && !is_signal)              h0_AISS[k]->Fill(var_0jet,evtwt);
+	if (is_0jet && t1_charge*t2_charge>0 && !is_signal)         h0_AISS[k]->Fill(var_0jet,evtwt);
 	if (is_boosted && t1_charge*t2_charge>0 && !is_signal)	    h1_AISS[k]->Fill(var_boostedX,var_boostedY,evtwt);
-	if (is_VBF && t1_charge*t2_charge>0 && !is_signal)         	    h2_AISS[k]->Fill(var_vbfX,var_vbfY,evtwt);
+	if (is_VBF && t1_charge*t2_charge>0 && !is_signal)          h2_AISS[k]->Fill(var_vbfX,var_vbfY,evtwt);
       }
     } // end of loop over events
     
