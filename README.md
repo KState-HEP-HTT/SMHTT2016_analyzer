@@ -58,7 +58,7 @@ To run the code and make the distribution plots,
 ```
 cd ../test
 source quickPlot.sh <input folder> <numbin> <min> <max> <obs> <ch> 
-source quickPlot.sh FREEZE_TREES/tt_sync_NN 20 0 1 MELA tt
+source quickPlot.sh FREEZE_TREES/tt_qcdCRstudy 20 0 1 MELA tt
 ```
 
 This will give you the plots with embedded sample + two lines that enable you to make the same plots usint MC ZTT.
@@ -66,11 +66,8 @@ This will give you the plots with embedded sample + two lines that enable you to
 
 One need to recompile the code to change VBF category definition.
 
-https://github.com/KState-HEP-HTT/SMHTT_skimmersANDanalyzers/blob/b140f715b4dbf47959b2f15eabdaf23c0efda54d/2016SMHTT/tt/analysis/src/mt_quickplot.cc#L134
+https://github.com/KState-HEP-HTT/SMHTT2016_analyzer/blob/master/src/plotter_tt.cc#L177-L179
 
-Abailable branches are here and one can added whatever.
-
-https://github.com/KState-HEP-HTT/SMHTT_skimmersANDanalyzers/blob/master/2016SMHTT/tt/analysis/test/python/stackPlotter_dev.py#L37-L60
 
 
 
