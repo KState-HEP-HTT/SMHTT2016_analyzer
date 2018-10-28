@@ -1,24 +1,63 @@
 # 2016 Higgs to Tau-Tau Analysis Code
 
-## Instruction of quick plotter :
-One can run this analyzer from local machine as well as Wisconsin machine. 
-
 Checkout the repository.
 ```
-git clone git@github.com:KState-HEP-HTT/SMHTT_skimmersANDanalyzers.git
+git clone git@github.com:KState-HEP-HTT/SMHTT2016_analyzer.git
 ```
+
+## Instruction of tree slicer :
 
 To compile,
 ```
-cd SMHTT_skimmersANDanalyzers/2016SMHTT/tt/analysis/src
-./Make.sh tt_quickplot.cc 
-./Make.sh mt_quickplot.cc 
+cd SMHTT_analyzer/src
+./Make.sh slicer_tt.cc 
+./Make.sh slicer_mt.cc 
 ```
 
-To run the analyzer and make the distribution plots,
+To run the code and make the distribution plots,
 
 ```
 cd ../test
+source runSlicer_nominal_<ch>.sh <inputfolder>
+source runSlicer_nominal_tt.sh myntuples/Sep03_fixQ
+```
+
+
+
+## Instruction of datacard maker :
+
+To compile,
+```
+cd SMHTT_analyzer/src
+./Make.sh datacardMaker_tt.cc 
+./Make.sh datacardMaker_mt.cc 
+```
+
+To run the code and make the distribution plots,
+
+```
+cd ../test
+source runDatacardMaker_<ch>.sh <inputfolder> <mc(or empty for embedded)>
+source runDatacardMaker_tt.sh output_Slicer/tt mc
+
+```
+
+
+## Instruction of quick plotter :
+One can run this analyzer from local machine as well as Wisconsin machine. 
+
+To compile,
+```
+cd SMHTT_analyzer/src
+./Make.sh plotter_tt.cc 
+./Make.sh plotter_mt.cc 
+```
+
+To run the code and make the distribution plots,
+
+```
+cd ../test
+source quickPlot.sh <input folder> <numbin> <min> <max> <obs> <ch> 
 source quickPlot.sh FREEZE_TREES/tt_sync_NN 20 0 1 MELA tt
 ```
 
@@ -32,4 +71,6 @@ https://github.com/KState-HEP-HTT/SMHTT_skimmersANDanalyzers/blob/b140f715b4dbf4
 Abailable branches are here and one can added whatever.
 
 https://github.com/KState-HEP-HTT/SMHTT_skimmersANDanalyzers/blob/master/2016SMHTT/tt/analysis/test/python/stackPlotter_dev.py#L37-L60
+
+
 
