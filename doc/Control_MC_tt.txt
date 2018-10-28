@@ -1,0 +1,189 @@
+channel is
+tt
+this is tt channel
+#################################################   tt_0jet   #################################################
+
+data_obs
+official datacard yield is  19632.0
+KSU datacard yield is  19840.0 
+
+ZTT
+official datacard yield is  2645.09663708
+KSU datacard yield is  2876.22177982 
+
+ZJ
+official datacard yield is  120.957682696
+KSU datacard yield is  122.244873524 
+
+ZL
+official datacard yield is  167.204015484
+KSU datacard yield is  224.482242644 
+
+TTT
+official datacard yield is  8.9935701776
+KSU datacard yield is  5.14068309218 
+
+TTJ
+official datacard yield is  4.16427037941
+KSU datacard yield is  5.14068309218 
+
+VVT
+official datacard yield is  33.2404978192
+KSU datacard yield is  32.2786601409 
+
+VVJ
+official datacard yield is  13.9206355213
+KSU datacard yield is  16.1756472662 
+
+W
+official datacard yield is  1143.91993021
+KSU datacard yield is  1182.68367767 
+
+EWKZ
+official datacard yield is  1.72607300966
+KSU datacard yield is  2.17976868153 
+
+VBF125
+official datacard yield is  1.34762780474
+KSU datacard yield is  1.29901074059 
+
+ggH125
+official datacard yield is  108.025624185
+KSU datacard yield is  111.733458847 
+
+WH125
+official datacard yield is  0.85336841774
+KSU datacard yield is  0.856883295812 
+
+ZH125
+official datacard yield is  0.928328615102
+KSU datacard yield is  0.921412637457 
+
+QCD
+official datacard yield is  16008.3704825
+KSU datacard yield is  16290.367691 
+
+#################################################   tt_boosted   #################################################
+
+data_obs
+official datacard yield is  13732.0
+KSU datacard yield is  13863.0 
+
+ZTT
+official datacard yield is  5233.15597979
+KSU datacard yield is  5174.32332027 
+
+ZJ
+official datacard yield is  120.118177028
+KSU datacard yield is  122.264143288 
+
+ZL
+official datacard yield is  154.653811344
+KSU datacard yield is  199.430805713 
+
+TTT
+official datacard yield is  280.398048187
+KSU datacard yield is  284.247060463 
+
+TTJ
+official datacard yield is  248.802320131
+KSU datacard yield is  284.247060463 
+
+VVT
+official datacard yield is  144.585026624
+KSU datacard yield is  146.446799572 
+
+VVJ
+official datacard yield is  56.5063139317
+KSU datacard yield is  59.4626673278 
+
+W
+official datacard yield is  433.368095094
+KSU datacard yield is  447.9615646 
+
+EWKZ
+official datacard yield is  70.5011013891
+KSU datacard yield is  78.073394848 
+
+VBF125
+official datacard yield is  23.7008169605
+KSU datacard yield is  22.8311082525 
+
+ggH125
+official datacard yield is  136.132478196
+KSU datacard yield is  136.551022306 
+
+WH125
+official datacard yield is  8.40292326164
+KSU datacard yield is  8.32061360148 
+
+ZH125
+official datacard yield is  5.87023781151
+KSU datacard yield is  5.81706253288 
+
+QCD
+official datacard yield is  7311.65709023
+KSU datacard yield is  7361.96551678 
+
+#################################################   tt_vbf   #################################################
+
+data_obs
+official datacard yield is  645.0
+KSU datacard yield is  639.0 
+
+ZTT
+official datacard yield is  409.579816044
+KSU datacard yield is  419.050729737 
+
+ZJ
+official datacard yield is  3.24021416762
+KSU datacard yield is  3.36578470469 
+
+ZL
+official datacard yield is  6.4212508061
+KSU datacard yield is  9.52289128304 
+
+TTT
+official datacard yield is  16.4311315353
+KSU datacard yield is  18.0359808803 
+
+TTJ
+official datacard yield is  16.2891479446
+KSU datacard yield is  18.0359808803 
+
+VVT
+official datacard yield is  11.741345202
+KSU datacard yield is  11.6548143551 
+
+VVJ
+official datacard yield is  2.73011079759
+KSU datacard yield is  1.86929850187 
+
+W
+official datacard yield is  9.6105602733
+KSU datacard yield is  10.2630861364 
+
+EWKZ
+official datacard yield is  35.1393585474
+KSU datacard yield is  39.1034104079 
+
+VBF125
+official datacard yield is  18.8036175162
+KSU datacard yield is  18.0977813005 
+
+ggH125
+official datacard yield is  12.1612988849
+KSU datacard yield is  13.9131038487 
+
+WH125
+official datacard yield is  0.335927523645
+KSU datacard yield is  0.331047549611 
+
+ZH125
+official datacard yield is  0.212066250049
+KSU datacard yield is  0.20823266753 
+
+QCD
+official datacard yield is  141.683305687
+KSU datacard yield is  141.554588571 
+

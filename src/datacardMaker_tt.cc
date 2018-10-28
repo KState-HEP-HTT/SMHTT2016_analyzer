@@ -237,16 +237,16 @@ int main(int argc, char** argv) {
       ////////////////////////////
       // 2016 analysis category //
       ////////////////////////////
-      //if (njets==0) is_0jet=true;
-      //if (njets==1 || (njets>=2 && (!(higgs_pT>100 && dEtajj>2.5)))) is_boosted=true;
-      //if (njets>=2 && higgs_pT>100 && dEtajj>2.5) is_VBF=true;
+      if (njets==0) is_0jet=true;
+      if (njets==1 || (njets>=2 && (!(higgs_pT>100 && dEtajj>2.5)))) is_boosted=true;
+      if (njets>=2 && higgs_pT>100 && dEtajj>2.5) is_VBF=true;
 
       ////////////////////////     
       // KSU study category //     
       ////////////////////////     
-      if (njets==0) is_0jet=true;
-      else if (njets>=2 && mjj>300) is_VBF=true; 
-      else is_boosted=true;   
+      //if (njets==0) is_0jet=true;
+      //else if (njets>=2 && mjj>300) is_VBF=true; 
+      //else is_boosted=true;   
 
       float var_0jet = m_sv;
       float var_boostedX = higgs_pT;

@@ -1541,6 +1541,7 @@ public :
    virtual void     Init(TTree *tree);
    virtual Long64_t GetEntries();
    TTree* GetTree();
+   TBranch* GetBranch(const char*);
 };
 
 SkimmedTree_tt::SkimmedTree_tt(TTree *tree)
@@ -1563,6 +1564,11 @@ Long64_t SkimmedTree_tt::GetEntries()
 TTree* SkimmedTree_tt::GetTree()
 {
   return fChain;
+}
+
+TBranch* SkimmedTree_tt::GetBranch(const char* name)
+{
+  return fChain->GetBranch(name);
 }
 
 void SkimmedTree_tt::Init(TTree *tree)

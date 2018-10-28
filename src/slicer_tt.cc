@@ -184,19 +184,20 @@ int main(int argc, char** argv) {
     namu->Branch("is_signal",           &is_signal,           "is_signal/I"          );
     namu->Branch("is_ai",               &is_ai,               "is_ai/I"              );
 
-    ////////////////////////////////////
-    //                                //
-    //  Weights and Scale Factors     //
-    //  1. PU reweighting : # of PV   //
-    //  2. Tau ID eff SF : below
-    //  3. Anti-lepton discriminator tau ID SF : below with 2.
-    //  4. Trigger efficiencies ??
-    //  5. Reweighting of LO Madgraph DY samples
-    //  6. Top pT reweighting
-    //  7. Recoil correction
-    //  8. Generator event weights
-    //
-    /////////////////////////////////
+    //////////////////////////////////////////////////////////////////
+    //                                                              //          
+    //  Weights and Scale Factors                                   //
+    //  1. PU reweighting : # of PV                                 //
+    //  2. Tau ID eff SF : below                                    //
+    //  3. Anti-lepton discriminator tau ID SF : below with 2.      //
+    //  4. Trigger efficiencies ??                                  //
+    //  5. Reweighting of LO Madgraph DY samples                    //
+    //  6. Top pT reweighting                                       //
+    //  7. Recoil correction                                        //
+    //  8. Generator event weights                                  //
+    //                                                              //
+    /////////////////////////////////////////////////////////////////
+
     reweight::LumiReWeighting* LumiWeights_12;
     LumiWeights_12 = new reweight::LumiReWeighting("../weightROOTs/MC_Moriond17_PU25ns_V1.root", "../weightROOTs/Data_Pileup_2016_271036-284044_80bins.root", "pileup", "pileup");
     
