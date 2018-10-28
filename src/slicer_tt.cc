@@ -372,13 +372,18 @@ int main(int argc, char** argv) {
       treePtr->GetEntry(i);
       if (i % 1000 == 0) fprintf(stdout, "\r  Processed events: %8d of %8d ", i, nentries_wtn);
       fflush(stdout);
+      bool isoAll =
+	tree->byVLooseIsolationMVArun2v1DBoldDMwLT_1 > 0.5 &&
+	tree->byVLooseIsolationMVArun2v1DBoldDMwLT_1 > 0.5;
+      if (!isoAll ) continue; // Added for yield cross check
+      
       // DoubleTau trigger
-      if (sample=="data_obs" && input=="myntuples/data_H.root") {
+      if (sample=="data_obs" && input=="myntuples/Oct26_tt/data_H.root") {
 	if(!tree->passDoubleTauCmbIso35) continue;
 	if(!tree->matchDoubleTauCmbIso35_1  || !tree->matchDoubleTauCmbIso35_2) continue;
 	if(!tree->filterDoubleTauCmbIso35_1 || !tree->filterDoubleTauCmbIso35_2) continue;
       }
-      if (sample=="data_obs" && input=="myntuples/data_H.root") {
+      if (sample=="data_obs" && input=="myntuples/Oct25_tt/data_H.root") {
 	if (!tree->passDoubleTau35) continue;
 	if (!tree->matchDoubleTau35_1  || !tree->matchDoubleTau35_2) continue;
 	if (!tree->filterDoubleTau35_1 || !tree->filterDoubleTau35_2) continue;
@@ -503,7 +508,7 @@ int main(int argc, char** argv) {
       // ID and iso corrections
       float correction=sf_id;
       if (sample!="data_obs") correction=correction*LumiWeights_12->weight(tree->npu);
-      float aweight=tree->amcatNLO_weight*weight*correction;
+      float aweight=tree->genweight*weight*correction;
       if (sample!="data_obs"){
 	//Tau ID SF (Tight WP)
 	if (tree->gen_match_1==5) aweight=aweight*0.95;
@@ -692,7 +697,7 @@ int main(int argc, char** argv) {
 	// Embedded weights //
 	//////////////////////
 	if (sample=="embedded") {
-	  if( tree->amcatNLO_weight > 1) continue;
+	  if( tree->genweight > 1) continue;
 	  aweight=1.0; weight2=1.0;
 	  //float Stitching_Weight= 1.0/0.899;
           float Stitching_Weight= 1.0;
@@ -706,7 +711,7 @@ int main(int argc, char** argv) {
 	  if((tree->run >= 280919) && (tree->run < 284045))  Stitching_Weight=(1.0/0.949* 1.02* 1.02);
           double EmbedWeight=  sf_trg1*sf_trg2 ;
           float WEIGHT_sel_trg_ratio= m_sel_trg_ratio(wEmbed,mytau1.Pt(),mytau1.Eta(),mytau2.Pt(),mytau2.Eta());
-	  aweight=EmbedWeight * tree->amcatNLO_weight * Stitching_Weight * WEIGHT_sel_trg_ratio;
+	  aweight=EmbedWeight * tree->genweight * Stitching_Weight * WEIGHT_sel_trg_ratio;
 	  //std::cout << "embedded weight : " << aweight << std::endl;
 	}
 	//std::cout << aweight << "\t" << weight2 << "\t" << weight2*aweight << std::endl;
@@ -804,7 +809,7 @@ int main(int argc, char** argv) {
 	  if (tree->gen_match_1==6 && tree->gen_match_2==5) h_trgSF_FR[k]->Fill(sf_trg_FR);
 	  if (tree->gen_match_1==5 && tree->gen_match_2==6) h_trgSF_RF[k]->Fill(sf_trg_RF);
 	  if (tree->gen_match_1==6 && tree->gen_match_2==6) h_trgSF_FF[k]->Fill(sf_trg_FF);
-	  
+
 	  // Anything related to systematics should be included i.e. picked by scenario
 	  fillTree(namu, tree, i,
 		   Higgs, mytau1, mytau2, myjet1, myjet2,
