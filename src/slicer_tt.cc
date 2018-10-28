@@ -374,8 +374,8 @@ int main(int argc, char** argv) {
       if (i % 1000 == 0) fprintf(stdout, "\r  Processed events: %8d of %8d ", i, nentries_wtn);
       fflush(stdout);
       bool isoAll =
-	tree->byVLooseIsolationMVArun2v1DBoldDMwLT_1 > 0.5 &&
-	tree->byVLooseIsolationMVArun2v1DBoldDMwLT_1 > 0.5;
+	tree->byVLooseIsolationMVArun2v1DBnewDMwLT_1 > 0.5 &&
+	tree->byVLooseIsolationMVArun2v1DBnewDMwLT_1 > 0.5;
       if (!isoAll ) continue; // Added for yield cross check
       
       // DoubleTau trigger
@@ -436,7 +436,7 @@ int main(int argc, char** argv) {
       if (tree->againstMuonLoose3_1 < 0.5) continue; //774
       if (tree->againstMuonLoose3_2 < 0.5) continue;
       // Change && -> ||
-      if (tree->byLooseIsolationMVArun2v1DBoldDMwLT_1 < 0.5 || tree->byLooseIsolationMVArun2v1DBoldDMwLT_2 < 0.5) continue; // Fig 43(a)
+      if (tree->byLooseIsolationMVArun2v1DBnewDMwLT_1 < 0.5 || tree->byLooseIsolationMVArun2v1DBnewDMwLT_2 < 0.5) continue; // Fig 43(a)
       if (tree->extramuon_veto) continue;
       if (tree->extraelec_veto) continue;
       //float sf_trg=1.0;
@@ -480,8 +480,8 @@ int main(int argc, char** argv) {
       }
           
       // Regions
-      float signalRegion = tree->byTightIsolationMVArun2v1DBoldDMwLT_1 && tree->byTightIsolationMVArun2v1DBoldDMwLT_2;
-      float aiRegion = ((tree->byMediumIsolationMVArun2v1DBoldDMwLT_1 && !tree->byTightIsolationMVArun2v1DBoldDMwLT_2 && tree->byLooseIsolationMVArun2v1DBoldDMwLT_2) || (tree->byMediumIsolationMVArun2v1DBoldDMwLT_2 && !tree->byTightIsolationMVArun2v1DBoldDMwLT_1 && tree->byLooseIsolationMVArun2v1DBoldDMwLT_1));
+      float signalRegion = tree->byTightIsolationMVArun2v1DBnewDMwLT_1 && tree->byTightIsolationMVArun2v1DBnewDMwLT_2;
+      float aiRegion = ((tree->byMediumIsolationMVArun2v1DBnewDMwLT_1 && !tree->byTightIsolationMVArun2v1DBnewDMwLT_2 && tree->byLooseIsolationMVArun2v1DBnewDMwLT_2) || (tree->byMediumIsolationMVArun2v1DBnewDMwLT_2 && !tree->byTightIsolationMVArun2v1DBnewDMwLT_1 && tree->byLooseIsolationMVArun2v1DBnewDMwLT_1));
       
       // Weights depending in the generated jet multiplicity
       if (sample=="W"){
