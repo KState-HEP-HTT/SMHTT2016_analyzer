@@ -65,7 +65,7 @@ int main(int argc, char** argv) {
     float ngen = nbevt->GetBinContent(2);
     SkimmedTree_mt* tree = new SkimmedTree_mt (treePtr);
     std::cout.precision(11);
-
+    TFile *fout = TFile::Open(output.c_str(), "RECREATE");
     TTree* namu = new TTree("mutau_tree", "mutau_tree");
     namu->SetDirectory(0);
 
@@ -243,12 +243,13 @@ int main(int argc, char** argv) {
     TGraph * g_NNLOPS_3jet = (TGraph*) f_NNLOPS-> Get("gr_NNLOPSratio_pt_powheg_3jet");
 
     Int_t nentries_wtn = (Int_t) treePtr->GetEntries();
-
-    for (Int_t i = 0; i < nentries_wtn; i++) {
+    int lastindex = 0;
+    for (Int_t i = 0; i < nentries_wtn; i++) {      
       treePtr->GetEntry(i);
-      if (TMath::IsNaN(tree->Q2V2)) {
+      if (TMath::IsNaN(tree->Q2V2) ) {
 	std::cout << "WHOLE" << std::endl;
 	std::cout << "run :" << tree->run << std::endl;
+	continue;
       }
       if (i % 10000 == 0) fprintf(stdout, "\r  Processed events: %8d of %8d ", i, nentries_wtn);
       fflush(stdout);
@@ -258,14 +259,13 @@ int main(int argc, char** argv) {
 
       if (sample=="data_obs" && tree->run<278820 && !tree->id_m_medium2016_1) continue;
       if (sample=="data_obs" && tree->run>=278820 && !tree->id_m_medium_1) continue;
-
       //if (sample=="embedded" && tZTTGenDR>0.2) continue;
 
       if (tree->pt_1<20) continue;
       if (fabs(tree->eta_1)>2.1) continue;
       if (sample!="embedded" && !isSingleLep && !isCrossTrigger) continue;
       if (sample!="embedded" && (!((isSingleLep && tree->pt_1>23) or (isCrossTrigger && tree->pt_1<=23)))) continue;
-      
+
       if (!tree->againstElectronVLooseMVA6_2 or !tree->againstMuonTight3_2) continue;
 
       if (tree->extraelec_veto!=0) continue;
@@ -321,9 +321,9 @@ int main(int argc, char** argv) {
       
       float correction=sf_id;
         if (sample!="embedded" && sample!="data_obs") correction=correction*LumiWeights_12->weight(tree->npu);
-        if (sample=="embedded" && tree->amcatNLO_weight>1) continue;//genweight=0.10;
+        if (sample=="embedded" && tree->genweight>1) continue;//genweight=0.10;
 	float aweight = 1.0;
-	if (name.find("ggH")) aweight = tree->amcatNLO_weight*weight*correction;
+	if (name.find("ggH")) aweight = tree->genweight*weight*correction;
 	else aweight=tree->genweight*weight*correction;
 	
         if (sample!="data_obs"){
@@ -411,17 +411,51 @@ int main(int argc, char** argv) {
         }
 	bool is_bveto=(sample!="data_obs" or tree->nbtag==0);
 	
-
         TLorentzVector myrawmet;
         myrawmet.SetPtEtaPhiM(tree->met,0,tree->metphi,0);
 	TLorentzVector myrawtau=mytau;
+	float ratioantiraw=ratioanti;
+	float weight2=1.0;
 	TLorentzVector mymet=myrawmet;
-
+	mytau=myrawtau;
+	var1_1=tree->pt_sv;
+	var2=tree->m_sv;
+	float var1_2=tree->mjj;
+	float dm_weight=1.0;
+	if (tree->njets==0) var2=(mymu+mytau).M();
+	if (mytau.Pt()<30) continue;
+	  //var1_0=mytau.Pt();
+	var1_0=tree->l2_decayMode;//FIXME
+	var1_1=(mymu+mytau+mymet).Pt();//FIXME
+	
+	float mt=TMass_F(mymu.Pt(),mymet.Pt(),mymu.Px(),mymet.Px(),mymu.Py(),mymet.Py());
+	
+	if (sample!="embedded" && sample!="data_obs"){
+	  if (mymu.Pt()<23){ 
+	    w2->var("t_pt")->setVal(mytau.Pt());
+	    w2->var("t_eta")->setVal(mytau.Eta());
+	    w2->var("t_dm")->setVal(tree->l2_decayMode);
+	    float eff_tau_ratio = w2->function("t_genuine_TightIso_mt_ratio")->getVal();
+	    sf_trg=myScaleFactor_trgMu19Leg->get_ScaleFactor(tree->pt_1,tree->eta_1)*eff_tau_ratio;
+	    sf_trg_anti=myScaleFactor_trgMu19LegAnti->get_ScaleFactor(tree->pt_1,tree->eta_1)*eff_tau_ratio;
+	  }
+	  else{
+	    sf_trg=myScaleFactor_trgMu22->get_ScaleFactor(tree->pt_1,tree->eta_1);
+	    sf_trg_anti=myScaleFactor_trgMu22Anti->get_ScaleFactor(tree->pt_1,tree->eta_1);
+	  }
+	}
+	if (sample=="data_obs") {aweight=1.0; weight2=1.0;}
+	/*
+	  TLorentzVector myrawmet;
+	  myrawmet.SetPtEtaPhiM(tree->met,0,tree->metphi,0);
+	TLorentzVector myrawtau=mytau;
+	TLorentzVector mymet=myrawmet;
+	*/
 	//////////////////////
 	// Embedded weights //
 	//////////////////////
 	if (sample=="embedded") {
-	  aweight=1.0; 
+	  aweight=1.0; weight2=1.0;
 	  float Stitching_Weight= 1.0;
 	  if ((tree->run >= 272007) && (tree->run < 275657))  Stitching_Weight=(1.0/0.899 * 1.02);
 	  if ((tree->run >= 275657) && (tree->run < 276315))  Stitching_Weight=(1.0/0.881 * 1.02);
@@ -437,12 +471,14 @@ int main(int argc, char** argv) {
 	  double muon_trg_efficiency = info[6];
 	  double EmbedWeight=muon_id_scalefactor*muon_iso_scalefactor*muon_trg_efficiency;
 	  float WEIGHT_sel_trg_ratio= m_sel_trg_ratio(wEmbed,mymu.Pt(),mymu.Eta(),mytau.Pt(),mytau.Eta());
-	  aweight=EmbedWeight * tree->amcatNLO_weight * Stitching_Weight * WEIGHT_sel_trg_ratio;
+	  aweight=EmbedWeight * tree->genweight * Stitching_Weight * WEIGHT_sel_trg_ratio;
 	}
 
-	float mt=TMass_F(mymu.Pt(),mymet.Pt(),mymu.Px(),mymet.Px(),mymu.Py(),mymet.Py());
+	weight2=weight2*sf_trg*dm_weight;
+	ratioanti=ratioantiraw*sf_trg_anti/(sf_trg+0.000000001);
 	TLorentzVector Higgs;
 	Higgs.SetPtEtaPhiM(var1_1,(mymet+mymu+mytau).Eta(),(mymet+mymu+mytau).Phi(),(mymet+mymu+mytau).M());
+
 	//cout << aweight << endl;
 	fillTree_mt(namu, tree, i,
 		    Higgs, mytau, mymu, myjet1, myjet2,
@@ -450,11 +486,24 @@ int main(int argc, char** argv) {
 		    tree->Dbkg_VBF, tree->Dbkg_ggH,
 		    tree->ME_sm_VBF, tree->ME_sm_ggH,tree->ME_sm_WH,tree->ME_sm_ZH,tree->ME_bkg,tree->ME_bkg1,tree->ME_bkg2,
 		    tree->Phi,tree->Phi1,tree->costheta1,tree->costheta2,tree->costhetastar,tree->Q2V1,tree->Q2V2,
-		    signalRegion, qcdRegion,aweight, mt
+		    signalRegion, qcdRegion,weight2*aweight, mt
 		    );
+	lastindex = i;
     } // end of loop over events
-
-    TFile *fout = TFile::Open(output.c_str(), "RECREATE");
+    std::cout << "DONE\t" << lastindex << "\t" << treePtr->GetEntries() << std::endl;    
+    /*
+    TLorentzVector dummy; 
+    dummy.SetPtEtaPhiM(0,0,0,0);
+    fillTree_mt(namu, tree, lastindex,
+		dummy,dummy,dummy,dummy,dummy,//Higgs, mytau, mymu, myjet1, myjet2,
+		0,0,0,0,0,0,//tree->mjj, tree->met, tree->metphi, tree->m_sv, tree->pt_sv, tree->njets,
+		0,0,//tree->Dbkg_VBF, tree->Dbkg_ggH,
+		0,0,0,0,0,0,0,//tree->ME_sm_VBF, tree->ME_sm_ggH,tree->ME_sm_WH,tree->ME_sm_ZH,tree->ME_bkg,tree->ME_bkg1,tree->ME_bkg2,
+		0,0,0,0,0,0,0,//tree->Phi,tree->Phi1,tree->costheta1,tree->costheta2,tree->costhetastar,tree->Q2V1,tree->Q2V2,
+		0,0,0,0//signalRegion, qcdRegion,aweight, mt
+		);
+    std::cout << "Dummy is filled" << std::endl;    
+    */
     fout->cd();
     nbevt->Write();
     namu->Write();
