@@ -373,11 +373,22 @@ int main(int argc, char** argv) {
       treePtr->GetEntry(i);
       if (i % 1000 == 0) fprintf(stdout, "\r  Processed events: %8d of %8d ", i, nentries_wtn);
       fflush(stdout);
+
+
+      //////////////////////////////////
+      // Added for yield cross check  //
+      //////////////////////////////////
+      //if (!tree->decayModeFinding_1 || !tree->decayModeFinding_2) continue;
       bool isoAll =
-	tree->byVLooseIsolationMVArun2v1DBnewDMwLT_1 > 0.5 &&
-	tree->byVLooseIsolationMVArun2v1DBnewDMwLT_1 > 0.5;
-      if (!isoAll ) continue; // Added for yield cross check
-      
+	tree->byVLooseIsolationMVArun2v1DBoldDMwLT_1 > 0.5 &&
+	tree->byVLooseIsolationMVArun2v1DBoldDMwLT_1 > 0.5;
+      //if (!isoAll ) continue; 
+      //////////////////////////////////
+      // Regions
+      float signalRegion = tree->byTightIsolationMVArun2v1DBoldDMwLT_1 && tree->byTightIsolationMVArun2v1DBoldDMwLT_2;
+      float aiRegion = ((tree->byMediumIsolationMVArun2v1DBoldDMwLT_1 && !tree->byTightIsolationMVArun2v1DBoldDMwLT_2 && tree->byLooseIsolationMVArun2v1DBoldDMwLT_2) || (tree->byMediumIsolationMVArun2v1DBoldDMwLT_2 && !tree->byTightIsolationMVArun2v1DBoldDMwLT_1 && tree->byLooseIsolationMVArun2v1DBoldDMwLT_1));
+
+
       // DoubleTau trigger
       if (sample=="data_obs" && input=="myntuples/Oct26_tt/data_H.root") {
 	if(!tree->passDoubleTauCmbIso35) continue;
@@ -436,7 +447,7 @@ int main(int argc, char** argv) {
       if (tree->againstMuonLoose3_1 < 0.5) continue; //774
       if (tree->againstMuonLoose3_2 < 0.5) continue;
       // Change && -> ||
-      if (tree->byLooseIsolationMVArun2v1DBnewDMwLT_1 < 0.5 || tree->byLooseIsolationMVArun2v1DBnewDMwLT_2 < 0.5) continue; // Fig 43(a)
+      if (tree->byLooseIsolationMVArun2v1DBoldDMwLT_1 < 0.5 || tree->byLooseIsolationMVArun2v1DBoldDMwLT_2 < 0.5) continue; // Fig 43(a)
       if (tree->extramuon_veto) continue;
       if (tree->extraelec_veto) continue;
       //float sf_trg=1.0;
@@ -479,9 +490,6 @@ int main(int argc, char** argv) {
 
       }
           
-      // Regions
-      float signalRegion = tree->byTightIsolationMVArun2v1DBnewDMwLT_1 && tree->byTightIsolationMVArun2v1DBnewDMwLT_2;
-      float aiRegion = ((tree->byMediumIsolationMVArun2v1DBnewDMwLT_1 && !tree->byTightIsolationMVArun2v1DBnewDMwLT_2 && tree->byLooseIsolationMVArun2v1DBnewDMwLT_2) || (tree->byMediumIsolationMVArun2v1DBnewDMwLT_2 && !tree->byTightIsolationMVArun2v1DBnewDMwLT_1 && tree->byLooseIsolationMVArun2v1DBnewDMwLT_1));
       
       // Weights depending in the generated jet multiplicity
       if (sample=="W"){
@@ -714,6 +722,8 @@ int main(int argc, char** argv) {
           float WEIGHT_sel_trg_ratio= m_sel_trg_ratio(wEmbed,mytau1.Pt(),mytau1.Eta(),mytau2.Pt(),mytau2.Eta());
 	  aweight=EmbedWeight * tree->genweight * Stitching_Weight * WEIGHT_sel_trg_ratio;
 	  //std::cout << "embedded weight : " << aweight << std::endl;
+	  std::cout << "embedded weight : " << aweight << "\t" << tree->genweight << std::endl;
+	  std::cout << tree->evt << "\t" << mytau1.Pt() << "\t" << mytau2.Pt() << std::endl;
 	}
 	//std::cout << aweight << "\t" << weight2 << "\t" << weight2*aweight << std::endl;
 

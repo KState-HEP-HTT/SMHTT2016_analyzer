@@ -230,12 +230,6 @@ int main(int argc, char** argv) {
       double my_NN = t->Value(0, Phi, Phi1, costheta1, costheta2, costhetastar, Q2V1, Q2V2);      
       float normMELAvbf = ME_sm_VBF/(ME_sm_VBF+45*ME_bkg);
 
-      if(t1_iso_VL < 0.5 || t2_iso_VL < 0.5) continue;
-      if(!t1_dmf || !t2_dmf) continue;
-      // Regions
-      float signalRegion = t1_iso_T && t2_iso_T;
-      float aiRegion = ((t1_iso_M && !t2_iso_T && t2_iso_L) || (t2_iso_M && !t1_iso_T && t1_iso_L));
-      
       // Categories
       bool is_0jet = false;
       bool is_boosted = false;
@@ -261,7 +255,6 @@ int main(int argc, char** argv) {
       float var_vbfY = m_sv;
 
       for (int k=0; k<nbhist; ++k){
-	/*
 	// ################### signalRegion && OS ####################
 	if (is_0jet && is_signal && t1_charge*t2_charge<0)	    h0_OS[k]->Fill(var_0jet,evtwt);
 	if (is_boosted && is_signal && t1_charge*t2_charge<0)	    h1_OS[k]->Fill(var_boostedX,var_boostedY,evtwt);
@@ -278,23 +271,6 @@ int main(int argc, char** argv) {
 	if (is_0jet && t1_charge*t2_charge>0 && !is_signal)         h0_AISS[k]->Fill(var_0jet,evtwt);
 	if (is_boosted && t1_charge*t2_charge>0 && !is_signal)	    h1_AISS[k]->Fill(var_boostedX,var_boostedY,evtwt);
 	if (is_VBF && t1_charge*t2_charge>0 && !is_signal)          h2_AISS[k]->Fill(var_vbfX,var_vbfY,evtwt);
-	*/
-	// ################### signalRegion && OS ####################
-	if (is_0jet && signalRegion && t1_charge*t2_charge<0)	    h0_OS[k]->Fill(var_0jet,evtwt);
-	if (is_boosted && signalRegion && t1_charge*t2_charge<0)	    h1_OS[k]->Fill(var_boostedX,var_boostedY,evtwt);
-	if (is_VBF && signalRegion && t1_charge*t2_charge<0) 	    h2_OS[k]->Fill(var_vbfX,var_vbfY,evtwt);
-	// ################### signalRegion && SS ####################
-	if (is_0jet && signalRegion && t1_charge*t2_charge>0)          h0_SS[k]->Fill(var_0jet,evtwt);
-	if (is_boosted && signalRegion && t1_charge*t2_charge>0)	    h1_SS[k]->Fill(var_boostedX,var_boostedY,evtwt);
-	if (is_VBF && signalRegion && t1_charge*t2_charge>0) 	    h2_SS[k]->Fill(var_vbfX,var_vbfY,evtwt);
-	// ################### ai-Region && OS ####################
-	if (is_0jet && t1_charge*t2_charge<0 && aiRegion)         h0_AIOS[k]->Fill(var_0jet,evtwt);
-	if (is_boosted && t1_charge*t2_charge<0 && aiRegion)	    h1_AIOS[k]->Fill(var_boostedX,var_boostedY,evtwt);
-	if (is_VBF && t1_charge*t2_charge<0 && aiRegion)          h2_AIOS[k]->Fill(var_vbfX,var_vbfY,evtwt);
-	// ################### ai-Region && SS ####################
-	if (is_0jet && t1_charge*t2_charge>0 && aiRegion)         h0_AISS[k]->Fill(var_0jet,evtwt);
-	if (is_boosted && t1_charge*t2_charge>0 && aiRegion)	    h1_AISS[k]->Fill(var_boostedX,var_boostedY,evtwt);
-	if (is_VBF && t1_charge*t2_charge>0 &&  aiRegion)          h2_AISS[k]->Fill(var_vbfX,var_vbfY,evtwt);
       }
     } // end of loop over events
     
