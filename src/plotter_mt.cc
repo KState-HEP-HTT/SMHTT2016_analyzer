@@ -14,7 +14,7 @@
 #include "TFile.h"
 // my includes
 #include "../include/myHelper.h"
-#include "../include/tr_Tree.h"
+#include "../include/tt_Tree.h"
 #include "../include/TMVAClassification_TMlpANN.cxx"
 
 int main(int argc, char** argv) {    
