@@ -56,7 +56,9 @@ titleMap = {
     'costheta1': 'Cos(#theta_1)',
     'costheta2': 'Cos(#theta_2)',
     'costhetastar': 'Cos(#theta*)',
-    'nbjets': 'N(b-jets)'
+    'nbjets': 'N(b-jets)',
+    't1_decayMode': 'Tau1 decayMode',
+    't2_decayMode': 'Tau2 decayMode'    
 }
 
 
