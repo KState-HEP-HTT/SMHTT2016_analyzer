@@ -15,7 +15,6 @@
 #include "../include/myHelper.h"
 #include "../include/tt_Tree.h"
 #include "../include/scenario_info.h"
-#include "../include/TMVAClassification_TMlpANN.cxx"
 
 int main(int argc, char** argv) {    
     std::string input = *(argv + 1);
@@ -129,7 +128,6 @@ int main(int argc, char** argv) {
     namu->SetBranchAddress("ME_bkg1"     ,        &ME_bkg1              );  
     namu->SetBranchAddress("ME_bkg2"     ,        &ME_bkg2              ); 
 
-
     namu->SetBranchAddress("higgs_pT",            &higgs_pT             );
     namu->SetBranchAddress("higgs_m",             &higgs_m              );       
     namu->SetBranchAddress("hjj_pT",              &hjj_pT               );
@@ -225,9 +223,8 @@ int main(int argc, char** argv) {
       namu->GetEntry(i);
       if (i % 1000 == 0) fprintf(stdout, "\r  Processed events: %8d of %8d ", i, nentries_wtn);
       fflush(stdout);
-      // book the NN                                                                                                        
-      TMVAClassification_TMlpANN* t = new TMVAClassification_TMlpANN();
-      double my_NN = t->Value(0, Phi, Phi1, costheta1, costheta2, costhetastar, Q2V1, Q2V2);      
+      
+      if (!t1_newiso_VL || !t2_newiso_VL) continue;
       float normMELAvbf = ME_sm_VBF/(ME_sm_VBF+45*ME_bkg);
 
       // Categories
@@ -237,21 +234,23 @@ int main(int argc, char** argv) {
       ////////////////////////////
       // 2016 analysis category //
       ////////////////////////////
-      if (njets==0) is_0jet=true;
-      if (njets==1 || (njets>=2 && (!(higgs_pT>100 && dEtajj>2.5)))) is_boosted=true;
-      if (njets>=2 && higgs_pT>100 && dEtajj>2.5) is_VBF=true;
+      //if (njets==0) is_0jet=true;
+      //if (njets==1 || (njets>=2 && (!(higgs_pT>100 && dEtajj>2.5)))) is_boosted=true;
+      //if (njets>=2 && higgs_pT>100 && dEtajj>2.5) is_VBF=true;
 
+      bool twoProng = t1_decayMode == 5 || t1_decayMode ==  6 || t2_decayMode == 5 || t2_decayMode ==6;
       ////////////////////////     
       // KSU study category //     
       ////////////////////////     
-      //if (njets==0) is_0jet=true;
-      //else if (njets>=2 && mjj>300) is_VBF=true; 
-      //else is_boosted=true;   
+      if (njets==0) is_0jet=true;
+      else if (njets==1) is_boosted=true;   
+      else if (cat_vbf && higgs_pT>100 && !twoProng ) is_VBF=true;
+
 
       float var_0jet = m_sv;
       float var_boostedX = higgs_pT;
       float var_boostedY = m_sv;
-      float var_vbfX =  mjj;
+      float var_vbfX = mjj;
       float var_vbfY = m_sv;
 
       for (int k=0; k<nbhist; ++k){
@@ -264,13 +263,13 @@ int main(int argc, char** argv) {
 	if (is_boosted && is_signal && t1_charge*t2_charge>0)	    h1_SS[k]->Fill(var_boostedX,var_boostedY,evtwt);
 	if (is_VBF && is_signal && t1_charge*t2_charge>0) 	    h2_SS[k]->Fill(var_vbfX,var_vbfY,evtwt);
 	// ################### ai-Region && OS ####################
-	if (is_0jet && t1_charge*t2_charge<0 && !is_signal)         h0_AIOS[k]->Fill(var_0jet,evtwt);
-	if (is_boosted && t1_charge*t2_charge<0 && !is_signal)	    h1_AIOS[k]->Fill(var_boostedX,var_boostedY,evtwt);
-	if (is_VBF && t1_charge*t2_charge<0 && !is_signal)          h2_AIOS[k]->Fill(var_vbfX,var_vbfY,evtwt);
+	if (is_0jet && t1_charge*t2_charge<0 && is_ai)              h0_AIOS[k]->Fill(var_0jet,evtwt);
+	if (is_boosted && t1_charge*t2_charge<0 && is_ai)	    h1_AIOS[k]->Fill(var_boostedX,var_boostedY,evtwt);
+	if (is_VBF && t1_charge*t2_charge<0 && is_ai)               h2_AIOS[k]->Fill(var_vbfX,var_vbfY,evtwt);
 	// ################### ai-Region && SS ####################
-	if (is_0jet && t1_charge*t2_charge>0 && !is_signal)         h0_AISS[k]->Fill(var_0jet,evtwt);
-	if (is_boosted && t1_charge*t2_charge>0 && !is_signal)	    h1_AISS[k]->Fill(var_boostedX,var_boostedY,evtwt);
-	if (is_VBF && t1_charge*t2_charge>0 && !is_signal)          h2_AISS[k]->Fill(var_vbfX,var_vbfY,evtwt);
+	if (is_0jet && t1_charge*t2_charge>0 && is_ai)              h0_AISS[k]->Fill(var_0jet,evtwt);
+	if (is_boosted && t1_charge*t2_charge>0 && is_ai)	    h1_AISS[k]->Fill(var_boostedX,var_boostedY,evtwt);
+	if (is_VBF && t1_charge*t2_charge>0 && is_ai)               h2_AISS[k]->Fill(var_vbfX,var_vbfY,evtwt);
       }
     } // end of loop over events
     

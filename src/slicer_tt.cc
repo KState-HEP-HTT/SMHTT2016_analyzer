@@ -379,25 +379,18 @@ int main(int argc, char** argv) {
       // Added for yield cross check  //
       //////////////////////////////////
       /*
-      if (!tree->decayModeFinding_1 || !tree->decayModeFinding_2) continue;
-      bool isoAll =
-	tree->byVLooseIsolationMVArun2v1DBoldDMwLT_1 > 0.5 &&
-	tree->byVLooseIsolationMVArun2v1DBoldDMwLT_2 > 0.5;
-      if (!isoAll ) continue; 
+      if (!tree->byVLooseIsolationMVArun2v1DBoldDMwLT_1 || !tree->byVLooseIsolationMVArun2v1DBoldDMwLT_2) continue; 
       // Regions
       float signalRegion = tree->byTightIsolationMVArun2v1DBoldDMwLT_1 && tree->byTightIsolationMVArun2v1DBoldDMwLT_2;
       float aiRegion = ((tree->byMediumIsolationMVArun2v1DBoldDMwLT_1 && !tree->byTightIsolationMVArun2v1DBoldDMwLT_2 && tree->byLooseIsolationMVArun2v1DBoldDMwLT_2) || (tree->byMediumIsolationMVArun2v1DBoldDMwLT_2 && !tree->byTightIsolationMVArun2v1DBoldDMwLT_1 && tree->byLooseIsolationMVArun2v1DBoldDMwLT_1));
-      if (tree->byLooseIsolationMVArun2v1DBoldDMwLT_1 < 0.5 || tree->byLooseIsolationMVArun2v1DBoldDMwLT_2 < 0.5) continue; // Fig 43(a)
+      if (!tree->byLooseIsolationMVArun2v1DBoldDMwLT_1 && !tree->byLooseIsolationMVArun2v1DBoldDMwLT_2) continue; // Fig 43(a)
       */
       //////////////////////////////////
 
       // Regions
       float signalRegion = tree->byTightIsolationMVArun2v1DBnewDMwLT_1 && tree->byTightIsolationMVArun2v1DBnewDMwLT_2;
       float aiRegion = ((tree->byMediumIsolationMVArun2v1DBnewDMwLT_1 && !tree->byTightIsolationMVArun2v1DBnewDMwLT_2 && tree->byLooseIsolationMVArun2v1DBnewDMwLT_2) || (tree->byMediumIsolationMVArun2v1DBnewDMwLT_2 && !tree->byTightIsolationMVArun2v1DBnewDMwLT_1 && tree->byLooseIsolationMVArun2v1DBnewDMwLT_1));
-      bool isoAll =
-	tree->byVLooseIsolationMVArun2v1DBnewDMwLT_1 > 0.5 &&
-	tree->byVLooseIsolationMVArun2v1DBnewDMwLT_2 > 0.5;
-      if (!isoAll ) continue; 
+      if (!tree->byVLooseIsolationMVArun2v1DBnewDMwLT_1 || !tree->byVLooseIsolationMVArun2v1DBnewDMwLT_2) continue; 
 
       // DoubleTau trigger
       if (sample=="data_obs" && input=="myntuples/Oct26_tt/data_H.root") {
@@ -456,8 +449,7 @@ int main(int argc, char** argv) {
       if (tree->againstElectronVLooseMVA6_2 < 0.5) continue;
       if (tree->againstMuonLoose3_1 < 0.5) continue; //774
       if (tree->againstMuonLoose3_2 < 0.5) continue;
-      // Change && -> ||
-      // if (tree->byLooseIsolationMVArun2v1DBnewDMwLT_1 < 0.5 || tree->byLooseIsolationMVArun2v1DBnewDMwLT_2 < 0.5) continue; // Fig 43(a)
+      // if (!tree->byLooseIsolationMVArun2v1DBnewDMwLT_1 && !tree->byLooseIsolationMVArun2v1DBnewDMwLT_2) continue; // Fig 43(a)
       if (tree->extramuon_veto) continue;
       if (tree->extraelec_veto) continue;
       //float sf_trg=1.0;
@@ -473,8 +465,8 @@ int main(int argc, char** argv) {
       float sf_trg_FF = 1.0;
       PyObject* trgSF = PyObject_CallFunction(compute_sf,(char*)"[f,i]",0.0,0);
       if (sample!="data_obs"){
-	if (tree->t1_decayMode==0) trgSF = PyObject_CallFunction(compute_sf,(char*)"[f,i]",mytau1.Pt(),0);
-	else if (tree->t1_decayMode==1) trgSF = PyObject_CallFunction(compute_sf,(char*)"[f,i]",mytau1.Pt(),1);
+	if (tree->t1_decayMode==0 || tree->t1_decayMode==5) trgSF = PyObject_CallFunction(compute_sf,(char*)"[f,i]",mytau1.Pt(),0);
+	else if (tree->t1_decayMode==1 || tree->t1_decayMode==6) trgSF = PyObject_CallFunction(compute_sf,(char*)"[f,i]",mytau1.Pt(),1);
 	else if (tree->t1_decayMode==10) trgSF = PyObject_CallFunction(compute_sf,(char*)"[f,i]",mytau1.Pt(),10);
 	sf_trg1 = PyFloat_AsDouble(trgSF);
 	if (tree->gen_match_1==5)  {
@@ -485,8 +477,8 @@ int main(int argc, char** argv) {
 	  sf_trg_FR = PyFloat_AsDouble(trgSF);
 	  sf_trg_FF = PyFloat_AsDouble(trgSF);
 	}
-	if (tree->t2_decayMode==0) trgSF = PyObject_CallFunction(compute_sf,(char*)"[f,i]",mytau2.Pt(),0);
-	else if (tree->t2_decayMode==1) trgSF = PyObject_CallFunction(compute_sf,(char*)"[f,i]",mytau2.Pt(),1);
+	if (tree->t2_decayMode==0 || tree->t2_decayMode==5) trgSF = PyObject_CallFunction(compute_sf,(char*)"[f,i]",mytau2.Pt(),0);
+	else if (tree->t2_decayMode==1 || tree->t2_decayMode==6) trgSF = PyObject_CallFunction(compute_sf,(char*)"[f,i]",mytau2.Pt(),1);
 	else if (tree->t2_decayMode==10) trgSF = PyObject_CallFunction(compute_sf,(char*)"[f,i]",mytau2.Pt(),10);
 	sf_trg2 = PyFloat_AsDouble(trgSF);
 	if (tree->gen_match_2==5)  {
@@ -554,7 +546,7 @@ int main(int argc, char** argv) {
 	}
 	//aweight=aweight*h_Trk->Eval(eta_1);
       }
-      
+
       // Z pt reweighting for DY events
       if (sample=="DY" || sample=="EWKZLL" || sample=="EWKZNuNu" || sample=="ZTT" || sample=="ZLL" || sample=="ZL" || sample=="ZJ"){
 	float zpt_corr=histZ->GetBinContent(histZ->GetXaxis()->FindBin(tree->genM),histZ->GetYaxis()->FindBin(tree->genpT));
@@ -565,7 +557,7 @@ int main(int argc, char** argv) {
 	else 
 	  aweight=aweight*zpt_corr; // nominal
       }
-      
+
       //  Top pT reweighting for ttbar events
       float pttop1=tree->pt_top1;
       if (pttop1>400) pttop1=400;
@@ -574,7 +566,7 @@ int main(int argc, char** argv) {
       if ((sample=="TTL" or sample=="TTJ" or sample=="TTT" or sample=="TT") && (shape!="ttbarShape_Up" && shape!="ttbarShape_Down")) aweight*=sqrt(exp(0.0615-0.0005*pttop1)*exp(0.0615-0.0005*pttop2));
       //aweight*=sqrt(exp(0.156-0.00137*pttop1)*exp(0.156-0.00137*pttop2));
       if ((sample=="TTL" or sample=="TTJ" or sample=="TTT" or sample=="TT") && shape=="ttbarShape_Up") aweight*=(1+2*(sqrt(exp(0.0615-0.0005*pttop1)*exp(0.0615-0.0005*pttop2))-1));
-      
+
       if (sample=="data_obs") aweight=1.0;
       
       // D.Kim : https://github.com/cecilecaillol/SMHTT2016/blob/master/mt/Analyze/FinalSelection2D_relaxed.cc#L744-L754
@@ -831,9 +823,9 @@ int main(int argc, char** argv) {
 	  fillTree(namu, tree, i,
 		   Higgs, mytau1, mytau2, myjet1, myjet2,
 		   mjj, met, metphi, m_sv, pt_sv, njets,
-		   Dbkg_VBF, Dbkg_ggH,
-		   ME_sm_VBF,ME_sm_ggH,ME_sm_WH,ME_sm_ZH,ME_bkg,ME_bkg1,ME_bkg2,
-		   Phi,Phi1,costheta1,costheta2,costhetastar,Q2V1,Q2V2,
+		   tree->Dbkg_VBF, tree->Dbkg_ggH,
+		   ME_sm_VBF,ME_sm_ggH,tree->ME_sm_WH,tree->ME_sm_ZH,ME_bkg,tree->ME_bkg1,tree->ME_bkg2,
+		   tree->Phi,tree->Phi1,tree->costheta1,tree->costheta2,tree->costhetastar,tree->Q2V1,tree->Q2V2,
 		   signalRegion, aiRegion,weight2*aweight
 		   );
 	}

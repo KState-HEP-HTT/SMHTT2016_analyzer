@@ -13,7 +13,6 @@
 // my includes
 #include "../include/myHelper.h"
 #include "../include/tt_Tree.h"
-#include "../include/TMVAClassification_TMlpANN.cxx"
 
 int main(int argc, char** argv) {    
     std::string input = *(argv + 1);
@@ -170,17 +169,19 @@ int main(int argc, char** argv) {
       namu->GetEntry(i);
       //if (i % 1000 == 0) fprintf(stdout, "\r  Processed events: %8d of %8d ", i, nentries_wtn);
       fflush(stdout);
-      // book the NN                                                                                                        
-      TMVAClassification_TMlpANN* t = new TMVAClassification_TMlpANN();
-      double my_NN = t->Value(0, Phi, Phi1, costheta1, costheta2, costhetastar, Q2V1, Q2V2);      
+      if (!t1_newiso_VL || !t2_newiso_VL) continue;
+      bool twoProng = t1_decayMode == 5 || t1_decayMode ==  6 || t2_decayMode == 5 || t2_decayMode ==6;
 
       // Define VBF cate
       bool is_VBF = false;
-      if (cat_vbf ) is_VBF=true; 
+      if (cat_vbf && higgs_pT>100 && !twoProng) is_VBF=true; 
+
       // User obs
       if(tvar == "MELA") var = ME_sm_VBF/(ME_sm_VBF+45*ME_bkg);   
+      if(tvar == "MELAggH") var = ME_sm_ggH/(ME_sm_ggH+45*ME_bkg);   
 
       if (is_VBF && is_signal && t1_charge*t2_charge<0) h_os->Fill(var,evtwt);
+      //if (is_VBF && is_ai) h_os->Fill(var,evtwt);
       if (is_VBF && is_signal && t1_charge*t2_charge>0) h_ss->Fill(var,evtwt);
       if (is_VBF && is_ai && t1_charge*t2_charge<0) h_aios->Fill(var,evtwt);
       if (is_VBF && is_ai && t1_charge*t2_charge>0) h_aiss->Fill(var,evtwt);
