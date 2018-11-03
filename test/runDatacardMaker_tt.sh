@@ -25,7 +25,7 @@
  ./datacardMaker_tt.exe ${1}/EWKZ.root output_DatacardMaker/tt/EWKZ.root EWKZ nominal
 
  # 5. TT
- ./datacardMaker_tt.exe ${1}/TTJ.root output_DatacardMaker/tt/TTT.root TTT nominal
+ ./datacardMaker_tt.exe ${1}/TTT.root output_DatacardMaker/tt/TTT.root TTT nominal
  ./datacardMaker_tt.exe ${1}/TTJ.root output_DatacardMaker/tt/TTJ.root TTJ nominal
 
  # 6. W

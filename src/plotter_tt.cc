@@ -169,22 +169,40 @@ int main(int argc, char** argv) {
       namu->GetEntry(i);
       //if (i % 1000 == 0) fprintf(stdout, "\r  Processed events: %8d of %8d ", i, nentries_wtn);
       fflush(stdout);
-      if (!t1_newiso_VL || !t2_newiso_VL) continue;
+
+      /////////////////////////
+      //  For relaxed skims  //
+      /////////////////////////
       bool twoProng = t1_decayMode == 5 || t1_decayMode ==  6 || t2_decayMode == 5 || t2_decayMode ==6;
+      if (twoProng) continue;
+      bool signalRegion = is_signal;
+      bool aiRegion = is_ai;  
+      if (!t1_newiso_VL || !t2_newiso_VL) continue;          
+      ////////////////////////
+
+      ////////////////////////////
+      // 2016 analysis category //
+      ////////////////////////////      
+      /*
+      if (!t1_iso_VL || !t2_iso_VL) continue;
+      if (!t1_dmf || !t2_dmf) continue;
+      bool signalRegion = t1_iso_T && t2_iso_T;
+      bool aiRegion = (t1_iso_M && t2_iso_L && !t2_iso_T) || (t2_iso_M && t1_iso_L && !t1_iso_T);
+      */
 
       // Define VBF cate
       bool is_VBF = false;
-      if (cat_vbf && higgs_pT>100 && !twoProng) is_VBF=true; 
+      if (cat_vbf && higgs_pT>100) is_VBF=true; 
 
       // User obs
       if(tvar == "MELA") var = ME_sm_VBF/(ME_sm_VBF+45*ME_bkg);   
       if(tvar == "MELAggH") var = ME_sm_ggH/(ME_sm_ggH+45*ME_bkg);   
 
-      if (is_VBF && is_signal && t1_charge*t2_charge<0) h_os->Fill(var,evtwt);
+      if (is_VBF && signalRegion && t1_charge*t2_charge<0) h_os->Fill(var,evtwt);
       //if (is_VBF && is_ai) h_os->Fill(var,evtwt);
-      if (is_VBF && is_signal && t1_charge*t2_charge>0) h_ss->Fill(var,evtwt);
-      if (is_VBF && is_ai && t1_charge*t2_charge<0) h_aios->Fill(var,evtwt);
-      if (is_VBF && is_ai && t1_charge*t2_charge>0) h_aiss->Fill(var,evtwt);
+      if (is_VBF && signalRegion && t1_charge*t2_charge>0) h_ss->Fill(var,evtwt);
+      if (is_VBF && aiRegion && t1_charge*t2_charge<0) h_aios->Fill(var,evtwt);
+      if (is_VBF && aiRegion && t1_charge*t2_charge>0) h_aiss->Fill(var,evtwt);
     }
     
     TFile *fout = TFile::Open(output.c_str(), "RECREATE");

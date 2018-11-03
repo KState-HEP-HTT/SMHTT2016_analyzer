@@ -8,8 +8,8 @@ ch = raw_input()
 print "channel is"
 print ch
 #fin = ROOT.TFile("files_nominal/VBF125.root","")
-finKSU = ROOT.TFile("final_nominal.root","")
-finOFF = ROOT.TFile("../../../CommonAN/htt_input.root","")
+finKSU = ROOT.TFile("htt_"+ch+"_input.root","")
+finOFF = ROOT.TFile("htt_input.root","")
 fout = ROOT.TFile("testUnroll.root","recreate")
 dic_cat = {ch+'_0jet':'htt_'+ch+'_1_13TeV', ch+'_boosted':'htt_'+ch+'_2_13TeV', ch+'_vbf':'htt_'+ch+'_3_13TeV'}
 dic_sig = {'VBF125':'qqH_htt125', 'WH125':'WH_htt125','ggH125':'ggH_htt125','ZH125':'ZH_htt125'}

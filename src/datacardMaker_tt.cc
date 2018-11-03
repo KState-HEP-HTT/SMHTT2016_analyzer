@@ -21,9 +21,11 @@ int main(int argc, char** argv) {
     std::string output = *(argv + 2);
     std::string name = *(argv + 3);
     std::string shape = *(argv + 4);
+    float is2016 = atof(argv[5]);
+    if (is2016==2016) std::cout << "All selections are consistent with 2016 SMHTT analysis." << std::endl;
 
     TFile *f_Double = new TFile(input.c_str());
-    std::cout<<"XXXXXXXXXXXXX "<<input.c_str()<<" XXXXXXXXXXXX"<<std::endl;
+    std::cout<< input.c_str() << "  is processing ... " <<std::endl;
     TTree* namu = (TTree*) f_Double->Get("tautau_tree");
     TH1F* nbevt = (TH1F*) f_Double->Get("nevents");
     float ngen = nbevt->GetBinContent(2);
@@ -152,6 +154,7 @@ int main(int argc, char** argv) {
     namu->SetBranchAddress("is_ai",               &is_ai                );              
 
     namu->SetBranchAddress("NN_disc",             &NN_disc              );
+    namu->SetBranchAddress("NN_disc_ZTT",         &NN_disc_ZTT          );
 
     //Binning for 0jet cat. 1D: Msv. In AN it was 10GeV binning / official data card combined 0~50 as one bin
     float bins0[] = {0,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,260,270,280,290,300};
@@ -160,7 +163,7 @@ int main(int argc, char** argv) {
     //Binning for 1jet cat, y-axis: Msv
     float bins1Y[] = {0,40,60,70,80,90,100,110,120,130,150,200,250};
     //Binning for 2jet cat, x-axis: Mjj
-    float bins2X[] = {0,300,500,800,10000};//{0, 0.1, 0.5, 0.9, 1.0};//
+    float bins2X[] = {0,300,500,800,10000}; //{300,700,1100,1500,10000};//{0,0.1,0.5,0.9,1.0};
     //Binning for 2jet cat, y-axis: Msv
     float bins2Y[] = {0,40,60,70,80,90,100,110,120,130,150,200,250};
 
@@ -223,30 +226,44 @@ int main(int argc, char** argv) {
       namu->GetEntry(i);
       if (i % 1000 == 0) fprintf(stdout, "\r  Processed events: %8d of %8d ", i, nentries_wtn);
       fflush(stdout);
-      
-      if (!t1_newiso_VL || !t2_newiso_VL) continue;
       float normMELAvbf = ME_sm_VBF/(ME_sm_VBF+45*ME_bkg);
+
+      /////////////////////////
+      //  For relaxed skims  //
+      /////////////////////////
+      bool twoProng = t1_decayMode == 5 || t1_decayMode ==  6 || t2_decayMode == 5 || t2_decayMode ==6;
+      if (twoProng) continue;            
+      ////////////////////////
 
       // Categories
       bool is_0jet = false;
       bool is_boosted = false;
       bool is_VBF = false;
-      ////////////////////////////
-      // 2016 analysis category //
-      ////////////////////////////
-      //if (njets==0) is_0jet=true;
-      //if (njets==1 || (njets>=2 && (!(higgs_pT>100 && dEtajj>2.5)))) is_boosted=true;
-      //if (njets>=2 && higgs_pT>100 && dEtajj>2.5) is_VBF=true;
-
-      bool twoProng = t1_decayMode == 5 || t1_decayMode ==  6 || t2_decayMode == 5 || t2_decayMode ==6;
-      ////////////////////////     
-      // KSU study category //     
-      ////////////////////////     
-      if (njets==0) is_0jet=true;
-      else if (njets==1) is_boosted=true;   
-      else if (cat_vbf && higgs_pT>100 && !twoProng ) is_VBF=true;
-
-
+      bool signalRegion = false;
+      bool aiRegion = false;
+      if (is2016 == 2016) {
+	////////////////////////////
+	// 2016 analysis category //
+	////////////////////////////
+	if (!t1_iso_VL || !t2_iso_VL) continue;
+	if (!t1_dmf || !t2_dmf) continue;
+	signalRegion = t1_iso_T && t2_iso_T;
+	aiRegion = (t1_iso_M && t2_iso_L && !t2_iso_T) || (t2_iso_M && t1_iso_L && !t1_iso_T);
+	if (njets==0) is_0jet=true;
+	if (njets==1 || (njets>=2 && (!(higgs_pT>100 && dEtajj>2.5)))) is_boosted=true;
+	if (njets>=2 && higgs_pT>100 && dEtajj>2.5) is_VBF=true;
+      }
+      else {	
+	////////////////////////     
+	// KSU study category //     
+	////////////////////////     
+	if (!t1_newiso_VL || !t2_newiso_VL) continue;
+	signalRegion = is_signal;
+	aiRegion = is_ai;
+	if (njets==0) is_0jet=true;
+	else if (njets==1) is_boosted=true;   
+	else if (cat_vbf && higgs_pT>100 && !twoProng) is_VBF=true;
+      }
       float var_0jet = m_sv;
       float var_boostedX = higgs_pT;
       float var_boostedY = m_sv;
@@ -255,21 +272,21 @@ int main(int argc, char** argv) {
 
       for (int k=0; k<nbhist; ++k){
 	// ################### signalRegion && OS ####################
-	if (is_0jet && is_signal && t1_charge*t2_charge<0)	    h0_OS[k]->Fill(var_0jet,evtwt);
-	if (is_boosted && is_signal && t1_charge*t2_charge<0)	    h1_OS[k]->Fill(var_boostedX,var_boostedY,evtwt);
-	if (is_VBF && is_signal && t1_charge*t2_charge<0) 	    h2_OS[k]->Fill(var_vbfX,var_vbfY,evtwt);
+	if (is_0jet && signalRegion && t1_charge*t2_charge<0)	    h0_OS[k]->Fill(var_0jet,evtwt);
+	if (is_boosted && signalRegion && t1_charge*t2_charge<0)	    h1_OS[k]->Fill(var_boostedX,var_boostedY,evtwt);
+	if (is_VBF && signalRegion && t1_charge*t2_charge<0) 	    h2_OS[k]->Fill(var_vbfX,var_vbfY,evtwt);
 	// ################### signalRegion && SS ####################
-	if (is_0jet && is_signal && t1_charge*t2_charge>0)          h0_SS[k]->Fill(var_0jet,evtwt);
-	if (is_boosted && is_signal && t1_charge*t2_charge>0)	    h1_SS[k]->Fill(var_boostedX,var_boostedY,evtwt);
-	if (is_VBF && is_signal && t1_charge*t2_charge>0) 	    h2_SS[k]->Fill(var_vbfX,var_vbfY,evtwt);
+	if (is_0jet && signalRegion && t1_charge*t2_charge>0)          h0_SS[k]->Fill(var_0jet,evtwt);
+	if (is_boosted && signalRegion && t1_charge*t2_charge>0)	    h1_SS[k]->Fill(var_boostedX,var_boostedY,evtwt);
+	if (is_VBF && signalRegion && t1_charge*t2_charge>0) 	    h2_SS[k]->Fill(var_vbfX,var_vbfY,evtwt);
 	// ################### ai-Region && OS ####################
-	if (is_0jet && t1_charge*t2_charge<0 && is_ai)              h0_AIOS[k]->Fill(var_0jet,evtwt);
-	if (is_boosted && t1_charge*t2_charge<0 && is_ai)	    h1_AIOS[k]->Fill(var_boostedX,var_boostedY,evtwt);
-	if (is_VBF && t1_charge*t2_charge<0 && is_ai)               h2_AIOS[k]->Fill(var_vbfX,var_vbfY,evtwt);
+	if (is_0jet && t1_charge*t2_charge<0 && aiRegion)              h0_AIOS[k]->Fill(var_0jet,evtwt);
+	if (is_boosted && t1_charge*t2_charge<0 && aiRegion)	    h1_AIOS[k]->Fill(var_boostedX,var_boostedY,evtwt);
+	if (is_VBF && t1_charge*t2_charge<0 && aiRegion)               h2_AIOS[k]->Fill(var_vbfX,var_vbfY,evtwt);
 	// ################### ai-Region && SS ####################
-	if (is_0jet && t1_charge*t2_charge>0 && is_ai)              h0_AISS[k]->Fill(var_0jet,evtwt);
-	if (is_boosted && t1_charge*t2_charge>0 && is_ai)	    h1_AISS[k]->Fill(var_boostedX,var_boostedY,evtwt);
-	if (is_VBF && t1_charge*t2_charge>0 && is_ai)               h2_AISS[k]->Fill(var_vbfX,var_vbfY,evtwt);
+	if (is_0jet && t1_charge*t2_charge>0 && aiRegion)              h0_AISS[k]->Fill(var_0jet,evtwt);
+	if (is_boosted && t1_charge*t2_charge>0 && aiRegion)	    h1_AISS[k]->Fill(var_boostedX,var_boostedY,evtwt);
+	if (is_VBF && t1_charge*t2_charge>0 && aiRegion)               h2_AISS[k]->Fill(var_vbfX,var_vbfY,evtwt);
       }
     } // end of loop over events
     
