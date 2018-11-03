@@ -233,22 +233,25 @@ int main(int argc, char** argv) {
       /////////////////////////
       bool twoProng = t1_decayMode == 5 || t1_decayMode ==  6 || t2_decayMode == 5 || t2_decayMode ==6;
       if (twoProng) continue;            
+      if (!t1_iso_VL || !t2_iso_VL) continue;
+      if (!t1_dmf || !t2_dmf) continue;
+      bool signalRegion = false;
+      bool aiRegion = false;
+      signalRegion = t1_iso_T && t2_iso_T;
+      aiRegion = (t1_iso_M && t2_iso_L && !t2_iso_T) || (t2_iso_M && t1_iso_L && !t1_iso_T);
+      //if (!t1_newiso_VL || !t2_newiso_VL) continue;
+      //signalRegion = is_signal;
+      //aiRegion = is_ai;
       ////////////////////////
 
       // Categories
       bool is_0jet = false;
       bool is_boosted = false;
       bool is_VBF = false;
-      bool signalRegion = false;
-      bool aiRegion = false;
       if (is2016 == 2016) {
 	////////////////////////////
 	// 2016 analysis category //
 	////////////////////////////
-	if (!t1_iso_VL || !t2_iso_VL) continue;
-	if (!t1_dmf || !t2_dmf) continue;
-	signalRegion = t1_iso_T && t2_iso_T;
-	aiRegion = (t1_iso_M && t2_iso_L && !t2_iso_T) || (t2_iso_M && t1_iso_L && !t1_iso_T);
 	if (njets==0) is_0jet=true;
 	if (njets==1 || (njets>=2 && (!(higgs_pT>100 && dEtajj>2.5)))) is_boosted=true;
 	if (njets>=2 && higgs_pT>100 && dEtajj>2.5) is_VBF=true;
@@ -257,9 +260,6 @@ int main(int argc, char** argv) {
 	////////////////////////     
 	// KSU study category //     
 	////////////////////////     
-	if (!t1_newiso_VL || !t2_newiso_VL) continue;
-	signalRegion = is_signal;
-	aiRegion = is_ai;
 	if (njets==0) is_0jet=true;
 	else if (njets==1) is_boosted=true;   
 	else if (cat_vbf && higgs_pT>100 && !twoProng) is_VBF=true;

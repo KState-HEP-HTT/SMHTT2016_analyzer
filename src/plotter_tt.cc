@@ -175,23 +175,18 @@ int main(int argc, char** argv) {
       /////////////////////////
       bool twoProng = t1_decayMode == 5 || t1_decayMode ==  6 || t2_decayMode == 5 || t2_decayMode ==6;
       if (twoProng) continue;
-      bool signalRegion = is_signal;
-      bool aiRegion = is_ai;  
-      if (!t1_newiso_VL || !t2_newiso_VL) continue;          
-      ////////////////////////
-
-      ////////////////////////////
-      // 2016 analysis category //
-      ////////////////////////////      
-      /*
       if (!t1_iso_VL || !t2_iso_VL) continue;
       if (!t1_dmf || !t2_dmf) continue;
       bool signalRegion = t1_iso_T && t2_iso_T;
       bool aiRegion = (t1_iso_M && t2_iso_L && !t2_iso_T) || (t2_iso_M && t1_iso_L && !t1_iso_T);
-      */
+      //bool signalRegion = is_signal;
+      //bool aiRegion = is_ai;  
+      //if (!t1_newiso_VL || !t2_newiso_VL) continue;          
+      ////////////////////////
 
       // Define VBF cate
       bool is_VBF = false;
+      //if (njets>=2 && higgs_pT>100 && dEtajj>2.5) is_VBF=true;  // 2016 anaysis
       if (cat_vbf && higgs_pT>100) is_VBF=true; 
 
       // User obs
