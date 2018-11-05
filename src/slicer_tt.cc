@@ -40,7 +40,6 @@
 #include "../include/scenario_info.h"
 #include "../include/zmumuSF.h"
 #include "../include/EmbedWeight.h"
-#include "../include/TMVAClassification_TMlpANN.cxx"
 
 int main(int argc, char** argv) {
     
@@ -412,7 +411,6 @@ int main(int argc, char** argv) {
       // Reject problomatic one event data G
       if (TMath::IsNaN(tree->Q2V2)) continue;
 
-
       float jpt_1 = scenario.get_jpt_1();
       float jpt_2 = scenario.get_jpt_2();
       float njets = scenario.get_njets();
@@ -423,7 +421,20 @@ int main(int argc, char** argv) {
       float mjj = scenario.get_mjj();
       float ME_sm_ggH = scenario.get_ME_sm_ggH();
       float ME_sm_VBF = scenario.get_ME_sm_VBF();
+      float ME_sm_WH = scenario.get_ME_sm_WH();
+      float ME_sm_ZH = scenario.get_ME_sm_ZH();
       float ME_bkg = scenario.get_ME_bkg();
+      float ME_bkg1 = scenario.get_ME_bkg1();
+      float ME_bkg2 = scenario.get_ME_bkg2();
+      float Dbkg_VBF = scenario.get_Dbkg_VBF();
+      float Dbkg_ggH = scenario.get_Dbkg_ggH();
+      float Phi = scenario.get_Phi();
+      float Phi1 = scenario.get_Phi1();
+      float costheta1 = scenario.get_costheta1();
+      float costheta2 = scenario.get_costheta2();
+      float costhetastar = scenario.get_costhetastar();
+      float Q2V1 = scenario.get_Q2V1();
+      float Q2V2 = scenario.get_Q2V2();
 
       // mytau1 is the highest pT tau
       float charge1=tree->q_1;
@@ -622,25 +633,15 @@ int main(int argc, char** argv) {
         if (jpt_2<30) {jpt_2=-9999.0; tree->jeta_2=-9999.0; tree->jphi_2=-9999.0;}
 	TLorentzVector myjet1;
 	myjet1.SetPtEtaPhiM(jpt_1,tree->jeta_1,tree->jphi_1,0);
-	//myjet1.SetPtEtaPhiM(scenario.get_jpt_1(),jeta_1,jphi_1,0);
 	TLorentzVector myjet2;
 	myjet2.SetPtEtaPhiM(jpt_2,tree->jeta_2,tree->jphi_2,0);
-	//myjet2.SetPtEtaPhiM(scenario.get_jpt_2(),jeta_2,jphi_2,0);
 	TLorentzVector jets=myjet2+myjet1;
 	//mjj = jets.M();
 
 	TLorentzVector myrawmet;
-	//myrawmet.SetPtEtaPhiM(met,0,metphi,0);
-	myrawmet.SetPtEtaPhiM(scenario.get_met(),0,scenario.get_metphi(),0);
+	myrawmet.SetPtEtaPhiM(met,0,metphi,0);
 	TLorentzVector mymet=myrawmet;
-
 	TLorentzVector Higgs = mytau1+mytau2+mymet;	
-	// MELA
-        float normMELAvbf = ME_sm_VBF/(ME_sm_VBF+45*ME_bkg);
-        float normMELAggh = ME_sm_ggH/(ME_sm_ggH+45*ME_bkg);
-        float normMELAvbfByggh = ME_sm_VBF/(ME_sm_ggH+ME_sm_VBF);
-        float normMELAgghByvbf = ME_sm_ggH/(ME_sm_VBF+ME_sm_ggH);
-        float normtest = ME_sm_VBF/(ME_sm_VBF+35*ME_bkg);
 
 	// TES 
 	if (tree->gen_match_2==5 && tree->gen_match_1==5) {
@@ -670,34 +671,14 @@ int main(int argc, char** argv) {
 
        	// Additional selections
 	bool selection =true;
-	
-	// Categories
-	bool is_0jet = false;
-	bool is_boosted = false;
-	bool is_VBF = false;
-	bool is_studyVBF = false;
-	bool is_VH = false;
-	bool is_2jets = false;
-	////////////////////////////
-	// 2016 analysis category //
-	////////////////////////////
-	if (njets==0) is_0jet=true;
-	if (njets==1 || (njets>=2 && (!(Higgs.Pt()>100 && std::abs(myjet1.Eta()-myjet2.Eta())>2.5)))) is_boosted=true; 
-	if (njets>=2 && Higgs.Pt()>100 && std::abs(myjet1.Eta()-myjet2.Eta())>2.5) is_VBF=true;
-	if (njets>=2 && mjj>300) is_studyVBF=true;
-	////////////////////////
-	// KSU study category //
-	////////////////////////
-	//if (njets==0) is_0jet=true;
-	//else if (njets>=2 && mjj>300)  is_VBF=true; 
-	//else is_boosted=true;
 
-	// Z mumu SF 
+	// Z mumu SF -- Need to be changed for new category!! FIXME
+	/*
 	if (is_boosted && (sample=="DY" || sample=="ZTT" || sample=="ZLL" || sample=="ZL" || sample=="ZJ" || sample=="EWKZLL" || sample=="EWKZNuNu")) 
 	  aweight*=zmumuSF_boosted(pt_sv,shape);
 	if (is_VBF && (sample=="DY" || sample=="ZTT" || sample=="ZLL" || sample=="ZL" || sample=="ZJ" || sample=="EWKZLL" || sample=="EWKZNuNu")) 
 	  aweight*=zmumuSF_vbf(mjj,shape);
-
+	*/
 	if (sample=="data_obs") {aweight=1.0; weight2=1.0;}       
 
 	//////////////////////
@@ -725,108 +706,15 @@ int main(int argc, char** argv) {
 	}
 	//std::cout << aweight << "\t" << weight2 << "\t" << weight2*aweight << std::endl;
 
-	// book the NN                                                                                                        
-	TMVAClassification_TMlpANN* t = new TMVAClassification_TMlpANN();
-	double my_NN = t->Value(0, Phi, Phi1, costheta1, costheta2, costhetastar, Q2V1, Q2V2);      
-
-	//************************* Fill histograms **********************
-	//////////////////////////////////////////////////////////////////
-	//                                                              //
-	//  - Variable info (2016 analysis) -                           //
-	//                                                              //
-	//   0jet    -> mtautau svFit (m_sv)                            //
-	//   boosted -> Higgs pT svFit (pt_sv) VS mtautau svFit (m_sv)  // 
-	//   vbf     -> mjj VS mtautau svFit (m_sv)                     //
-	//                                                              //
-	//////////////////////////////////////////////////////////////////
-	float var_0jet = m_sv;
-	float var_boostedX = Higgs.Pt();//pt_sv;
-	float var_boostedY = m_sv; 
-	float var_vbfX = mjj;
-	float var_vbfY = m_sv;
-
 	if (selection){
-	  // ################### signalRegion && OS ####################
-	  if (is_0jet && signalRegion && OS){
-	    h0_OS[k]->Fill(var_0jet,weight2*aweight);
-	    if (shape=="nominal")
-	      h_0jet->Fill(var_0jet,weight2*aweight);
-	  }
-	  if (is_boosted && signalRegion && OS){
-	    h1_OS[k]->Fill(var_boostedX,var_boostedY,weight2*aweight);
-	    if (shape=="nominal"){
-	      hx_boosted->Fill(var_boostedX,weight2*aweight);
-	      hy_boosted->Fill(var_boostedY,weight2*aweight);
-	    }
-	  }
-	  if (is_VBF && signalRegion && OS) {
-	    h2_OS[k]->Fill(var_vbfX,var_vbfY,weight2*aweight);
-	    if (shape=="nominal"){
-	      hx_vbf->Fill(var_vbfX,weight2*aweight);
-	      hy_vbf->Fill(var_vbfY,weight2*aweight);
-	    }
-	  }
-	  if (is_VH && signalRegion && OS)
-	    h3_OS[k]->Fill(var_vbfX,var_vbfY,weight2*aweight);
-	  if (signalRegion && OS)
-	    h_OS[k]->Fill(var_0jet,weight2*aweight);
-	  
-	  
-	  // ################### signalRegion && SS ####################
-	  if (is_0jet && signalRegion && SS)
-	    h0_SS[k]->Fill(var_0jet,weight2*aweight);
-	  if (is_boosted && signalRegion && SS)
-	    h1_SS[k]->Fill(var_boostedX,var_boostedY,weight2*aweight);
-	  if (is_VBF && signalRegion && SS) 
-	    h2_SS[k]->Fill(var_vbfX,var_vbfY,weight2*aweight);
-	  if (is_VH && signalRegion && SS)
-	    h3_SS[k]->Fill(var_vbfX,var_vbfY,weight2*aweight); 
-	  if (signalRegion && SS)
-	    h_SS[k]->Fill(var_0jet,weight2*aweight);
-
-
-	  // ################### ai-Region && OS ####################
-	  if (is_0jet && OS && aiRegion)
-	    h0_AIOS[k]->Fill(var_0jet,weight2*aweight);
-	  if (is_boosted && OS && aiRegion)
-	    h1_AIOS[k]->Fill(var_boostedX,var_boostedY,weight2*aweight);
-	  if (is_VBF && OS && aiRegion) 
-	    h2_AIOS[k]->Fill(var_vbfX,var_vbfY,weight2*aweight);
-	  if (is_VH && OS && aiRegion)
-	    h3_AIOS[k]->Fill(var_vbfX,var_vbfY,weight2*aweight);
-	  if (OS && aiRegion)
-	    h_AIOS[k]->Fill(var_0jet,weight2*aweight);
-
-	  
-	  // ################### ai-Region && SS ####################
-	  if (is_0jet && SS && aiRegion)
-	    h0_AISS[k]->Fill(var_0jet,weight2*aweight);
-	  if (is_boosted && SS && aiRegion)
-	    h1_AISS[k]->Fill(var_boostedX,var_boostedY,weight2*aweight);
-	  if (is_VBF && SS && aiRegion) 
-	    h2_AISS[k]->Fill(var_vbfX,var_vbfY,weight2*aweight);
-	  if (is_VH && SS && aiRegion)
-	    h3_AISS[k]->Fill(var_vbfX,var_vbfY,weight2*aweight);
-	  if (SS && aiRegion)
-	    h_AISS[k]->Fill(var_0jet,weight2*aweight);	  
-
-
-	  // ################### trg SF ####################
-	  h_trgSF1[k]->Fill(sf_trg1);
-	  h_trgSF2[k]->Fill(sf_trg2);
-	  if (tree->gen_match_1==5 && tree->gen_match_2==5) h_trgSF_RR[k]->Fill(sf_trg_RR);
-	  if (tree->gen_match_1==6 && tree->gen_match_2==5) h_trgSF_FR[k]->Fill(sf_trg_FR);
-	  if (tree->gen_match_1==5 && tree->gen_match_2==6) h_trgSF_RF[k]->Fill(sf_trg_RF);
-	  if (tree->gen_match_1==6 && tree->gen_match_2==6) h_trgSF_FF[k]->Fill(sf_trg_FF);
-
 	  // Anything related to systematics should be included i.e. picked by scenario
 	  fillTree(namu, tree, i,
 		   Higgs, mytau1, mytau2, myjet1, myjet2,
 		   mjj, met, metphi, m_sv, pt_sv, njets,
-		   tree->Dbkg_VBF, tree->Dbkg_ggH,
-		   ME_sm_VBF,ME_sm_ggH,tree->ME_sm_WH,tree->ME_sm_ZH,ME_bkg,tree->ME_bkg1,tree->ME_bkg2,
-		   tree->Phi,tree->Phi1,tree->costheta1,tree->costheta2,tree->costhetastar,tree->Q2V1,tree->Q2V2,
-		   signalRegion, aiRegion,weight2*aweight
+		   Dbkg_VBF, Dbkg_ggH,
+		   ME_sm_VBF, ME_sm_ggH, ME_sm_WH, ME_sm_ZH, ME_bkg, ME_bkg1, ME_bkg2,
+		   Phi, Phi1, costheta1, costheta2, costhetastar, Q2V1, Q2V2,
+		   signalRegion, aiRegion, weight2*aweight
 		   );
 	}
       }
