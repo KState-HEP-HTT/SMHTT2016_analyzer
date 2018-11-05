@@ -44,6 +44,7 @@ int main(int argc, char** argv) {
     namu->SetBranchAddress("mu_phi",              &mu_phi               );
     namu->SetBranchAddress("mu_mass",             &mu_mass              ); 
     namu->SetBranchAddress("mu_charge",           &mu_charge            );
+    namu->SetBranchAddress("mu_iso",              &mu_iso               );
     namu->SetBranchAddress("t1_pt",               &t1_pt                ); 
     namu->SetBranchAddress("t1_eta",              &t1_eta               );
     namu->SetBranchAddress("t1_phi",              &t1_phi               );
@@ -153,7 +154,7 @@ int main(int argc, char** argv) {
     namu->SetBranchAddress("is_signal",           &is_signal            );          
     namu->SetBranchAddress("is_ai",               &is_ai                );              
 
-    namu->SetBranchAddress("NN_disc",             &NN_disc              );
+    namu->SetBranchAddress("NN_disc_QCD",         &NN_disc_QCD          );
     namu->SetBranchAddress("NN_disc_ZTT",         &NN_disc_ZTT          );
 
     //Binning for 0jet cat. 1D: Msv. In AN it was 10GeV binning / official data card combined 0~50 as one bin
@@ -163,7 +164,7 @@ int main(int argc, char** argv) {
     //Binning for 1jet cat, y-axis: Msv
     float bins1Y[] = {0,40,60,70,80,90,100,110,120,130,150,200,250};
     //Binning for 2jet cat, x-axis: Mjj
-    float bins2X[] = {0,300,500,800,10000}; //{300,700,1100,1500,10000};//{0,0.1,0.5,0.9,1.0};
+    float bins2X[] = {300,700,1100,1500,10000};//{0,0.1,0.5,0.9,1.0}; //{0,300,500,800,10000}; //{300,700,1100,1500,10000};//{0,0.1,0.5,0.9,1.0};
     //Binning for 2jet cat, y-axis: Msv
     float bins2Y[] = {0,40,60,70,80,90,100,110,120,130,150,200,250};
 
@@ -261,8 +262,9 @@ int main(int argc, char** argv) {
 	// KSU study category //     
 	////////////////////////     
 	if (njets==0) is_0jet=true;
-	else if (njets==1) is_boosted=true;   
-	else if (cat_vbf && higgs_pT>100 && !twoProng) is_VBF=true;
+	//else if (njets==1 ||) is_boosted=true;   
+	else if (cat_vbf && higgs_pT>100) is_VBF=true;
+	else is_boosted=true;
       }
       float var_0jet = m_sv;
       float var_boostedX = higgs_pT;

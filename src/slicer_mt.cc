@@ -38,7 +38,6 @@
 #include "../include/ZmmSF.h"
 #include "../include/LumiReweightingStandAlone_mt.h"
 #include "../include/btagSF_mt.h"
-#include "../include/TMVAClassification_TMlpANN.cxx"
 #include "../include/EmbedWeight.h"
 //#include "include/scenario_info.h"
 
@@ -82,6 +81,7 @@ int main(int argc, char** argv) {
     namu->Branch("mu_phi",              &mu_phi,              "mu_phi/F"             );
     namu->Branch("mu_mass",             &mu_mass,             "mu_mass/F"            );
     namu->Branch("mu_charge",           &mu_charge,           "mu_charge/F"          );
+    namu->Branch("mu_iso",              &mu_iso,              "mu_iso/F"             );
     namu->Branch("t1_pt",               &t1_pt,               "t1_pt/F"              );
     namu->Branch("t1_eta",              &t1_eta,              "t1_eta/F"             );
     namu->Branch("t1_phi",              &t1_phi,              "t1_phi/F"             );
@@ -251,6 +251,19 @@ int main(int argc, char** argv) {
 	std::cout << "run :" << tree->run << std::endl;
 	continue;
       }
+
+      /////////////////////////////////////
+      //  For cross check with 2016 SVN  //
+      /////////////////////////////////////
+      //if (!tree->decayModeFinding_2) continue;
+      if (!tree->byVLooseIsolationMVArun2v1DBnewDMwLT_2) continue;
+      float signalRegion=(tree->byTightIsolationMVArun2v1DBnewDMwLT_2 && tree->iso_1<0.15);
+      float qcdRegion=(tree->byMediumIsolationMVArun2v1DBnewDMwLT_2 && tree->iso_1<0.30);
+      float wRegion=(tree->byMediumIsolationMVArun2v1DBnewDMwLT_2 && tree->iso_1<0.30);
+      float wsfRegion=(tree->byTightIsolationMVArun2v1DBnewDMwLT_2 && tree->iso_1<0.15);
+      float qcdCR=(tree->byTightIsolationMVArun2v1DBnewDMwLT_2 && tree->iso_1<0.30 && tree->iso_1>0.15);      
+      /////////////////////////////////////
+      //tree->byVLooseIsolationMVArun2v1DBnewDMwLT_2
       if (i % 10000 == 0) fprintf(stdout, "\r  Processed events: %8d of %8d ", i, nentries_wtn);
       fflush(stdout);
 
@@ -286,12 +299,6 @@ int main(int argc, char** argv) {
 
       float ratioanti=(sf_id_anti)/(sf_id);
       
-      float signalRegion=(tree->byTightIsolationMVArun2v1DBoldDMwLT_2 && tree->iso_1<0.15);
-      float qcdRegion=(tree->byMediumIsolationMVArun2v1DBoldDMwLT_2 && tree->iso_1<0.30);
-      float wRegion=(tree->byMediumIsolationMVArun2v1DBoldDMwLT_2 && tree->iso_1<0.30);
-      float wsfRegion=(tree->byTightIsolationMVArun2v1DBoldDMwLT_2 && tree->iso_1<0.15);
-      float qcdCR=(tree->byTightIsolationMVArun2v1DBoldDMwLT_2 && tree->iso_1<0.30 && tree->iso_1>0.15);
-
       TLorentzVector mytau; 
       mytau.SetPtEtaPhiM(tree->pt_2,tree->eta_2,tree->phi_2,tree->m_2);
       TLorentzVector mymu;

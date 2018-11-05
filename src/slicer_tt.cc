@@ -73,6 +73,7 @@ int main(int argc, char** argv) {
     namu->Branch("mu_phi",              &mu_phi,              "mu_phi/F"             );
     namu->Branch("mu_mass",             &mu_mass,             "mu_mass/F"            );
     namu->Branch("mu_charge",           &mu_charge,           "mu_charge/F"          );
+    namu->Branch("mu_iso",              &mu_iso,              "mu_iso/F"             );
     namu->Branch("t1_pt",               &t1_pt,               "t1_pt/F"              );
     namu->Branch("t1_eta",              &t1_eta,              "t1_eta/F"             );
     namu->Branch("t1_phi",              &t1_phi,              "t1_phi/F"             );

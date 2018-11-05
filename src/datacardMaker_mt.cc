@@ -42,6 +42,7 @@ int main(int argc, char** argv) {
     arbre->SetBranchAddress("mu_phi", &mu_phi);
     arbre->SetBranchAddress("mu_mass", &mu_mass);
     arbre->SetBranchAddress("mu_charge", &mu_charge);
+    arbre->SetBranchAddress("mu_iso", &mu_iso);
 
     arbre->SetBranchAddress("j1_pt",&j1_pt);
     arbre->SetBranchAddress("j1_eta", &j1_eta);
@@ -162,10 +163,20 @@ int main(int argc, char** argv) {
       arbre->GetEntry(i);
       if (i % 1000 == 0) fprintf(stdout, "\r  Processed events: %8d of %8d ", i, nentries_wtn);
       fflush(stdout);
-      // book the NN                                                                                                        
-      TMVAClassification_TMlpANN* t = new TMVAClassification_TMlpANN();
-      double my_NN = t->Value(0, Phi, Phi1, costheta1, costheta2, costhetastar, Q2V1, Q2V2);      
       float normMELAvbf = ME_sm_VBF/(ME_sm_VBF+45*ME_bkg);
+
+      /////////////////////////
+      //  For relaxed skims  //
+      /////////////////////////
+      bool twoProng = t1_decayMode == 5 || t1_decayMode ==  6;
+      if (twoProng) continue;            
+      if (!t1_iso_VL) continue;
+      if (!t1_dmf) continue;
+      bool signalRegion = false;
+      bool aiRegion = false;
+      signalRegion = t1_iso_T && t2_iso_T;
+      aiRegion = (t1_iso_M && t2_iso_L && !t2_iso_T) || (t2_iso_M && t1_iso_L && !t1_iso_T);
+      ////////////////////////
 
       // Categories                                                                                                                                                                                       
       bool is_0jet = false;
