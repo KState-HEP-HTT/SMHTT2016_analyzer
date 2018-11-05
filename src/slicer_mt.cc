@@ -39,7 +39,7 @@
 #include "../include/LumiReweightingStandAlone_mt.h"
 #include "../include/btagSF_mt.h"
 #include "../include/EmbedWeight.h"
-//#include "include/scenario_info.h"
+#include "../include/scenario_info.h"
 
 typedef std::vector<double> NumV;
 
@@ -88,8 +88,6 @@ int main(int argc, char** argv) {
     namu->Branch("t1_mass",             &t1_mass,             "t1_mass/F"            );
     namu->Branch("t1_charge",           &t1_charge,           "t1_charge/F"          );
     namu->Branch("t1_decayMode",        &t1_decayMode,        "t1_decayMode/F"       );
-    namu->Branch("t1_tightIso",         &t1_tightIso,         "t1_tightIso/F"        );//
-    namu->Branch("t1_mediumIso",        &t1_mediumIso,        "t1_mediumIso/F"       );//
     namu->Branch("t1_dmf",              &t1_dmf,              "t1_dmf/F"             );
     namu->Branch("t1_dmf_new",          &t1_dmf_new,          "t1_dmf_new/F"         );
     namu->Branch("t1_iso_VL",           &t1_iso_VL,           "t1_iso_VL/F"          );
@@ -219,6 +217,8 @@ int main(int argc, char** argv) {
     cout.setf(ios::fixed, ios::floatfield);
     cout.precision(10);
 
+    scenario_info scenario(treePtr, shape);
+
     // Construct scenario
     //scenario_info scenario(arbre, unc);
     ScaleFactor * myScaleFactor_trgMu24 = new ScaleFactor();
@@ -251,6 +251,32 @@ int main(int argc, char** argv) {
 	std::cout << "run :" << tree->run << std::endl;
 	continue;
       }
+
+      float jpt_1 = scenario.get_jpt_1();
+      float jpt_2 = scenario.get_jpt_2();
+      float njets = scenario.get_njets();
+      float met = scenario.get_met();
+      float metphi = scenario.get_metphi();
+      float m_sv = scenario.get_m_sv();
+      float pt_sv = scenario.get_pt_sv();
+      float mjj = scenario.get_mjj();
+      float ME_sm_ggH = scenario.get_ME_sm_ggH();
+      float ME_sm_VBF = scenario.get_ME_sm_VBF();
+      float ME_sm_WH = scenario.get_ME_sm_WH();
+      float ME_sm_ZH = scenario.get_ME_sm_ZH();
+      float ME_bkg = scenario.get_ME_bkg();
+      float ME_bkg1 = scenario.get_ME_bkg1();
+      float ME_bkg2 = scenario.get_ME_bkg2();
+      float Dbkg_VBF = scenario.get_Dbkg_VBF();
+      float Dbkg_ggH = scenario.get_Dbkg_ggH();
+      float Phi = scenario.get_Phi();
+      float Phi1 = scenario.get_Phi1();
+      float costheta1 = scenario.get_costheta1();
+      float costheta2 = scenario.get_costheta2();
+      float costhetastar = scenario.get_costhetastar();
+      float Q2V1 = scenario.get_Q2V1();
+      float Q2V2 = scenario.get_Q2V2();
+
 
       /////////////////////////////////////
       //  For cross check with 2016 SVN  //
@@ -327,190 +353,177 @@ int main(int argc, char** argv) {
       }
       
       float correction=sf_id;
-        if (sample!="embedded" && sample!="data_obs") correction=correction*LumiWeights_12->weight(tree->npu);
-        if (sample=="embedded" && tree->genweight>1) continue;//genweight=0.10;
-	float aweight = 1.0;
-	if (name.find("ggH")) aweight = tree->genweight*weight*correction;
-	else aweight=tree->genweight*weight*correction;
+      if (sample!="embedded" && sample!="data_obs") correction=correction*LumiWeights_12->weight(tree->npu);
+      if (sample=="embedded" && tree->genweight>1) continue;//genweight=0.10;
+      float aweight = 1.0;
+      if (name.find("ggH")) aweight = tree->genweight*weight*correction;
+      else aweight=tree->genweight*weight*correction;
 	
-        if (sample!="data_obs"){
-	  if (tree->gen_match_2==5) aweight=aweight*0.95;
-	  if (tree->gen_match_2==2 or tree->gen_match_2==4){//Yiwen reminiaod
-	    if (fabs(tree->eta_2)<0.4) aweight=aweight*1.263;
-	    else if (fabs(tree->eta_2)<0.8) aweight=aweight*1.364;
-	    else if (fabs(tree->eta_2)<1.2) aweight=aweight*0.854;
-	    else if (fabs(tree->eta_2)<1.7) aweight=aweight*1.712;
-	    else if (fabs(tree->eta_2)<2.3) aweight=aweight*2.324;
-	    if (sample=="ZL" && tree->l2_decayMode==0) aweight=aweight*0.74; //ZL corrections Laura
-	    else if (sample=="ZL" && tree->l2_decayMode==1) aweight=aweight*1.0;
-	  }
-	  if (tree->gen_match_2==1 or tree->gen_match_2==3){//Yiwen
-	    if (fabs(tree->eta_2)<1.460) aweight=aweight*1.213;
-	    else if (fabs(tree->eta_2)>1.558) aweight=aweight*1.375;
-	  }
-	  aweight=aweight*h_Trk->Eval(tree->eta_1);
-        }
-
-	if (name.find("ggH")<100 && name.find("NNLOPS")>100 && name.find("hww")>100){
-	  if (tree->Rivet_nJets30==0) aweight = aweight * g_NNLOPS_0jet->Eval(min(tree->Rivet_higgsPt,float(125.0)));
-	  if (tree->Rivet_nJets30==1) aweight = aweight * g_NNLOPS_1jet->Eval(min(tree->Rivet_higgsPt,float(625.0)));
-	  if (tree->Rivet_nJets30==2) aweight = aweight * g_NNLOPS_2jet->Eval(min(tree->Rivet_higgsPt,float(800.0)));
-	  if (tree->Rivet_nJets30>=3) aweight = aweight * g_NNLOPS_3jet->Eval(min(tree->Rivet_higgsPt,float(925.0)));
+      if (sample!="data_obs"){
+	if (tree->gen_match_2==5) aweight=aweight*0.95;
+	if (tree->gen_match_2==2 or tree->gen_match_2==4){//Yiwen reminiaod
+	  if (fabs(tree->eta_2)<0.4) aweight=aweight*1.263;
+	  else if (fabs(tree->eta_2)<0.8) aweight=aweight*1.364;
+	  else if (fabs(tree->eta_2)<1.2) aweight=aweight*0.854;
+	  else if (fabs(tree->eta_2)<1.7) aweight=aweight*1.712;
+	  else if (fabs(tree->eta_2)<2.3) aweight=aweight*2.324;
+	  if (sample=="ZL" && tree->l2_decayMode==0) aweight=aweight*0.74; //ZL corrections Laura
+	  else if (sample=="ZL" && tree->l2_decayMode==1) aweight=aweight*1.0;
 	}
-
-
-        NumV WG1unc = qcd_ggF_uncert_2017(tree->Rivet_nJets30, tree->Rivet_higgsPt, tree->Rivet_stage1_cat_pTjet30GeV);
-
-	if (sample=="EWKZLL" or sample=="EWKZNuNu" or sample=="ZTT" or sample=="ZLL" or sample=="ZL" or sample=="ZJ"){
-	  float zpt_corr=histZ->GetBinContent(histZ->GetXaxis()->FindBin(tree->genM),histZ->GetYaxis()->FindBin(tree->genpT));
-	  if (fabs(tes)!=10) //nominal
-	    aweight=aweight*zpt_corr;
-	  else if (tes==10) // up
-	    aweight=aweight*(1+1.10*(zpt_corr-1));
-	  else if (tes==-10) // down
-	    aweight=aweight*(1+0.90*(zpt_corr-1));
+	if (tree->gen_match_2==1 or tree->gen_match_2==3){//Yiwen
+	  if (fabs(tree->eta_2)<1.460) aweight=aweight*1.213;
+	  else if (fabs(tree->eta_2)>1.558) aweight=aweight*1.375;
 	}
+	aweight=aweight*h_Trk->Eval(tree->eta_1);
+      }
 
-	//************************ Jet to tau FR shape **************************
-	if (tes==14 && (sample=="TTJ" or sample=="ZJ" or sample=="W") && tree->gen_match_2==6){
-	  float jtotau=1-(0.2*mytau.Pt()/100);
-	  if (mytau.Pt()>200) jtotau=1-(0.2*200.0/100);
-	  aweight=aweight*jtotau;
-	}
-        if (tes==-14 && (sample=="TTJ" or sample=="ZJ" or sample=="W") && tree->gen_match_2==6){
-	  float jtotau=1+(0.2*mytau.Pt()/100);
-	  if (mytau.Pt()>200) jtotau=1+(0.2*200.0/100);
-	  aweight=aweight*jtotau;
-        }
+      if (name.find("ggH")<100 && name.find("NNLOPS")>100 && name.find("hww")>100){
+	if (tree->Rivet_nJets30==0) {aweight = aweight * g_NNLOPS_0jet->Eval(min(tree->Rivet_higgsPt,float(125.0))); std::cout << "1" << std::endl;}
+	if (tree->Rivet_nJets30==1) {aweight = aweight * g_NNLOPS_1jet->Eval(min(tree->Rivet_higgsPt,float(625.0))); std::cout << "2"<< std::endl;}
+	if (tree->Rivet_nJets30==2) {aweight = aweight * g_NNLOPS_2jet->Eval(min(tree->Rivet_higgsPt,float(800.0))); std::cout << "3"<< std::endl;}
+	if (tree->Rivet_nJets30>=3) {aweight = aweight * g_NNLOPS_3jet->Eval(min(tree->Rivet_higgsPt,float(925.0))); std::cout << "4"<< std::endl;}
+      }
 
-	//*********************** Definition of fit variables *******************
-        float var2=tree->m_sv;
-        float var1_1=tree->pt_sv;
-        float var1_0=mytau.Pt();
 
-	// ###########################################################
-	// ######## Separation between L, T and J ####################
-	// ###########################################################
+      NumV WG1unc = qcd_ggF_uncert_2017(tree->Rivet_nJets30, tree->Rivet_higgsPt, tree->Rivet_stage1_cat_pTjet30GeV);
+
+      if (sample=="EWKZLL" or sample=="EWKZNuNu" or sample=="ZTT" or sample=="ZLL" or sample=="ZL" or sample=="ZJ"){
+	float zpt_corr=histZ->GetBinContent(histZ->GetXaxis()->FindBin(tree->genM),histZ->GetYaxis()->FindBin(tree->genpT));
+	if (fabs(tes)!=10) //nominal
+	  aweight=aweight*zpt_corr;
+	else if (tes==10) // up
+	  aweight=aweight*(1+1.10*(zpt_corr-1));
+	else if (tes==-10) // down
+	  aweight=aweight*(1+0.90*(zpt_corr-1));
+      }
+
+      //************************ Jet to tau FR shape **************************
+      if (tes==14 && (sample=="TTJ" or sample=="ZJ" or sample=="W") && tree->gen_match_2==6){
+	float jtotau=1-(0.2*mytau.Pt()/100);
+	if (mytau.Pt()>200) jtotau=1-(0.2*200.0/100);
+	aweight=aweight*jtotau;
+      }
+      if (tes==-14 && (sample=="TTJ" or sample=="ZJ" or sample=="W") && tree->gen_match_2==6){
+	float jtotau=1+(0.2*mytau.Pt()/100);
+	if (mytau.Pt()>200) jtotau=1+(0.2*200.0/100);
+	aweight=aweight*jtotau;
+      }
+
+      //*********************** Definition of fit variables *******************
+      float var2=tree->m_sv;
+      float var1_1=tree->pt_sv;
+      float var1_0=mytau.Pt();
+      
+      // ###########################################################
+      // ######## Separation between L, T and J ####################
+      // ###########################################################
+      
+      if (sample=="ZL" && tree->gen_match_2>4) continue;
+      if ((sample=="TTT" or sample=="ZTT") && tree->gen_match_2!=5) continue;
+      if ((sample=="TTJ" or sample=="ZLL") && tree->gen_match_2==5) continue;
+      if (sample=="ZJ" && tree->gen_match_2!=6) continue;
+      
+      // #############################################################
+      // ################### Top pT reweighting ######################
+      // #############################################################
+      float pttop1=tree->pt_top1;
+      if (pttop1>400) pttop1=400;
+      float pttop2=tree->pt_top2;
+      if (pttop2>400) pttop2=400;
+      if ((sample=="TTJ" or sample=="TTT" or sample=="TT") && fabs(tes)!=11) aweight*=sqrt(exp(0.0615-0.0005*pttop1)*exp(0.0615-0.0005*pttop2));
+      if ((sample=="TTJ" or sample=="TTT" or sample=="TT") && tes==11) aweight*=(1+2*(sqrt(exp(0.0615-0.0005*pttop1)*exp(0.0615-0.0005*pttop2))-1));
+      
+      if (sample=="data_obs") aweight=1.0;
+
+      float weight_btag=1.0;
+      if (sample!="data_obs"){
+	int nbtagged=tree->nbtag;
+	if (nbtagged>2) nbtagged=2;
+	weight_btag=bTagEventWeight(nbtagged,tree->bpt_1,tree->bflavor_1,tree->bpt_2,tree->bflavor_2,1,0,0);
+	if (nbtagged>2) weight_btag=0;
+      }
+      bool is_bveto=(sample!="data_obs" or tree->nbtag==0);
+      
+      TLorentzVector myrawmet;
+      myrawmet.SetPtEtaPhiM(tree->met,0,tree->metphi,0);
+      TLorentzVector myrawtau=mytau;
+      float ratioantiraw=ratioanti;
+      float weight2=1.0;
+      TLorentzVector mymet=myrawmet;
+      mytau=myrawtau;
+      var1_1=tree->pt_sv;
+      var2=tree->m_sv;
+      float var1_2=tree->mjj;
+      float dm_weight=1.0;
+      if (tree->njets==0) var2=(mymu+mytau).M();
+      if (mytau.Pt()<30) continue;
+      //var1_0=mytau.Pt();
+      var1_0=tree->l2_decayMode;//FIXME
+      var1_1=(mymu+mytau+mymet).Pt();//FIXME
+      
+      float mt=TMass_F(mymu.Pt(),mymet.Pt(),mymu.Px(),mymet.Px(),mymu.Py(),mymet.Py());
 	
-        if (sample=="ZL" && tree->gen_match_2>4) continue;
-        if ((sample=="TTT" or sample=="ZTT") && tree->gen_match_2!=5) continue;
-        if ((sample=="TTJ" or sample=="ZLL") && tree->gen_match_2==5) continue;
-        if (sample=="ZJ" && tree->gen_match_2!=6) continue;
-
-	// #############################################################
-     	// ################### Top pT reweighting ######################
-     	// #############################################################
-	float pttop1=tree->pt_top1;
-        if (pttop1>400) pttop1=400;
-        float pttop2=tree->pt_top2;
-        if (pttop2>400) pttop2=400;
-        if ((sample=="TTJ" or sample=="TTT" or sample=="TT") && fabs(tes)!=11) aweight*=sqrt(exp(0.0615-0.0005*pttop1)*exp(0.0615-0.0005*pttop2));
-        if ((sample=="TTJ" or sample=="TTT" or sample=="TT") && tes==11) aweight*=(1+2*(sqrt(exp(0.0615-0.0005*pttop1)*exp(0.0615-0.0005*pttop2))-1));
-
-	if (sample=="data_obs") aweight=1.0;
-
-	float weight_btag=1.0;
-        if (sample!="data_obs"){
-	  int nbtagged=tree->nbtag;
-	  if (nbtagged>2) nbtagged=2;
-	  weight_btag=bTagEventWeight(nbtagged,tree->bpt_1,tree->bflavor_1,tree->bpt_2,tree->bflavor_2,1,0,0);
-	  if (nbtagged>2) weight_btag=0;
-        }
-	bool is_bveto=(sample!="data_obs" or tree->nbtag==0);
-	
-        TLorentzVector myrawmet;
-        myrawmet.SetPtEtaPhiM(tree->met,0,tree->metphi,0);
+      if (sample!="embedded" && sample!="data_obs"){
+	if (mymu.Pt()<23){ 
+	  w2->var("t_pt")->setVal(mytau.Pt());
+	  w2->var("t_eta")->setVal(mytau.Eta());
+	  w2->var("t_dm")->setVal(tree->l2_decayMode);
+	  float eff_tau_ratio = w2->function("t_genuine_TightIso_mt_ratio")->getVal();
+	  sf_trg=myScaleFactor_trgMu19Leg->get_ScaleFactor(tree->pt_1,tree->eta_1)*eff_tau_ratio;
+	  sf_trg_anti=myScaleFactor_trgMu19LegAnti->get_ScaleFactor(tree->pt_1,tree->eta_1)*eff_tau_ratio;
+	}
+	else{
+	  sf_trg=myScaleFactor_trgMu22->get_ScaleFactor(tree->pt_1,tree->eta_1);
+	  sf_trg_anti=myScaleFactor_trgMu22Anti->get_ScaleFactor(tree->pt_1,tree->eta_1);
+	}
+      }
+      if (sample=="data_obs") {aweight=1.0; weight2=1.0;}
+      /*
+	TLorentzVector myrawmet;
+	myrawmet.SetPtEtaPhiM(tree->met,0,tree->metphi,0);
 	TLorentzVector myrawtau=mytau;
-	float ratioantiraw=ratioanti;
-	float weight2=1.0;
 	TLorentzVector mymet=myrawmet;
-	mytau=myrawtau;
-	var1_1=tree->pt_sv;
-	var2=tree->m_sv;
-	float var1_2=tree->mjj;
-	float dm_weight=1.0;
-	if (tree->njets==0) var2=(mymu+mytau).M();
-	if (mytau.Pt()<30) continue;
-	  //var1_0=mytau.Pt();
-	var1_0=tree->l2_decayMode;//FIXME
-	var1_1=(mymu+mytau+mymet).Pt();//FIXME
+      */
+      //////////////////////
+      // Embedded weights //
+      //////////////////////
+      if (sample=="embedded") {
+	aweight=1.0; weight2=1.0;
+	float Stitching_Weight= 1.0;
+	if ((tree->run >= 272007) && (tree->run < 275657))  Stitching_Weight=(1.0/0.899 * 1.02);
+	if ((tree->run >= 275657) && (tree->run < 276315))  Stitching_Weight=(1.0/0.881 * 1.02);
+	if ((tree->run >= 276315) && (tree->run < 276831))  Stitching_Weight=(1.0/0.877 * 1.02);
+	if ((tree->run >= 276831) && (tree->run < 277772))  Stitching_Weight=(1.0/0.939 * 1.02);
+	if ((tree->run >= 277772) && (tree->run < 278820))  Stitching_Weight=(1.0/0.936 * 1.02);
+	if ((tree->run >= 278820) && (tree->run < 280919))  Stitching_Weight=(1.0/0.908 * 1.02);
+	if ((tree->run >= 280919) && (tree->run < 284045))  Stitching_Weight=(1.0/0.962 * 1.02);
 	
-	float mt=TMass_F(mymu.Pt(),mymet.Pt(),mymu.Px(),mymet.Px(),mymu.Py(),mymet.Py());
-	
-	if (sample!="embedded" && sample!="data_obs"){
-	  if (mymu.Pt()<23){ 
-	    w2->var("t_pt")->setVal(mytau.Pt());
-	    w2->var("t_eta")->setVal(mytau.Eta());
-	    w2->var("t_dm")->setVal(tree->l2_decayMode);
-	    float eff_tau_ratio = w2->function("t_genuine_TightIso_mt_ratio")->getVal();
-	    sf_trg=myScaleFactor_trgMu19Leg->get_ScaleFactor(tree->pt_1,tree->eta_1)*eff_tau_ratio;
-	    sf_trg_anti=myScaleFactor_trgMu19LegAnti->get_ScaleFactor(tree->pt_1,tree->eta_1)*eff_tau_ratio;
-	  }
-	  else{
-	    sf_trg=myScaleFactor_trgMu22->get_ScaleFactor(tree->pt_1,tree->eta_1);
-	    sf_trg_anti=myScaleFactor_trgMu22Anti->get_ScaleFactor(tree->pt_1,tree->eta_1);
-	  }
-	}
-	if (sample=="data_obs") {aweight=1.0; weight2=1.0;}
-	/*
-	  TLorentzVector myrawmet;
-	  myrawmet.SetPtEtaPhiM(tree->met,0,tree->metphi,0);
-	TLorentzVector myrawtau=mytau;
-	TLorentzVector mymet=myrawmet;
-	*/
-	//////////////////////
-	// Embedded weights //
-	//////////////////////
-	if (sample=="embedded") {
-	  aweight=1.0; weight2=1.0;
-	  float Stitching_Weight= 1.0;
-	  if ((tree->run >= 272007) && (tree->run < 275657))  Stitching_Weight=(1.0/0.899 * 1.02);
-	  if ((tree->run >= 275657) && (tree->run < 276315))  Stitching_Weight=(1.0/0.881 * 1.02);
-	  if ((tree->run >= 276315) && (tree->run < 276831))  Stitching_Weight=(1.0/0.877 * 1.02);
-	  if ((tree->run >= 276831) && (tree->run < 277772))  Stitching_Weight=(1.0/0.939 * 1.02);
-	  if ((tree->run >= 277772) && (tree->run < 278820))  Stitching_Weight=(1.0/0.936 * 1.02);
-	  if ((tree->run >= 278820) && (tree->run < 280919))  Stitching_Weight=(1.0/0.908 * 1.02);
-	  if ((tree->run >= 280919) && (tree->run < 284045))  Stitching_Weight=(1.0/0.962 * 1.02);
-	  
-	  vector<double> info=EmdWeight_Muon(wEmbed,mymu.Pt(),mymu.Eta(),tree->iso_1);	    
-	  double muon_id_scalefactor = info[2];
-	  double muon_iso_scalefactor = info[5];
-	  double muon_trg_efficiency = info[6];
-	  double EmbedWeight=muon_id_scalefactor*muon_iso_scalefactor*muon_trg_efficiency;
-	  float WEIGHT_sel_trg_ratio= m_sel_trg_ratio(wEmbed,mymu.Pt(),mymu.Eta(),mytau.Pt(),mytau.Eta());
-	  aweight=EmbedWeight * tree->genweight * Stitching_Weight * WEIGHT_sel_trg_ratio;
-	}
-
-	weight2=weight2*sf_trg*dm_weight;
-	ratioanti=ratioantiraw*sf_trg_anti/(sf_trg+0.000000001);
-	TLorentzVector Higgs;
-	Higgs.SetPtEtaPhiM(var1_1,(mymet+mymu+mytau).Eta(),(mymet+mymu+mytau).Phi(),(mymet+mymu+mytau).M());
-
-	//cout << aweight << endl;
-	fillTree_mt(namu, tree, i,
-		    Higgs, mytau, mymu, myjet1, myjet2,
-		    tree->mjj, tree->met, tree->metphi, tree->m_sv, tree->pt_sv, tree->njets,
-		    tree->Dbkg_VBF, tree->Dbkg_ggH,
-		    tree->ME_sm_VBF, tree->ME_sm_ggH,tree->ME_sm_WH,tree->ME_sm_ZH,tree->ME_bkg,tree->ME_bkg1,tree->ME_bkg2,
-		    tree->Phi,tree->Phi1,tree->costheta1,tree->costheta2,tree->costhetastar,tree->Q2V1,tree->Q2V2,
-		    signalRegion, qcdRegion,weight2*aweight, mt
-		    );
-	lastindex = i;
+	vector<double> info=EmdWeight_Muon(wEmbed,mymu.Pt(),mymu.Eta(),tree->iso_1);	    
+	double muon_id_scalefactor = info[2];
+	double muon_iso_scalefactor = info[5];
+	double muon_trg_efficiency = info[6];
+	double EmbedWeight=muon_id_scalefactor*muon_iso_scalefactor*muon_trg_efficiency;
+	float WEIGHT_sel_trg_ratio= m_sel_trg_ratio(wEmbed,mymu.Pt(),mymu.Eta(),mytau.Pt(),mytau.Eta());
+	aweight=EmbedWeight * tree->genweight * Stitching_Weight * WEIGHT_sel_trg_ratio;
+      }
+      
+      weight2=weight2*sf_trg*dm_weight;
+      ratioanti=ratioantiraw*sf_trg_anti/(sf_trg+0.000000001);
+      TLorentzVector Higgs;
+      Higgs.SetPtEtaPhiM(var1_1,(mymet+mymu+mytau).Eta(),(mymet+mymu+mytau).Phi(),(mymet+mymu+mytau).M());
+      
+      fillTree_mt(namu, tree, i,
+		  Higgs, mytau, mymu, myjet1, myjet2,
+		  tree->mjj, tree->met, tree->metphi, tree->m_sv, tree->pt_sv, tree->njets,
+		  tree->Dbkg_VBF, tree->Dbkg_ggH,
+		  tree->ME_sm_VBF, tree->ME_sm_ggH,tree->ME_sm_WH,tree->ME_sm_ZH,tree->ME_bkg,tree->ME_bkg1,tree->ME_bkg2,
+		  tree->Phi,tree->Phi1,tree->costheta1,tree->costheta2,tree->costhetastar,tree->Q2V1,tree->Q2V2,
+		  signalRegion, qcdRegion,weight2*aweight, mt
+		  );
+      lastindex = i;
     } // end of loop over events
     std::cout << "DONE\t" << lastindex << "\t" << treePtr->GetEntries() << std::endl;    
-    /*
-    TLorentzVector dummy; 
-    dummy.SetPtEtaPhiM(0,0,0,0);
-    fillTree_mt(namu, tree, lastindex,
-		dummy,dummy,dummy,dummy,dummy,//Higgs, mytau, mymu, myjet1, myjet2,
-		0,0,0,0,0,0,//tree->mjj, tree->met, tree->metphi, tree->m_sv, tree->pt_sv, tree->njets,
-		0,0,//tree->Dbkg_VBF, tree->Dbkg_ggH,
-		0,0,0,0,0,0,0,//tree->ME_sm_VBF, tree->ME_sm_ggH,tree->ME_sm_WH,tree->ME_sm_ZH,tree->ME_bkg,tree->ME_bkg1,tree->ME_bkg2,
-		0,0,0,0,0,0,0,//tree->Phi,tree->Phi1,tree->costheta1,tree->costheta2,tree->costhetastar,tree->Q2V1,tree->Q2V2,
-		0,0,0,0//signalRegion, qcdRegion,aweight, mt
-		);
-    std::cout << "Dummy is filled" << std::endl;    
-    */
+    
     fout->cd();
     nbevt->Write();
     namu->Write();
