@@ -51,11 +51,8 @@ int main(int argc, char** argv) {
     std::string output = *(argv + 2);
     std::string sample = *(argv + 3);
     std::string name = *(argv + 4);
-
+    std::string shape = *(argv + 5);
     float tes=0;
-    if (argc > 1) {
-        tes = atof(argv[5]);
-    }
 
     TFile *f_Double = new TFile(input.c_str());
     cout<<"XXXXXXXXXXXXX "<<input.c_str()<<" XXXXXXXXXXXX"<<endl;
@@ -330,9 +327,9 @@ int main(int argc, char** argv) {
       TLorentzVector mymu;
       mymu.SetPtEtaPhiM(tree->pt_1,tree->eta_1,tree->phi_1,tree->m_1);
       TLorentzVector myjet1;
-      myjet1.SetPtEtaPhiM(tree->jpt_1,tree->jeta_1,tree->jphi_1,0);
+      myjet1.SetPtEtaPhiM(jpt_1,tree->jeta_1,tree->jphi_1,0);
       TLorentzVector myjet2;
-      myjet2.SetPtEtaPhiM(tree->jpt_2,tree->jeta_2,tree->jphi_2,0);
+      myjet2.SetPtEtaPhiM(jpt_2,tree->jeta_2,tree->jphi_2,0);
 
       //***************** Weights **************
       
@@ -378,10 +375,10 @@ int main(int argc, char** argv) {
       }
 
       if (name.find("ggH")<100 && name.find("NNLOPS")>100 && name.find("hww")>100){
-	if (tree->Rivet_nJets30==0) {aweight = aweight * g_NNLOPS_0jet->Eval(min(tree->Rivet_higgsPt,float(125.0))); std::cout << "1" << std::endl;}
-	if (tree->Rivet_nJets30==1) {aweight = aweight * g_NNLOPS_1jet->Eval(min(tree->Rivet_higgsPt,float(625.0))); std::cout << "2"<< std::endl;}
-	if (tree->Rivet_nJets30==2) {aweight = aweight * g_NNLOPS_2jet->Eval(min(tree->Rivet_higgsPt,float(800.0))); std::cout << "3"<< std::endl;}
-	if (tree->Rivet_nJets30>=3) {aweight = aweight * g_NNLOPS_3jet->Eval(min(tree->Rivet_higgsPt,float(925.0))); std::cout << "4"<< std::endl;}
+	if (tree->Rivet_nJets30==0) aweight = aweight * g_NNLOPS_0jet->Eval(min(tree->Rivet_higgsPt,float(125.0))); 
+	if (tree->Rivet_nJets30==1) aweight = aweight * g_NNLOPS_1jet->Eval(min(tree->Rivet_higgsPt,float(625.0))); 
+	if (tree->Rivet_nJets30==2) aweight = aweight * g_NNLOPS_2jet->Eval(min(tree->Rivet_higgsPt,float(800.0))); 
+	if (tree->Rivet_nJets30>=3) aweight = aweight * g_NNLOPS_3jet->Eval(min(tree->Rivet_higgsPt,float(925.0))); 
       }
 
 
@@ -410,8 +407,8 @@ int main(int argc, char** argv) {
       }
 
       //*********************** Definition of fit variables *******************
-      float var2=tree->m_sv;
-      float var1_1=tree->pt_sv;
+      float var2=m_sv;
+      float var1_1=pt_sv;
       float var1_0=mytau.Pt();
       
       // ###########################################################
@@ -430,7 +427,7 @@ int main(int argc, char** argv) {
       if (pttop1>400) pttop1=400;
       float pttop2=tree->pt_top2;
       if (pttop2>400) pttop2=400;
-      if ((sample=="TTJ" or sample=="TTT" or sample=="TT") && fabs(tes)!=11) aweight*=sqrt(exp(0.0615-0.0005*pttop1)*exp(0.0615-0.0005*pttop2));
+      if ((sample=="TTJ" or sample=="TTT" or sample=="TT") && fabs(tes)!=11) aweight*=sqrt(exp(0.0615-0.0005*pttop1)*exp(0.0615-0.0005*pttop2)); 
       if ((sample=="TTJ" or sample=="TTT" or sample=="TT") && tes==11) aweight*=(1+2*(sqrt(exp(0.0615-0.0005*pttop1)*exp(0.0615-0.0005*pttop2))-1));
       
       if (sample=="data_obs") aweight=1.0;
@@ -445,19 +442,21 @@ int main(int argc, char** argv) {
       bool is_bveto=(sample!="data_obs" or tree->nbtag==0);
       
       TLorentzVector myrawmet;
-      myrawmet.SetPtEtaPhiM(tree->met,0,tree->metphi,0);
+      //myrawmet.SetPtEtaPhiM(tree->met,0,tree->metphi,0);
+      myrawmet.SetPtEtaPhiM(met,0,metphi,0);
       TLorentzVector myrawtau=mytau;
       float ratioantiraw=ratioanti;
       float weight2=1.0;
       TLorentzVector mymet=myrawmet;
       mytau=myrawtau;
-      var1_1=tree->pt_sv;
-      var2=tree->m_sv;
-      float var1_2=tree->mjj;
+      var1_1=pt_sv;
+      var2=m_sv;
+      float var1_2=mjj;
       float dm_weight=1.0;
-      if (tree->njets==0) var2=(mymu+mytau).M();
+      if (njets==0) var2=(mymu+mytau).M();
       if (mytau.Pt()<30) continue;
       //var1_0=mytau.Pt();
+      //std::cout << "pass" << std::endl;
       var1_0=tree->l2_decayMode;//FIXME
       var1_1=(mymu+mytau+mymet).Pt();//FIXME
       
@@ -514,10 +513,10 @@ int main(int argc, char** argv) {
       
       fillTree_mt(namu, tree, i,
 		  Higgs, mytau, mymu, myjet1, myjet2,
-		  tree->mjj, tree->met, tree->metphi, tree->m_sv, tree->pt_sv, tree->njets,
-		  tree->Dbkg_VBF, tree->Dbkg_ggH,
-		  tree->ME_sm_VBF, tree->ME_sm_ggH,tree->ME_sm_WH,tree->ME_sm_ZH,tree->ME_bkg,tree->ME_bkg1,tree->ME_bkg2,
-		  tree->Phi,tree->Phi1,tree->costheta1,tree->costheta2,tree->costhetastar,tree->Q2V1,tree->Q2V2,
+		  mjj, met, metphi, m_sv, pt_sv, njets,
+		  Dbkg_VBF, Dbkg_ggH,
+		  ME_sm_VBF, ME_sm_ggH, ME_sm_WH, ME_sm_ZH, ME_bkg, ME_bkg1, ME_bkg2,
+		  Phi, Phi1, costheta1, costheta2, costhetastar, Q2V1, Q2V2,
 		  signalRegion, qcdRegion,weight2*aweight, mt
 		  );
       lastindex = i;
