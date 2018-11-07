@@ -6,7 +6,7 @@ Int_t cat_0jet, cat_boosted, cat_vbf, cat_inclusive, cat_antiiso, cat_antiiso_0j
   cat_qcd, cat_qcd_0jet, cat_qcd_boosted, cat_qcd_vbf, is_signal, is_ai, is_qcd;
 Float_t evtwt,
   el_pt, el_eta, el_phi, el_mass, el_charge, el_iso,
-  mu_pt, mu_eta, mu_phi, mu_mass, mu_charge,
+  mu_pt, mu_eta, mu_phi, mu_mass, mu_charge, mu_iso,
   t1_pt, t1_eta, t1_phi, t1_mass, t1_charge, t1_dmf, t1_dmf_new, t1_decayMode, t1_tightIso, t1_mediumIso,
   t1_iso_VL, t1_iso_L, t1_iso_M, t1_iso_T, t1_iso_VT, t1_iso,
   t1_newiso_VL, t1_newiso_L, t1_newiso_M, t1_newiso_T, t1_newiso_VT, t1_newiso,
@@ -22,7 +22,7 @@ Float_t evtwt,
   pt_sv, m_sv, Dbkg_VBF, Dbkg_ggH,
   Phi, Phi1, costheta1, costheta2, costhetastar, Q2V1, Q2V2,
   ME_sm_VBF, ME_sm_ggH, ME_sm_WH, ME_sm_ZH, ME_bkg, ME_bkg1, ME_bkg2,
-  higgs_pT, higgs_m, hjj_pT, hjj_m, dEtajj, dPhijj, vis_mass, NN_disc, NN_disc_ZTT;
+  higgs_pT, higgs_m, hjj_pT, hjj_m, dEtajj, dPhijj, vis_mass, NN_disc_QCD, NN_disc_ZTT;
 
 void fillTree(TTree* namu, SkimmedTree_tt* tree, int index, TLorentzVector Higgs, TLorentzVector tau1, TLorentzVector tau2, TLorentzVector jet1, TLorentzVector jet2, Float_t mjj_, Float_t met_, Float_t metphi_, Float_t m_sv_, Float_t pt_sv_, Float_t njets_, Float_t Dbkg_VBF_, Float_t Dbkg_ggH_, Float_t ME_sm_VBF_, Float_t ME_sm_ggH_, Float_t ME_sm_WH_, Float_t ME_sm_ZH_, Float_t ME_bkg_, Float_t ME_bkg1_, Float_t ME_bkg2_, Float_t Phi_, Float_t Phi1_, Float_t costheta1_, Float_t costheta2_, Float_t costhetastar_, Float_t Q2V1_, Float_t Q2V2_, bool signalRegion, bool aiRegion , float weight) {
   tree->GetEntry(index);
@@ -36,7 +36,7 @@ void fillTree(TTree* namu, SkimmedTree_tt* tree, int index, TLorentzVector Higgs
 
   if (njets_ == 0) cat_0jet = 1;
   else if (njets_ == 1) cat_boosted = 1;
-  else if (njets_ == 2 && mjj_>300) cat_vbf = 1;
+  else if (njets_ > 1 && mjj_>300) cat_vbf = 1;
   if (cat_0jet && cat_boosted && cat_vbf) cat_inclusive = 1;
 
   // tau1
@@ -145,6 +145,7 @@ void fillTree(TTree* namu, SkimmedTree_tt* tree, int index, TLorentzVector Higgs
   mu_phi = 0;
   mu_mass = 0;
   mu_charge = 0;
+  mu_iso = 0;
 
   cat_antiiso = 0;
   cat_antiiso_0jet = 0;
@@ -184,7 +185,7 @@ void fillTree_mt(TTree* namu, SkimmedTree_mt* tree, int index, TLorentzVector Hi
 
   if (njets_ == 0) cat_0jet = 1;
   else if (njets_ == 1) cat_boosted = 1;
-  else if (njets_ == 2 && mjj_>300 && tau1.Pt()>40) cat_vbf = 1;
+  else if (njets_>1 && mjj_>300 && tau1.Pt()>40) cat_vbf = 1;
   if (cat_0jet && cat_boosted && cat_vbf) cat_inclusive = 1;
 
   // tau1
@@ -214,6 +215,7 @@ void fillTree_mt(TTree* namu, SkimmedTree_mt* tree, int index, TLorentzVector Hi
   mu_phi = mu.Phi();
   mu_mass = mu.M();
   mu_charge = tree->q_1;
+  mu_iso = tree->iso_1;
   // jets
   njets = njets_;
   j1_pt = jet1.Pt();
