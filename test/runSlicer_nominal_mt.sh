@@ -82,7 +82,7 @@ rm output_Slicer/mt/W4.root
 rm output_Slicer/mt/EWKW*.root
 
 
-
+# VV
 ./slicer_mt.exe ${1}/WW1l1nu2q.root output_Slicer/mt/WW1L1Nu2Q.root WW1L1Nu2Q VV nominal 
 ./slicer_mt.exe ${1}/VV2l2nu.root output_Slicer/mt/VV2L2Nu.root VV2L2Nu VV nominal 
 ./slicer_mt.exe ${1}/WZ3l1nu.root output_Slicer/mt/WZLLLNu.root WZLLLNu VV nominal 
@@ -108,6 +108,63 @@ rm output_Slicer/mt/ST_t_antitop.root
 rm output_Slicer/mt/ST_t_top.root
 rm output_Slicer/mt/ST_tW_top.root
 rm output_Slicer/mt/ST_tW_antitop.root
+
+#VVT
+
+./slicer_mt.exe ${1}/WW1l1nu2q.root output_Slicer/mt/WW1L1Nu2Q_t.root WW1L1Nu2Q VVT nominal 
+./slicer_mt.exe ${1}/VV2l2nu.root output_Slicer/mt/VV2L2Nu_t.root VV2L2Nu VVT nominal 
+./slicer_mt.exe ${1}/WZ3l1nu.root output_Slicer/mt/WZLLLNu_t.root WZLLLNu VVT nominal 
+./slicer_mt.exe ${1}/ZZ2l2q.root output_Slicer/mt/ZZ2L2Q_t.root ZZ2L2Q VVT nominal 
+./slicer_mt.exe ${1}/ZZ4l.root output_Slicer/mt/ZZ4L_t.root ZZ4L VVT nominal 
+./slicer_mt.exe ${1}/WZ2l2q.root output_Slicer/mt/WZ2L2Q_t.root WZ2L2Q VVT nominal
+./slicer_mt.exe ${1}/WZ1l3nu.root output_Slicer/mt/WZ1L3Nu_t.root WZ1L3Nu VVT nominal
+./slicer_mt.exe ${1}/WZ1l1nu2q.root output_Slicer/mt/WZ1L1Nu2Q_t.root WZ1L1Nu2Q VVT nominal
+./slicer_mt.exe ${1}/T-tchan.root output_Slicer/mt/ST_t_top_t.root ST_t_top VVT nominal 
+./slicer_mt.exe ${1}/Tbar-tchan.root output_Slicer/mt/ST_t_antitop_t.root ST_t_antitop VVT nominal
+./slicer_mt.exe ${1}/T-tW.root output_Slicer/mt/ST_tW_top_t.root ST_tW_top VVT nominal 
+./slicer_mt.exe ${1}/Tbar-tW.root output_Slicer/mt/ST_tW_antitop_t.root ST_tW_antitop VVT nominal 
+hadd -f output_Slicer/mt/VVT.root output_Slicer/mt/ST_t_top_t.root output_Slicer/mt/ST_t_antitop_t.root output_Slicer/mt/ST_tW_top_t.root output_Slicer/mt/ST_tW_antitop_t.root output_Slicer/mt/WW1L1Nu2Q_t.root output_Slicer/mt/ZZ2L2Q_t.root output_Slicer/mt/WZ2L2Q_t.root output_Slicer/mt/WZ1L3Nu_t.root output_Slicer/mt/WZ1L1Nu2Q_t.root output_Slicer/mt/VV2L2Nu_t.root output_Slicer/mt/WZLLLNu_t.root output_Slicer/mt/ZZ4L_t.root
+rm output_Slicer/mt/WW1L1Nu2Q_t.root
+rm output_Slicer/mt/VV2L2Nu_t.root
+rm output_Slicer/mt/WZLLLNu_t.root
+rm output_Slicer/mt/ZZ2L2Q_t.root
+rm output_Slicer/mt/ZZ4L_t.root
+rm output_Slicer/mt/WZ2L2Q_t.root
+rm output_Slicer/mt/WZ1L3Nu_t.root
+rm output_Slicer/mt/WZ1L1Nu2Q_t.root
+rm output_Slicer/mt/ST_t_antitop_t.root
+rm output_Slicer/mt/ST_t_top_t.root
+rm output_Slicer/mt/ST_tW_top_t.root
+rm output_Slicer/mt/ST_tW_antitop_t.root
+
+
+#VVJ
+
+./slicer_mt.exe ${1}/WW1l1nu2q.root output_Slicer/mt/WW1L1Nu2Q_j.root WW1L1Nu2Q VVJ nominal 
+./slicer_mt.exe ${1}/VV2l2nu.root output_Slicer/mt/VV2L2Nu_j.root VV2L2Nu VVJ nominal 
+./slicer_mt.exe ${1}/WZ3l1nu.root output_Slicer/mt/WZLLLNu_j.root WZLLLNu VVJ nominal 
+./slicer_mt.exe ${1}/ZZ2l2q.root output_Slicer/mt/ZZ2L2Q_j.root ZZ2L2Q VVJ nominal 
+./slicer_mt.exe ${1}/ZZ4l.root output_Slicer/mt/ZZ4L_j.root ZZ4L VVJ nominal 
+./slicer_mt.exe ${1}/WZ2l2q.root output_Slicer/mt/WZ2L2Q_j.root WZ2L2Q VVJ nominal
+./slicer_mt.exe ${1}/WZ1l3nu.root output_Slicer/mt/WZ1L3Nu_j.root WZ1L3Nu VVJ nominal
+./slicer_mt.exe ${1}/WZ1l1nu2q.root output_Slicer/mt/WZ1L1Nu2Q_j.root WZ1L1Nu2Q VVJ nominal
+./slicer_mt.exe ${1}/T-tchan.root output_Slicer/mt/ST_t_top_j.root ST_t_top VVJ nominal 
+./slicer_mt.exe ${1}/Tbar-tchan.root output_Slicer/mt/ST_t_antitop_j.root ST_t_antitop VVJ nominal
+./slicer_mt.exe ${1}/T-tW.root output_Slicer/mt/ST_tW_top_j.root ST_tW_top VVJ nominal 
+./slicer_mt.exe ${1}/Tbar-tW.root output_Slicer/mt/ST_tW_antitop_j.root ST_tW_antitop VVJ nominal 
+hadd -f output_Slicer/mt/VVJ.root output_Slicer/mt/ST_t_top_j.root output_Slicer/mt/ST_t_antitop_j.root output_Slicer/mt/ST_tW_top_j.root output_Slicer/mt/ST_tW_antitop_j.root output_Slicer/mt/WW1L1Nu2Q_j.root output_Slicer/mt/ZZ2L2Q_j.root output_Slicer/mt/WZ2L2Q_j.root output_Slicer/mt/WZ1L3Nu_j.root output_Slicer/mt/WZ1L1Nu2Q_j.root output_Slicer/mt/VV2L2Nu_j.root output_Slicer/mt/WZLLLNu_j.root output_Slicer/mt/ZZ4L_j.root
+rm output_Slicer/mt/WW1L1Nu2Q_j.root
+rm output_Slicer/mt/VV2L2Nu_j.root
+rm output_Slicer/mt/WZLLLNu_j.root
+rm output_Slicer/mt/ZZ2L2Q_j.root
+rm output_Slicer/mt/ZZ4L_j.root
+rm output_Slicer/mt/WZ2L2Q_j.root
+rm output_Slicer/mt/WZ1L3Nu_j.root
+rm output_Slicer/mt/WZ1L1Nu2Q_j.root
+rm output_Slicer/mt/ST_t_antitop_j.root
+rm output_Slicer/mt/ST_t_top_j.root
+rm output_Slicer/mt/ST_tW_top_j.root
+rm output_Slicer/mt/ST_tW_antitop_j.root
 
 
 # signal
