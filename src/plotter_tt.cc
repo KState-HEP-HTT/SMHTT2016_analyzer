@@ -43,6 +43,7 @@ int main(int argc, char** argv) {
     namu->SetBranchAddress("mu_phi",              &mu_phi               );
     namu->SetBranchAddress("mu_mass",             &mu_mass              ); 
     namu->SetBranchAddress("mu_charge",           &mu_charge            );
+    namu->SetBranchAddress("mu_iso",              &mu_iso               );
     namu->SetBranchAddress("t1_pt",               &t1_pt                ); 
     namu->SetBranchAddress("t1_eta",              &t1_eta               );
     namu->SetBranchAddress("t1_phi",              &t1_phi               );
@@ -153,7 +154,8 @@ int main(int argc, char** argv) {
     namu->SetBranchAddress("is_signal",           &is_signal            );          
     namu->SetBranchAddress("is_ai",               &is_ai                );              
 
-    namu->SetBranchAddress("NN_disc",             &NN_disc              );
+    namu->SetBranchAddress("NN_disc_QCD",         &NN_disc_QCD          );
+    namu->SetBranchAddress("NN_disc_ZTT",         &NN_disc_ZTT          );
     // Reset branch address if it exists branch
     TBranch* br = namu->GetBranch(tvar.c_str());
     if (br) namu->SetBranchAddress(tvar.c_str(), &var);
@@ -187,7 +189,8 @@ int main(int argc, char** argv) {
       // Define VBF cate
       bool is_VBF = false;
       //if (njets>=2 && higgs_pT>100 && dEtajj>2.5) is_VBF=true;  // 2016 anaysis
-      if (cat_vbf && higgs_pT>100) is_VBF=true; 
+      //if (cat_vbf && higgs_pT>100) is_VBF=true; 
+      if (cat_vbf) is_VBF=true; 
 
       // User obs
       if(tvar == "MELA") var = ME_sm_VBF/(ME_sm_VBF+45*ME_bkg);   
