@@ -30,6 +30,7 @@ public :
    Float_t         npv;
    Float_t         npu;
    Float_t         genweight;
+   Float_t         amcatNLO_weight;
    Float_t         Rivet_stage1_cat_pTjet30GeV;
    Float_t         Rivet_stage0_cat;
    Float_t         Rivet_higgsPt;
@@ -54,6 +55,17 @@ public :
    Float_t         genM;
    Float_t         vispX;
    Float_t         vispY;
+   Float_t         mMatchesIsoMu20Tau27Path;
+   Float_t         mMatchesIsoMu20Tau27Filter;
+   Float_t         tMatchesIsoMu20Tau27Path;
+   Float_t         tMatchesIsoMu20Tau27Filter;
+   Float_t         Mu20Tau27Pass;
+   Float_t         mMatchesIsoMu24Path;
+   Float_t         mMatchesIsoMu24Filter;
+   Float_t         IsoMu24Pass;
+   Float_t         mMatchesIsoMu27Path;
+   Float_t         mMatchesIsoMu27Filter;
+   Float_t         IsoMu27Pass;
    Float_t         matchIsoMu22eta2p1_1;
    Float_t         matchIsoTkMu22eta2p1_1;
    Float_t         matchIsoMu22_1;
@@ -743,6 +755,7 @@ public :
    TBranch        *b_npv;   //!
    TBranch        *b_npu;   //!
    TBranch        *b_genweight;   //!
+   TBranch        *b_amcatNLO_weight;   //!
    TBranch        *b_Rivet_stage1_cat_pTjet30GeV;   //!
    TBranch        *b_Rivet_stage0_cat;   //!
    TBranch        *b_Rivet_higgsPt;   //!
@@ -767,6 +780,17 @@ public :
    TBranch        *b_genM;   //!
    TBranch        *b_vispX;   //!
    TBranch        *b_vispY;   //!
+   TBranch        *b_mMatchesIsoMu20Tau27Path;
+   TBranch        *b_mMatchesIsoMu20Tau27Filter;
+   TBranch        *b_tMatchesIsoMu20Tau27Path;
+   TBranch        *b_tMatchesIsoMu20Tau27Filter;
+   TBranch        *b_Mu20Tau27Pass;
+   TBranch        *b_mMatchesIsoMu24Path;
+   TBranch        *b_mMatchesIsoMu24Filter;
+   TBranch        *b_IsoMu24Pass;
+   TBranch        *b_mMatchesIsoMu27Path;
+   TBranch        *b_mMatchesIsoMu27Filter;
+   TBranch        *b_IsoMu27Pass;
    TBranch        *b_matchIsoMu22eta2p1_1;   //!
    TBranch        *b_matchIsoTkMu22eta2p1_1;   //!
    TBranch        *b_matchIsoMu22_1;   //!
@@ -1500,6 +1524,7 @@ void SkimmedTree_mt::Init(TTree *tree)
    fChain->SetBranchAddress("npv", &npv, &b_npv);
    fChain->SetBranchAddress("npu", &npu, &b_npu);
    fChain->SetBranchAddress("genweight", &genweight, &b_genweight);
+   fChain->SetBranchAddress("amcatNLO_weight", &amcatNLO_weight, &b_amcatNLO_weight);
    fChain->SetBranchAddress("Rivet_stage1_cat_pTjet30GeV", &Rivet_stage1_cat_pTjet30GeV, &b_Rivet_stage1_cat_pTjet30GeV);
    fChain->SetBranchAddress("Rivet_stage0_cat", &Rivet_stage0_cat, &b_Rivet_stage0_cat);
    fChain->SetBranchAddress("Rivet_higgsPt", &Rivet_higgsPt, &b_Rivet_higgsPt);
@@ -1524,6 +1549,17 @@ void SkimmedTree_mt::Init(TTree *tree)
    fChain->SetBranchAddress("genM", &genM, &b_genM);
    fChain->SetBranchAddress("vispX", &vispX, &b_vispX);
    fChain->SetBranchAddress("vispY", &vispY, &b_vispY);
+   fChain->SetBranchAddress("mMatchesIsoMu20Tau27Path", &mMatchesIsoMu20Tau27Path, &b_mMatchesIsoMu20Tau27Path);
+   fChain->SetBranchAddress("mMatchesIsoMu20Tau27Filter", &mMatchesIsoMu20Tau27Filter, &b_mMatchesIsoMu20Tau27Filter);
+   fChain->SetBranchAddress("tMatchesIsoMu20Tau27Path", &tMatchesIsoMu20Tau27Path, &b_tMatchesIsoMu20Tau27Path);
+   fChain->SetBranchAddress("tMatchesIsoMu20Tau27Filter", &tMatchesIsoMu20Tau27Filter, &b_tMatchesIsoMu20Tau27Filter);
+   fChain->SetBranchAddress("Mu20Tau27Pass", &Mu20Tau27Pass, &b_Mu20Tau27Pass);
+   fChain->SetBranchAddress("mMatchesIsoMu24Path", &mMatchesIsoMu24Path, &b_mMatchesIsoMu24Path);
+   fChain->SetBranchAddress("mMatchesIsoMu24Filter", &mMatchesIsoMu24Filter, &b_mMatchesIsoMu24Filter);
+   fChain->SetBranchAddress("IsoMu24Pass", &IsoMu24Pass, &b_IsoMu24Pass);
+   fChain->SetBranchAddress("mMatchesIsoMu27Path", &mMatchesIsoMu27Path, &b_mMatchesIsoMu27Path);
+   fChain->SetBranchAddress("mMatchesIsoMu27Filter", &mMatchesIsoMu27Filter, &b_mMatchesIsoMu27Filter);
+   fChain->SetBranchAddress("IsoMu27Pass", &IsoMu27Pass, &b_IsoMu27Pass);
    fChain->SetBranchAddress("matchIsoMu22eta2p1_1", &matchIsoMu22eta2p1_1, &b_matchIsoMu22eta2p1_1);
    fChain->SetBranchAddress("matchIsoTkMu22eta2p1_1", &matchIsoTkMu22eta2p1_1, &b_matchIsoTkMu22eta2p1_1);
    fChain->SetBranchAddress("matchIsoMu22_1", &matchIsoMu22_1, &b_matchIsoMu22_1);
