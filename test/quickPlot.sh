@@ -25,5 +25,6 @@ python python/stackPlotter_dev.py -i plots/Quick/templates/$5.root -v $5 -c $6
 
 printf "\nCopy and paste the following to make ZTT MC plot.\n" 
 echo python python/QCDcreator_$6.py -i plots/Quick/ -q -z
+echo hadd -f plots/Quick/templates/$5.root plots/Quick/*.root
 echo python python/stackPlotter_dev.py -i plots/Quick/templates/$5.root -v $5 -c $6 -z
 echo
