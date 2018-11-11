@@ -46,7 +46,7 @@ static std::map<std::string, double> xs {
 
 float lumiWeight(std::string sample, float ngen) {
   float weight=1.0; 
-  float luminosity=41500.0;//35870.0;
+  float luminosity=41529.0;//35870.0;
   weight=luminosity*xs[sample]/ngen;
   if (sample=="data_obs" || sample=="embedded") weight = 1.0;
   if (xs.find(sample) == xs.end())     

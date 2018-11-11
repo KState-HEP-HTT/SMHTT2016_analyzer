@@ -224,6 +224,21 @@ public :
    Float_t         matchDoubleTauCmbIso35_2;
    Float_t         filterDoubleTauCmbIso35_1;
    Float_t         filterDoubleTauCmbIso35_2;
+   Float_t         t1MatchesDoubleTightTau35Path;
+   Float_t         t1MatchesDoubleTightTau35Filter;
+   Float_t         t1MatchesDoubleMediumTau40Path;
+   Float_t         t1MatchesDoubleMediumTau40Filter;
+   Float_t         t1MatchesDoubleTightTau40Path;
+   Float_t         t1MatchesDoubleTightTau40Filter;
+   Float_t         t2MatchesDoubleTightTau35Path;
+   Float_t         t2MatchesDoubleTightTau35Filter;
+   Float_t         t2MatchesDoubleMediumTau40Path;
+   Float_t         t2MatchesDoubleMediumTau40Filter;
+   Float_t         t2MatchesDoubleTightTau40Path;
+   Float_t         t2MatchesDoubleTightTau40Filter;
+   Float_t         DoubleTightTau35Pass;
+   Float_t         DoubleMediumTau40Pass;
+   Float_t         DoubleTightTau40Pass;
    Float_t         mjj_JESUp;
    Float_t         mjj_JESDown;
    Int_t           njets_JetAbsoluteFlavMapDown;
@@ -982,6 +997,21 @@ public :
    TBranch        *b_matchDoubleTauCmbIso35_2;   //!
    TBranch        *b_filterDoubleTauCmbIso35_1;   //!
    TBranch        *b_filterDoubleTauCmbIso35_2;   //!
+   TBranch        *b_t1MatchesDoubleTightTau35Path;
+   TBranch        *b_t1MatchesDoubleTightTau35Filter;
+   TBranch        *b_t1MatchesDoubleMediumTau40Path;
+   TBranch        *b_t1MatchesDoubleMediumTau40Filter;
+   TBranch        *b_t1MatchesDoubleTightTau40Path;
+   TBranch        *b_t1MatchesDoubleTightTau40Filter;
+   TBranch        *b_t2MatchesDoubleTightTau35Path;
+   TBranch        *b_t2MatchesDoubleTightTau35Filter;
+   TBranch        *b_t2MatchesDoubleMediumTau40Path;
+   TBranch        *b_t2MatchesDoubleMediumTau40Filter;
+   TBranch        *b_t2MatchesDoubleTightTau40Path;
+   TBranch        *b_t2MatchesDoubleTightTau40Filter;
+   TBranch        *b_DoubleTightTau35Pass;
+   TBranch        *b_DoubleMediumTau40Pass;
+   TBranch        *b_DoubleTightTau40Pass;
    TBranch        *b_njets_JetAbsoluteFlavMapDown;   //!
    TBranch        *b_mjj_JetAbsoluteFlavMapDown;   //!
    TBranch        *b_njets_JetAbsoluteMPFBiasDown;   //!
@@ -1787,6 +1817,21 @@ void SkimmedTree_tt::Init(TTree *tree)
    fChain->SetBranchAddress("matchDoubleTauCmbIso35_2", &matchDoubleTauCmbIso35_2, &b_matchDoubleTauCmbIso35_2);
    fChain->SetBranchAddress("filterDoubleTauCmbIso35_1", &filterDoubleTauCmbIso35_1, &b_filterDoubleTauCmbIso35_1);
    fChain->SetBranchAddress("filterDoubleTauCmbIso35_2", &filterDoubleTauCmbIso35_2, &b_filterDoubleTauCmbIso35_2);
+   fChain->SetBranchAddress("t1MatchesDoubleTightTau35Path", &t1MatchesDoubleTightTau35Path, &b_t1MatchesDoubleTightTau35Path);
+   fChain->SetBranchAddress("t1MatchesDoubleTightTau35Filter", &t1MatchesDoubleTightTau35Filter, &b_t1MatchesDoubleTightTau35Filter);
+   fChain->SetBranchAddress("t1MatchesDoubleMediumTau40Path", &t1MatchesDoubleMediumTau40Path, &b_t1MatchesDoubleMediumTau40Path);
+   fChain->SetBranchAddress("t1MatchesDoubleMediumTau40Filter", &t1MatchesDoubleMediumTau40Filter, &b_t1MatchesDoubleMediumTau40Filter);
+   fChain->SetBranchAddress("t1MatchesDoubleTightTau40Path", &t1MatchesDoubleTightTau40Path, &b_t1MatchesDoubleTightTau40Path);
+   fChain->SetBranchAddress("t1MatchesDoubleTightTau40Filter", &t1MatchesDoubleTightTau40Filter, &b_t1MatchesDoubleTightTau40Filter);
+   fChain->SetBranchAddress("t2MatchesDoubleTightTau35Path", &t2MatchesDoubleTightTau35Path, &b_t2MatchesDoubleTightTau35Path);
+   fChain->SetBranchAddress("t2MatchesDoubleTightTau35Filter", &t2MatchesDoubleTightTau35Filter, &b_t2MatchesDoubleTightTau35Filter);
+   fChain->SetBranchAddress("t2MatchesDoubleMediumTau40Path", &t2MatchesDoubleMediumTau40Path, &b_t2MatchesDoubleMediumTau40Path);
+   fChain->SetBranchAddress("t2MatchesDoubleMediumTau40Filter", &t2MatchesDoubleMediumTau40Filter, &b_t2MatchesDoubleMediumTau40Filter);
+   fChain->SetBranchAddress("t2MatchesDoubleTightTau40Path", &t2MatchesDoubleTightTau40Path, &b_t2MatchesDoubleTightTau40Path);
+   fChain->SetBranchAddress("t2MatchesDoubleTightTau40Filter", &t2MatchesDoubleTightTau40Filter, &b_t2MatchesDoubleTightTau40Filter);
+   fChain->SetBranchAddress("DoubleTightTau35Pass", &DoubleTightTau35Pass, &b_DoubleTightTau35Pass);
+   fChain->SetBranchAddress("DoubleMediumTau40Pass", &DoubleMediumTau40Pass, &b_DoubleMediumTau40Pass);
+   fChain->SetBranchAddress("DoubleTightTau40Pass", &DoubleTightTau40Pass, &b_DoubleTightTau40Pass);
 //    fChain->SetBranchAddress("met_UESUp", &met_UESUp, &b_met_UESUp);
 //    fChain->SetBranchAddress("met_UESDown", &met_UESDown, &b_met_UESDown);
 //    fChain->SetBranchAddress("metphi_UESUp", &metphi_UESUp, &b_metphi_UESUp);

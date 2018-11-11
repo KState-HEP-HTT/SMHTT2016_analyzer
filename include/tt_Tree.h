@@ -7,7 +7,7 @@ Int_t cat_0jet, cat_boosted, cat_vbf, cat_inclusive, cat_antiiso, cat_antiiso_0j
 Float_t evtwt,
   el_pt, el_eta, el_phi, el_mass, el_charge, el_iso,
   mu_pt, mu_eta, mu_phi, mu_mass, mu_charge, mu_iso,
-  t1_pt, t1_eta, t1_phi, t1_mass, t1_charge, t1_dmf, t1_dmf_new, t1_decayMode, t1_tightIso, t1_mediumIso,
+  t1_pt, t1_eta, t1_phi, t1_mass, t1_charge, t1_dmf, t1_dmf_new, t1_decayMode,
   t1_iso_VL, t1_iso_L, t1_iso_M, t1_iso_T, t1_iso_VT, t1_iso,
   t1_newiso_VL, t1_newiso_L, t1_newiso_M, t1_newiso_T, t1_newiso_VT, t1_newiso,
   t2_pt, t2_eta, t2_phi, t2_mass, t2_charge, t2_dmf, t2_dmf_new, t2_decayMode, 
@@ -155,9 +155,6 @@ void fillTree(TTree* namu, SkimmedTree_tt* tree, int index, TLorentzVector Higgs
   cat_qcd_0jet = 0;
   cat_qcd_boosted = 0;
   cat_qcd_vbf = 0;
-
-  t1_tightIso = 0; //
-  t1_mediumIso = 0; //
     
   mt = 0; // no need for tt channel
   namu->Fill();
@@ -295,12 +292,6 @@ void fillTree_mt(TTree* namu, SkimmedTree_mt* tree, int index, TLorentzVector Hi
   t2_newiso_T = 0;
   t2_newiso_VT = 0;
   t2_newiso = 0;
-
-
-
-
-  t1_tightIso = 0; //
-  t1_mediumIso = 0; //
     
   mt = mt_; // no need for tt channel
   namu->Fill();

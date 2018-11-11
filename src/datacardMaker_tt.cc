@@ -51,8 +51,6 @@ int main(int argc, char** argv) {
     namu->SetBranchAddress("t1_mass",             &t1_mass              );
     namu->SetBranchAddress("t1_charge",           &t1_charge            );
     namu->SetBranchAddress("t1_decayMode",        &t1_decayMode         );
-    namu->SetBranchAddress("t1_tightIso",         &t1_tightIso          ); 
-    namu->SetBranchAddress("t1_mediumIso",        &t1_mediumIso         );
     namu->SetBranchAddress("t1_dmf",              &t1_dmf               );
     namu->SetBranchAddress("t1_dmf_new",          &t1_dmf_new           );
     namu->SetBranchAddress("t1_iso_VL",           &t1_iso_VL            );
