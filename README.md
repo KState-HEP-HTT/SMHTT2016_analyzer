@@ -39,7 +39,7 @@ To run the code and make the distribution plots,
 cd ../test
 source runDatacardMaker_<ch>.sh <inputfolder> <2016 to reproduce 2016 analysis result(fot now only tt)> <mc(or empty for embedded)> 
 source runDatacardMaker_tt.sh output_Slicer/tt (2016) (mc)
-source runDatacardMaker_mt.sh output_Slicer/mt (mc) 
+source runDatacardMaker_mt.sh output_Slicer/mt (2016) (mc) 
 ```
 
 
