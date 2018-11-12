@@ -248,7 +248,6 @@ int main(int argc, char** argv) {
 
     std::cout.setf(std::ios::fixed, std::ios::floatfield);
     std::cout.precision(10);
-
     scenario_info scenario(treePtr, shape);
 
     // D.Kim : AN line 791~795
@@ -524,23 +523,27 @@ int main(int argc, char** argv) {
 
       }
           
-      
+
       // Weights depending in the generated jet multiplicity
       if (sample.find("WJets")!= string::npos){ 
-	weight=61.98299933;
-	if (tree->numGenJets==1) weight=6.963370836;
-	else if (tree->numGenJets==2) weight=16.37649708;
-	else if (tree->numGenJets==3) weight=2.532755448;
-	else if (tree->numGenJets==4) weight=2.418989568;
+	w_wjet=61.98299933;
+	if (tree->numGenJets==1) w_wjet=6.963370836;
+	else if (tree->numGenJets==2) w_wjet=16.37649708;
+	else if (tree->numGenJets==3) w_wjet=2.532755448;
+	else if (tree->numGenJets==4) w_wjet=2.418989568;
+	weight=w_wjet;
       }
-
+      else w_wjet=1.00;
+      
       if (sample.find("DY")!= string::npos) { 
-	weight=2.873324952;
-	if (tree->numGenJets==1) weight=0.502938039;
-	else if (tree->numGenJets==2) weight=1.042256272;
-	else if (tree->numGenJets==3) weight=0.656337234;
-	else if (tree->numGenJets==4) weight=0.458531131;
+	w_DYjet=2.873324952;
+	if (tree->numGenJets==1) w_DYjet=0.502938039;
+	else if (tree->numGenJets==2) w_DYjet=1.042256272;
+	else if (tree->numGenJets==3) w_DYjet=0.656337234;
+	else if (tree->numGenJets==4) w_DYjet=0.458531131;
+	weight=w_DYjet;
       }      
+      else w_DYjet=1.00;
 
       // Multiply some weights and scale factors together
       // ID and iso corrections

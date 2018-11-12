@@ -74,11 +74,11 @@ rm output_Slicer/${2}/TTJ1.root
 rm output_Slicer/${2}/TTJ2.root
 
 # WJets
-./slicer_${2}_2017.exe ${1}/W0.root output_Slicer/${2}/Wincl.root W0 W nominal
-./slicer_${2}_2017.exe ${1}/W1.root output_Slicer/${2}/W1.root W1 W nominal
-./slicer_${2}_2017.exe ${1}/W2.root output_Slicer/${2}/W2.root W2 W nominal
-./slicer_${2}_2017.exe ${1}/W3.root output_Slicer/${2}/W3.root W3 W nominal
-./slicer_${2}_2017.exe ${1}/W4.root output_Slicer/${2}/W4.root W4 W nominal
+./slicer_${2}_2017.exe ${1}/W0.root output_Slicer/${2}/Wincl.root WJets0 W nominal
+./slicer_${2}_2017.exe ${1}/W1.root output_Slicer/${2}/W1.root WJets1 W nominal
+./slicer_${2}_2017.exe ${1}/W2.root output_Slicer/${2}/W2.root WJets2 W nominal
+./slicer_${2}_2017.exe ${1}/W3.root output_Slicer/${2}/W3.root WJets3 W nominal
+./slicer_${2}_2017.exe ${1}/W4.root output_Slicer/${2}/W4.root WJets4 W nominal
 ./slicer_${2}_2017.exe ${1}/EWKWMinus.root output_Slicer/${2}/EWKWminus.root EWKWminus W nominal
 ./slicer_${2}_2017.exe ${1}/EWKWPlus.root output_Slicer/${2}/EWKWplus.root EWKWplus W nominal
 hadd -f output_Slicer/${2}/W.root output_Slicer/${2}/W4.root output_Slicer/${2}/W3.root output_Slicer/${2}/W2.root output_Slicer/${2}/W1.root output_Slicer/${2}/Wincl.root output_Slicer/${2}/EWKWminus.root output_Slicer/${2}/EWKWplus.root

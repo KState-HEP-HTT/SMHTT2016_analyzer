@@ -5,6 +5,8 @@ Checkout the repository.
 git clone git@github.com:KState-HEP-HTT/SMHTT2016_analyzer.git
 ```
 
+Slicer is saparated for 2016 and 2017 ntuples. Plotter and DatacardMaker can be used for both 2016 and 2017 after slicing.
+
 ## Instruction of tree slicer :
 
 To compile,
@@ -20,6 +22,8 @@ To run the code and make the distribution plots,
 cd ../test
 source runSlicer_nominal_<ch>.sh <inputfolder>
 source runSlicer_nominal_tt.sh myntuples/Sep03_fixQ
+source runSlicer_nominal_2017.sh <inputfolder> <ch>
+source runSlicer_nominal_2017.sh myntuples/Nov07_2017_tt tt
 ```
 
 
