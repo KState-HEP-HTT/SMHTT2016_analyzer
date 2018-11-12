@@ -23,6 +23,7 @@ Float_t evtwt,
   Phi, Phi1, costheta1, costheta2, costhetastar, Q2V1, Q2V2,
   ME_sm_VBF, ME_sm_ggH, ME_sm_WH, ME_sm_ZH, ME_bkg, ME_bkg1, ME_bkg2,
   higgs_pT, higgs_m, hjj_pT, hjj_m, dEtajj, dPhijj, vis_mass, NN_disc_QCD, NN_disc_ZTT;
+Float_t w_lumi, w_wjet, w_DYjet, w_pu, genweight, sf_id, sf_trg1, sf_trg2,w_trk;
 
 void fillTree(TTree* namu, SkimmedTree_tt* tree, int index, TLorentzVector Higgs, TLorentzVector tau1, TLorentzVector tau2, TLorentzVector jet1, TLorentzVector jet2, Float_t mjj_, Float_t met_, Float_t metphi_, Float_t m_sv_, Float_t pt_sv_, Float_t njets_, Float_t Dbkg_VBF_, Float_t Dbkg_ggH_, Float_t ME_sm_VBF_, Float_t ME_sm_ggH_, Float_t ME_sm_WH_, Float_t ME_sm_ZH_, Float_t ME_bkg_, Float_t ME_bkg1_, Float_t ME_bkg2_, Float_t Phi_, Float_t Phi1_, Float_t costheta1_, Float_t costheta2_, Float_t costhetastar_, Float_t Q2V1_, Float_t Q2V2_, bool signalRegion, bool aiRegion , float weight) {
   tree->GetEntry(index);
@@ -295,4 +296,21 @@ void fillTree_mt(TTree* namu, SkimmedTree_mt* tree, int index, TLorentzVector Hi
     
   mt = mt_; // no need for tt channel
   namu->Fill();
+}
+
+
+void fillWeightTree(TTree* w_namu, float w_lumi_, float w_wjet_, float w_DYjet_, float w_pu_, float genweight_, float sf_id_, float sf_trg1_, float sf_trg2_, float w_trk_, float evtwt_) {
+  w_lumi = w_lumi_;
+  w_wjet = w_wjet_;
+  w_DYjet = w_DYjet_;
+  w_pu = w_pu_;
+  genweight = genweight_;
+  sf_id = sf_id_;
+  sf_trg1 = sf_trg1_;
+  sf_trg2 = sf_trg2_;
+  w_trk = w_trk_;
+  evtwt = evtwt_;
+
+  w_namu->Fill();
+  
 }

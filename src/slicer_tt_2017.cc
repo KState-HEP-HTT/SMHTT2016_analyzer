@@ -182,7 +182,20 @@ int main(int argc, char** argv) {
     namu->Branch("is_signal",           &is_signal,           "is_signal/I"          );
     namu->Branch("is_ai",               &is_ai,               "is_ai/I"              );
 
-    namu->Branch("lumiW", &lumiW, "lumiW/F");
+
+    TTree* w_namu = new TTree("w_tree", "w_tree");
+    w_namu->SetDirectory(0);
+    w_namu->Branch("w_lumi",               &w_lumi,               "w_lumi/F"             );
+    w_namu->Branch("w_wjet",               &w_wjet,               "w_wjet/F"             );
+    w_namu->Branch("w_DYjet",              &w_DYjet,              "w_DYjet/F"            );
+    w_namu->Branch("w_pu",                 &w_pu,                 "w_pu/F"               );
+    w_namu->Branch("genweight",            &genweight,            "genweight/F"          );
+    w_namu->Branch("sf_id",                &sf_id,                "sf_id/F"              );
+    w_namu->Branch("sf_trg1",              &sf_trg1,              "sf_trg1/F"            );
+    w_namu->Branch("sf_trg2",              &sf_trg2,              "sf_trg2/F"            );
+    w_namu->Branch("evtwt",                &evtwt,                "evtwt/F"              );
+
+
     //////////////////////////////////////////////////////////////////
     //                                                              //          
     //  Weights and Scale Factors                                   //
@@ -513,7 +526,7 @@ int main(int argc, char** argv) {
           
       
       // Weights depending in the generated jet multiplicity
-      if (sample.find("W")!= string::npos){ 
+      if (sample.find("WJets")!= string::npos){ 
 	weight=61.98299933;
 	if (tree->numGenJets==1) weight=6.963370836;
 	else if (tree->numGenJets==2) weight=16.37649708;
@@ -667,14 +680,14 @@ int main(int argc, char** argv) {
 	  if (shape=="DM10_UP" && tree->t2_decayMode==10) {mytau2*=1.012; mymet=mymet-(0.012/1.012)*mytau2;}
 	}
 
-	if (mytau1.Pt() < 40 || mytau2.Pt() < 40 ) continue;
+	if (mytau1.Pt() < 41 || mytau2.Pt() < 41 ) continue;
 	if (mytau1.Pt() < 50) continue;	
 	if ((fabs(mytau1.Eta()))>2.1 || (fabs(mytau2.Eta())>2.1)) continue; // L770
 
 	float weight2=1.0;	  
 
 	// D.Kim
-	weight2=weight2*sf_trg1*sf_trg2;
+	//weight2=weight2*sf_trg1*sf_trg2;
 
        	// Additional selections
 	bool selection =true;
@@ -721,8 +734,18 @@ int main(int argc, char** argv) {
 		   Dbkg_VBF, Dbkg_ggH,
 		   ME_sm_VBF, ME_sm_ggH, ME_sm_WH, ME_sm_ZH, ME_bkg, ME_bkg1, ME_bkg2,
 		   Phi, Phi1, costheta1, costheta2, costhetastar, Q2V1, Q2V2,
-		   signalRegion, aiRegion, weight2*aweight, LumiWeights_12->weight(tree->npu)
+		   signalRegion, aiRegion, weight2*aweight
 		   );
+	  fillWeightTree(w_namu,
+			 w_lumi,
+			 w_wjet, w_DYjet,
+			 LumiWeights_12->weight(tree->npu),
+			 tree->genweight,
+			 sf_id,sf_trg1,sf_trg2,
+			 0,//w_trk
+			 weight2*aweight
+			 );
+			 
 	}
       }
     } // end of loop over events
@@ -730,6 +753,7 @@ int main(int argc, char** argv) {
     TFile *fout = TFile::Open(output.c_str(), "RECREATE");
     fout->cd();
     namu->Write();
+    w_namu->Write();
     nbevt->Write();
 
     fout->Close();
