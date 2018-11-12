@@ -187,6 +187,17 @@ int main(int argc, char** argv) {
     namu->Branch("is_signal",           &is_signal,           "is_signal/I"          );
     namu->Branch("is_qcd",              &is_qcd,              "is_qcd/I"             );
 
+    TTree* w_namu = new TTree("w_tree", "w_tree");
+    w_namu->SetDirectory(0);
+    w_namu->Branch("w_lumi",               &w_lumi,               "w_lumi/F"             );
+    w_namu->Branch("w_wjet",               &w_wjet,               "w_wjet/F"             );
+    w_namu->Branch("w_DYjet",              &w_DYjet,              "w_DYjet/F"            );
+    w_namu->Branch("w_pu",                 &w_pu,                 "w_pu/F"               );
+    w_namu->Branch("genweight",            &genweight,            "genweight/F"          );
+    w_namu->Branch("sf_id",                &sf_id,                "sf_id/F"              );
+    w_namu->Branch("sf_trg1",              &sf_trg1,              "sf_trg1/F"            );
+    w_namu->Branch("sf_trg2",              &sf_trg2,              "sf_trg2/F"            );
+    w_namu->Branch("evtwt",                &evtwt,                "evtwt/F"              );
 
     TFile *f_Trk=new TFile("../weightROOTs/Tracking_EfficienciesAndSF_BCDEFGH.root");
     TGraph *h_Trk=(TGraph*) f_Trk->Get("ratio_eff_eta3_dr030e030_corr");
@@ -307,12 +318,14 @@ int main(int argc, char** argv) {
 
       if (!isSingleLep24 && !isCrossTrigger && sample!="data_obs") continue;
       if (!isSingleLep24 && !isSingleLep27 && !isCrossTrigger && sample=="data_obs") continue;
+      if (sample!="embedded" && sample!="data_obs" && (!((isSingleLep24 && tree->pt_1>24) or (isCrossTrigger && tree->pt_1<=24)))) continue;
+      if (sample!="embedded" && sample=="data_obs" && (!((isSingleLep24 && tree->pt_1>24) or (isSingleLep27 && tree->pt_1>27) or (isCrossTrigger && tree->pt_1<=24)))) continue;
 
       if (sample=="data_obs" && tree->run<278820 && !tree->id_m_medium2016_1) continue;
       if (sample=="data_obs" && tree->run>=278820 && !tree->id_m_medium_1) continue;
       //if (sample=="embedded" && tZTTGenDR>0.2) continue;
 
-      if (tree->pt_1<20) continue;
+      if (tree->pt_1<21) continue;
       if (fabs(tree->eta_1)>2.1) continue;
 
       if (!tree->againstElectronVLooseMVA6_2 or !tree->againstMuonTight3_2) continue;
@@ -346,21 +359,27 @@ int main(int argc, char** argv) {
 
       //***************** Weights **************
       
-      if (name=="W"){
-	weight=61.98299933;
-	if (tree->numGenJets==1) weight=6.963370836;
-	else if (tree->numGenJets==2) weight=16.37649708;
-	else if (tree->numGenJets==3) weight=2.532755448;
-	else if (tree->numGenJets==4) weight=2.418989568;
+      if (sample.find("WJets")!= string::npos){ 
+	w_wjet=61.98299933;
+	if (tree->numGenJets==1) w_wjet=6.963370836;
+	else if (tree->numGenJets==2) w_wjet=16.37649708;
+	else if (tree->numGenJets==3) w_wjet=2.532755448;
+	else if (tree->numGenJets==4) w_wjet=2.418989568;
+	weight=w_wjet;
       }
+      else w_wjet=1.00;
 
-      if (name=="ZTT" or name=="ZLL" or name=="ZL" or name=="ZJ"){
-	weight=2.873324952;
-	if (tree->numGenJets==1) weight=0.502938039;
-	else if (tree->numGenJets==2) weight=1.042256272;
-	else if (tree->numGenJets==3) weight=0.656337234;
-	else if (tree->numGenJets==4) weight=0.458531131;
-      }
+
+      if (sample.find("DY")!= string::npos) { 
+	w_DYjet=2.873324952;
+	if (tree->numGenJets==1) w_DYjet=0.502938039;
+	else if (tree->numGenJets==2) w_DYjet=1.042256272;
+	else if (tree->numGenJets==3) w_DYjet=0.656337234;
+	else if (tree->numGenJets==4) w_DYjet=0.458531131;
+	weight=w_DYjet;
+      }      
+      else w_DYjet=1.00;
+
       
       float correction=sf_id;
       if (sample!="embedded" && sample!="data_obs") correction=correction*LumiWeights_12->weight(tree->npu);
@@ -531,6 +550,15 @@ int main(int argc, char** argv) {
 		  Phi, Phi1, costheta1, costheta2, costhetastar, Q2V1, Q2V2,
 		  signalRegion, qcdRegion,weight2*aweight, mt
 		  );
+      fillWeightTree(w_namu,
+		     w_lumi,
+		     w_wjet, w_DYjet,
+		     LumiWeights_12->weight(tree->npu),
+		     tree->genweight,
+		     sf_id,sf_trg1,sf_trg2,
+		     h_Trk->Eval(tree->eta_1),
+		     weight2*aweight
+		     );
       lastindex = i;
     } // end of loop over events
     std::cout << "DONE\t" << lastindex << "\t" << treePtr->GetEntries() << std::endl;    
@@ -538,6 +566,7 @@ int main(int argc, char** argv) {
     fout->cd();
     nbevt->Write();
     namu->Write();
+    w_namu->Write();
     fout->Close();
 } 
 
