@@ -426,8 +426,13 @@ int main(int argc, char** argv) {
       bool tight35 = tree->DoubleTightTau35Pass && tree->t1MatchesDoubleTightTau35Path && tree->t2MatchesDoubleTightTau35Path && tree->t1MatchesDoubleTightTau35Filter && tree->t2MatchesDoubleTightTau35Filter;
       bool medium40 = tree->DoubleMediumTau40Pass && tree->t1MatchesDoubleMediumTau40Path && tree->t2MatchesDoubleMediumTau40Path && tree->t1MatchesDoubleMediumTau40Filter && tree->t2MatchesDoubleMediumTau40Filter;
       bool tight40 = tree->DoubleTightTau40Pass && tree->t1MatchesDoubleTightTau40Path && tree->t2MatchesDoubleTightTau40Path && tree->t1MatchesDoubleTightTau40Filter && tree->t2MatchesDoubleTightTau40Filter;
-      if ( !tight35 && !medium40 && !tight40) continue;
-      
+      bool passTrigAndPt=false;
+      if (tree->pt_2>45 && (medium40 || tight40) ) passTrigAndPt = true;
+      else if (tree->pt_2>40 && tight35) passTrigAndPt=true;
+      else passTrigAndPt=false;
+      if (!passTrigAndPt) continue;
+      //if ( !tight35 && !medium40 && !tight40 ) continue;
+      //if (!((tight35 && tree->pt_2<=45) || (medium40 && tree->pt_2>45) || (tight40 && tree->pt_2>45))) continue;
       // Reject problomatic one event data G
       if (TMath::IsNaN(tree->Q2V2)) continue;
 
@@ -484,7 +489,7 @@ int main(int argc, char** argv) {
       if (tree->extramuon_veto) continue;
       if (tree->extraelec_veto) continue;
       //float sf_trg=1.0;
-      float sf_id=1.0;
+      float sf_id=1.00;//0.89*0.89;
       //float eff_tau=1.0;
 
       // D.Kim : Trigger SF
@@ -531,7 +536,7 @@ int main(int argc, char** argv) {
 	else if (tree->numGenJets==2) w_wjet=16.37649708;
 	else if (tree->numGenJets==3) w_wjet=2.532755448;
 	else if (tree->numGenJets==4) w_wjet=2.418989568;
-	weight=w_wjet;
+	//weight=w_wjet;
       }
       else w_wjet=1.00;
       
@@ -541,7 +546,7 @@ int main(int argc, char** argv) {
 	else if (tree->numGenJets==2) w_DYjet=1.042256272;
 	else if (tree->numGenJets==3) w_DYjet=0.656337234;
 	else if (tree->numGenJets==4) w_DYjet=0.458531131;
-	weight=w_DYjet;
+	//weight=w_DYjet;
       }      
       else w_DYjet=1.00;
 
@@ -552,31 +557,31 @@ int main(int argc, char** argv) {
       float aweight=tree->genweight*weight*correction;
       if (sample!="data_obs"){
 	//Tau ID SF (Tight WP)
-	if (tree->gen_match_1==5) aweight=aweight*0.95;
-	if (tree->gen_match_2==5) aweight=aweight*0.95;
+	if (tree->gen_match_1==5) aweight=aweight*0.89;
+	if (tree->gen_match_2==5) aweight=aweight*0.89;
 	//e->tau fakes VLoose
 	if (tree->gen_match_1==1 or tree->gen_match_1==3){
-	  if (std::abs(mytau1.Eta())<1.460) aweight=aweight*1.213;
-	  else if (std::abs(mytau1.Eta())>1.558) aweight=aweight*1.375;
+	  if (std::abs(mytau1.Eta())<1.460) aweight=aweight*1.09;
+	  else if (std::abs(mytau1.Eta())>1.558) aweight=aweight*1.19;
 	}
 	if (tree->gen_match_2==1 or tree->gen_match_2==3){
-	  if (std::abs(mytau2.Eta())<1.460) aweight=aweight*1.213;
-	  else if (std::abs(mytau2.Eta())>1.558) aweight=aweight*1.375;
+	  if (std::abs(mytau2.Eta())<1.460) aweight=aweight*1.09;
+	  else if (std::abs(mytau2.Eta())>1.558) aweight=aweight*1.19;
 	}
 	// mu->tau fakes Loose
 	else if (tree->gen_match_1==2 or tree->gen_match_1==4){
-	  if (std::abs(mytau1.Eta())<0.4) aweight=aweight*1.010;
-	  else if (std::abs(mytau1.Eta())<0.8) aweight=aweight*1.007;
-	  else if (std::abs(mytau1.Eta())<1.2) aweight=aweight*0.870;
-	  else if (std::abs(mytau1.Eta())<1.7) aweight=aweight*1.154;
-	  else aweight=aweight*2.281;
+	  if (std::abs(mytau1.Eta())<0.4) aweight=aweight*1.06;
+	  else if (std::abs(mytau1.Eta())<0.8) aweight=aweight*1.02;
+	  else if (std::abs(mytau1.Eta())<1.2) aweight=aweight*1.10;
+	  else if (std::abs(mytau1.Eta())<1.7) aweight=aweight*1.03;
+	  else aweight=aweight*1.94;
 	}
 	else if (tree->gen_match_2==2 or tree->gen_match_2==4){
-	  if (std::abs(mytau2.Eta())<0.4) aweight=aweight*1.010;
-	  else if (std::abs(mytau2.Eta())<0.8) aweight=aweight*1.007;
-	  else if (std::abs(mytau2.Eta())<1.2) aweight=aweight*0.870;
-	  else if (std::abs(mytau2.Eta())<1.7) aweight=aweight*1.154;
-	  else aweight=aweight*2.281;
+	  if (std::abs(mytau2.Eta())<0.4) aweight=aweight*1.06;
+	  else if (std::abs(mytau2.Eta())<0.8) aweight=aweight*1.02;
+	  else if (std::abs(mytau2.Eta())<1.2) aweight=aweight*1.10;
+	  else if (std::abs(mytau2.Eta())<1.7) aweight=aweight*1.03;
+	  else aweight=aweight*1.94;
 	}
 	//aweight=aweight*h_Trk->Eval(eta_1);
       }
