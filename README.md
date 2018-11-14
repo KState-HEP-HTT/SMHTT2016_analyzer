@@ -3,6 +3,8 @@
 Checkout the repository.
 ```
 git clone git@github.com:KState-HEP-HTT/SMHTT2016_analyzer.git
+cd ../tst
+git clone https://github.com/CMS-HTT/LeptonEfficiencies 
 ```
 
 Slicer is saparated for 2016 and 2017 ntuples. Plotter and DatacardMaker can be used for both 2016 and 2017 after slicing.
