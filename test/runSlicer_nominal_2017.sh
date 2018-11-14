@@ -14,41 +14,41 @@ rm output_Slicer/${2}/data_E.root
 rm output_Slicer/${2}/data_F.root
 
 # DY
-./slicer_${2}_2017.exe ${1}/DY0.root output_Slicer/${2}/ZTTall.root DY0 ZTT nominal
-./slicer_${2}_2017.exe ${1}/DY1.root output_Slicer/${2}/ZTT1.root DY1 ZTT nominal
-./slicer_${2}_2017.exe ${1}/DY2.root output_Slicer/${2}/ZTT2.root DY2 ZTT nominal
-./slicer_${2}_2017.exe ${1}/DY3.root output_Slicer/${2}/ZTT3.root DY3 ZTT nominal
-./slicer_${2}_2017.exe ${1}/DY4.root output_Slicer/${2}/ZTT4.root DY4 ZTT nominal
-hadd -f output_Slicer/${2}/ZTT.root output_Slicer/${2}/ZTT*.root 
-rm output_Slicer/${2}/ZTTall.root
-rm output_Slicer/${2}/ZTT1.root
-rm output_Slicer/${2}/ZTT2.root
-rm output_Slicer/${2}/ZTT3.root
-rm output_Slicer/${2}/ZTT4.root
+./slicer_${2}_2017.exe ${1}/DY0.root output_Slicer/${2}/ZTT.root DY0 ZTT nominal
+#./slicer_${2}_2017.exe ${1}/DY1.root output_Slicer/${2}/ZTT1.root DY1 ZTT nominal
+#./slicer_${2}_2017.exe ${1}/DY2.root output_Slicer/${2}/ZTT2.root DY2 ZTT nominal
+#./slicer_${2}_2017.exe ${1}/DY3.root output_Slicer/${2}/ZTT3.root DY3 ZTT nominal
+#./slicer_${2}_2017.exe ${1}/DY4.root output_Slicer/${2}/ZTT4.root DY4 ZTT nominal
+#hadd -f output_Slicer/${2}/ZTT.root output_Slicer/${2}/ZTT*.root 
+#rm output_Slicer/${2}/ZTTall.root
+#rm output_Slicer/${2}/ZTT1.root
+#rm output_Slicer/${2}/ZTT2.root
+#rm output_Slicer/${2}/ZTT3.root
+#rm output_Slicer/${2}/ZTT4.root
 
-./slicer_${2}_2017.exe ${1}/DY0.root output_Slicer/${2}/ZLall.root DY0 ZL nominal
-./slicer_${2}_2017.exe ${1}/DY1.root output_Slicer/${2}/ZL1.root DY1 ZL nominal
-./slicer_${2}_2017.exe ${1}/DY2.root output_Slicer/${2}/ZL2.root DY2 ZL nominal
-./slicer_${2}_2017.exe ${1}/DY3.root output_Slicer/${2}/ZL3.root DY3 ZL nominal
-./slicer_${2}_2017.exe ${1}/DY4.root output_Slicer/${2}/ZL4.root DY4 ZL nominal
-hadd -f output_Slicer/${2}/ZL.root output_Slicer/${2}/ZL*.root
-rm output_Slicer/${2}/ZLall.root
-rm output_Slicer/${2}/ZL1.root
-rm output_Slicer/${2}/ZL2.root
-rm output_Slicer/${2}/ZL3.root
-rm output_Slicer/${2}/ZL4.root
+./slicer_${2}_2017.exe ${1}/DY0.root output_Slicer/${2}/ZL.root DY0 ZL nominal
+#./slicer_${2}_2017.exe ${1}/DY1.root output_Slicer/${2}/ZL1.root DY1 ZL nominal
+#./slicer_${2}_2017.exe ${1}/DY2.root output_Slicer/${2}/ZL2.root DY2 ZL nominal
+#./slicer_${2}_2017.exe ${1}/DY3.root output_Slicer/${2}/ZL3.root DY3 ZL nominal
+#./slicer_${2}_2017.exe ${1}/DY4.root output_Slicer/${2}/ZL4.root DY4 ZL nominal
+#hadd -f output_Slicer/${2}/ZL.root output_Slicer/${2}/ZL*.root
+#rm output_Slicer/${2}/ZLall.root
+#rm output_Slicer/${2}/ZL1.root
+#rm output_Slicer/${2}/ZL2.root
+#rm output_Slicer/${2}/ZL3.root
+#rm output_Slicer/${2}/ZL4.root
 
-./slicer_${2}_2017.exe ${1}/DY0.root output_Slicer/${2}/ZJall.root DY0 ZJ nominal
-./slicer_${2}_2017.exe ${1}/DY1.root output_Slicer/${2}/ZJ1.root DY1 ZJ nominal
-./slicer_${2}_2017.exe ${1}/DY2.root output_Slicer/${2}/ZJ2.root DY2 ZJ nominal
-./slicer_${2}_2017.exe ${1}/DY3.root output_Slicer/${2}/ZJ3.root DY3 ZJ nominal
-./slicer_${2}_2017.exe ${1}/DY4.root output_Slicer/${2}/ZJ4.root DY4 ZJ nominal
-hadd -f output_Slicer/${2}/ZJ.root output_Slicer/${2}/ZJ*.root
-rm output_Slicer/${2}/ZJall.root
-rm output_Slicer/${2}/ZJ1.root
-rm output_Slicer/${2}/ZJ2.root
-rm output_Slicer/${2}/ZJ3.root
-rm output_Slicer/${2}/ZJ4.root
+./slicer_${2}_2017.exe ${1}/DY0.root output_Slicer/${2}/ZJ.root DY0 ZJ nominal
+#./slicer_${2}_2017.exe ${1}/DY1.root output_Slicer/${2}/ZJ1.root DY1 ZJ nominal
+#./slicer_${2}_2017.exe ${1}/DY2.root output_Slicer/${2}/ZJ2.root DY2 ZJ nominal
+#./slicer_${2}_2017.exe ${1}/DY3.root output_Slicer/${2}/ZJ3.root DY3 ZJ nominal
+#./slicer_${2}_2017.exe ${1}/DY4.root output_Slicer/${2}/ZJ4.root DY4 ZJ nominal
+#hadd -f output_Slicer/${2}/ZJ.root output_Slicer/${2}/ZJ*.root
+#rm output_Slicer/${2}/ZJall.root
+#rm output_Slicer/${2}/ZJ1.root
+#rm output_Slicer/${2}/ZJ2.root
+#rm output_Slicer/${2}/ZJ3.root
+#rm output_Slicer/${2}/ZJ4.root
 
 #EWKZ
 ./slicer_${2}_2017.exe ${1}/EWKZ2l.root output_Slicer/${2}/EWKZLL.root EWKZLL EWKZ nominal
@@ -75,19 +75,20 @@ rm output_Slicer/${2}/TTJ2.root
 
 # WJets
 ./slicer_${2}_2017.exe ${1}/W0.root output_Slicer/${2}/Wincl.root WJets0 W nominal
-./slicer_${2}_2017.exe ${1}/W1.root output_Slicer/${2}/W1.root WJets1 W nominal
-./slicer_${2}_2017.exe ${1}/W2.root output_Slicer/${2}/W2.root WJets2 W nominal
-./slicer_${2}_2017.exe ${1}/W3.root output_Slicer/${2}/W3.root WJets3 W nominal
-./slicer_${2}_2017.exe ${1}/W4.root output_Slicer/${2}/W4.root WJets4 W nominal
+#./slicer_${2}_2017.exe ${1}/W1.root output_Slicer/${2}/W1.root WJets1 W nominal
+#./slicer_${2}_2017.exe ${1}/W2.root output_Slicer/${2}/W2.root WJets2 W nominal
+#./slicer_${2}_2017.exe ${1}/W3.root output_Slicer/${2}/W3.root WJets3 W nominal
+#./slicer_${2}_2017.exe ${1}/W4.root output_Slicer/${2}/W4.root WJets4 W nominal
 ./slicer_${2}_2017.exe ${1}/EWKWMinus.root output_Slicer/${2}/EWKWminus.root EWKWminus W nominal
 ./slicer_${2}_2017.exe ${1}/EWKWPlus.root output_Slicer/${2}/EWKWplus.root EWKWplus W nominal
-hadd -f output_Slicer/${2}/W.root output_Slicer/${2}/W4.root output_Slicer/${2}/W3.root output_Slicer/${2}/W2.root output_Slicer/${2}/W1.root output_Slicer/${2}/Wincl.root output_Slicer/${2}/EWKWminus.root output_Slicer/${2}/EWKWplus.root
-rm output_Slicer/${2}/Wincl.root
-rm output_Slicer/${2}/W1.root
-rm output_Slicer/${2}/W2.root
-rm output_Slicer/${2}/W3.root
-rm output_Slicer/${2}/W4.root
-rm output_Slicer/${2}/EWKW*.root
+#hadd -f output_Slicer/${2}/W.root output_Slicer/${2}/W4.root output_Slicer/${2}/W3.root output_Slicer/${2}/W2.root output_Slicer/${2}/W1.root output_Slicer/${2}/Wincl.root output_Slicer/${2}/EWKWminus.root output_Slicer/${2}/EWKWplus.root
+#rm output_Slicer/${2}/Wincl.root
+#rm output_Slicer/${2}/W1.root
+#rm output_Slicer/${2}/W2.root
+#rm output_Slicer/${2}/W3.root
+#rm output_Slicer/${2}/W4.root
+#rm output_Slicer/${2}/EWKW*.root
+hadd -f output_Slicer/${2}/W.root output_Slicer/${2}/Wincl.root output_Slicer/${2}/EWKWminus.root output_Slicer/${2}/EWKWplus.root
 
 # VV
 if [ ${2} = "mt" ]; then
