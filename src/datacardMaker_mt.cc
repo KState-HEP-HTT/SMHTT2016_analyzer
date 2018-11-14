@@ -15,6 +15,7 @@
 // my includes
 #include "../include/myHelper.h"
 #include "../include/tt_Tree.h"
+#include "../include/scenario_info.h"
 
 int main(int argc, char** argv) {    
     std::string input = *(argv + 1);
@@ -159,16 +160,16 @@ int main(int argc, char** argv) {
     //Binning for 0jet cat, x-axis
     float bins0X[] = {0,1,10,11};
     //Binning for 0jet cat, y-axis
-    float bins0Y[] = {0,60,65,70,75,80,85,90,95,100,105,110,400};
+    float bins0Y[] = {0,60,65,70,75,80,85,90,95,100,105,110,400,10000};
     //Binning for 1jet cat, x-axis
     float bins1X[] = {0,100,150,200,250,300,5000};
     //Binning for 1jet cat, y-axis
-    float bins1Y[] = {0,80,90,100,110,120,130,140,150,160,300};
+    float bins1Y[] = {0,80,90,100,110,120,130,140,150,160,300,10000};
     //Binning for 2jet cat, x-axis
     float bins2X[] = {300,700,1100,1500,10000};
     //float bins2X[] = {0,0.1,0.5,0.9,1.0};
     //Binning for 2jet cat, y-axis
-    float bins2Y[] = {0,95,115,135,155,400};
+    float bins2Y[] = {0,95,115,135,155,400,10000};
 
     int  binnum0X = sizeof(bins0X)/sizeof(Float_t) - 1;
     int  binnum0Y = sizeof(bins0Y)/sizeof(Float_t) - 1;
@@ -187,7 +188,7 @@ int main(int argc, char** argv) {
     std::vector<TH2F*> h2_SS;
     std::vector<TH2F*> h2_QCD;
 
-    TString postfix = "";//postfixMaps(shape);
+    TString postfix = postfixMaps(shape);
 
     //binnum2X,bins2X,binnum2Y,bins2Y
     int nbhist=1;
@@ -253,8 +254,9 @@ int main(int argc, char** argv) {
 	////////////////////////
 	if (njets==0) is_0jet=true;
 	else if (cat_vbf && nbjets==0) is_VBF=true; 
-	else is_boosted=true;   
+	else if (njets==1) is_boosted=true;   
       }
+
 
       float var_0jetX = t1_decayMode;
       float var_0jetY = m_sv;
@@ -263,40 +265,12 @@ int main(int argc, char** argv) {
       float var_vbfX = mjj;
       float var_vbfY = m_sv;
 
-      if (TMath::IsNaN(Q2V2)) {
-	std::cout << "t1_charge:" << t1_charge << std::endl;
-	std::cout << "mu_charge:" << mu_charge << std::endl;
-	std::cout << "Q2V2 :" << Q2V2 << std::endl;
-	std::cout << "Q2V1 :" << Q2V1 << std::endl;
-	std::cout << "costheta1 :" << costheta1 << std::endl;
-	std::cout << "costheta2 :" << costheta2 << std::endl;
-	std::cout << "costhetastar :" << costhetastar << std::endl;
-	std::cout << "Phi :" << Phi << std::endl;
-	std::cout << "Phi1 :" << Phi1 << std::endl;
-	std::cout << "Dbkg_VBF :" << Dbkg_VBF << std::endl;
-	std::cout << "Dbkg_ggH :" << Dbkg_ggH << std::endl;
-	std::cout << "njets : " << njets << std::endl;
-	std::cout << "tau1 pT : " << t1_pt << std::endl;
-	std::cout << "tau2 pT : " << mu_pt << std::endl;
-	std::cout << "tau1 eta : " << t1_eta << std::endl;
-	std::cout << "tau2 eta : " << mu_eta << std::endl;
-	std::cout << "tau1 phi : " << t1_phi << std::endl;
-	std::cout << "tau2 phi : " << mu_phi << std::endl;
-	std::cout << "jet1 pT : " << j1_pt << std::endl;
-	std::cout << "jet2 pT : " << j2_pt << std::endl;
-	std::cout << "jet1 eta : " << j1_eta << std::endl;
-	std::cout << "jet2 eta : " << j2_eta << std::endl;
-	std::cout << "jet1 phi : " << j1_phi << std::endl;
-	std::cout << "jet2 phi : " << j2_phi << std::endl;
-	continue;
-      }
-
       for (int k=0; k<nbhist; ++k){
 	if (mt<50 && t1_charge*mu_charge<0) {
 	  // ################### signalRegion && OS ####################
 	  if (is_0jet && signalRegion)         h0_OS[k]->Fill(var_0jetX,var_0jetY,evtwt);
 	  if (is_boosted && signalRegion)	    h1_OS[k]->Fill(var_boostedX,var_boostedY,evtwt);
-	  if (is_VBF && signalRegion) 	    h2_OS[k]->Fill(var_vbfX,var_vbfY,evtwt);	  
+	  if (is_VBF && signalRegion) 	    h2_OS[k]->Fill(var_vbfX,var_vbfY,evtwt); 
 	}
 
 	if (mt<50 && t1_charge*mu_charge>0) {
