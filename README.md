@@ -3,7 +3,7 @@
 Checkout the repository.
 ```
 git clone git@github.com:KState-HEP-HTT/SMHTT2016_analyzer.git
-cd ../tst
+cd ../test
 git clone https://github.com/CMS-HTT/LeptonEfficiencies 
 ```
 
