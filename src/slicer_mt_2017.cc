@@ -419,7 +419,7 @@ int main(int argc, char** argv) {
 	  if (fabs(tree->eta_2)<1.460) aweight=aweight*1.09;
 	  else if (fabs(tree->eta_2)>1.558) aweight=aweight*1.19;
 	}
-	aweight=aweight*h_Trk->Eval(tree->eta_1);
+	//aweight=aweight*h_Trk->Eval(tree->eta_1);
       }
       /*
       if (name.find("ggH")<100 && name.find("NNLOPS")>100 && name.find("hww")>100){
