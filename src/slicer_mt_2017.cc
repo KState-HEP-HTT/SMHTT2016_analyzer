@@ -316,7 +316,7 @@ int main(int argc, char** argv) {
 
       // minimum lepton pT thresholds
       if (tree->pt_1<21) continue;
-      if (tree->pt_2<30) continue;
+      if (tree->pt_2<32) continue;
       // trigger
       bool isCrossTrigger = (tree->mMatchesIsoMu20Tau27Path && tree->mMatchesIsoMu20Tau27Filter && tree->tMatchesIsoMu20Tau27Path && tree->tMatchesIsoMu20Tau27Filter && tree->Mu20Tau27Pass);
       bool isSingleLep24 = (tree->mMatchesIsoMu24Path && tree->mMatchesIsoMu24Filter && tree->IsoMu24Pass);
@@ -329,11 +329,11 @@ int main(int argc, char** argv) {
       if (sample=="data_obs") {
 	if (tree->pt_1>28 && isSingleLep27) passTrigAndPt=true;
 	else if (tree->pt_1>25 && isSingleLep24) passTrigAndPt=true;
-	else if (tree->pt_1>21 && tree->pt_2>32 && isCrossTrigger) passTrigAndPt=true;
+	else if (tree->pt_1>21 && isCrossTrigger) passTrigAndPt=true;
       }
       else {
 	if (tree->pt_1>25 && isSingleLep24) passTrigAndPt=true;
-	else if (tree->pt_1>21 && tree->pt_2>32 && isCrossTrigger) passTrigAndPt=true;
+	else if (tree->pt_1>21 && isCrossTrigger) passTrigAndPt=true;
       }
       if (!passTrigAndPt) continue;
 
