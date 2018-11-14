@@ -231,18 +231,29 @@ int main(int argc, char** argv) {
 
     // Construct scenario
     //scenario_info scenario(arbre, unc);
+    //KK: Editing for 2017
     ScaleFactor * myScaleFactor_trgMu24 = new ScaleFactor();
-    myScaleFactor_trgMu24->init_ScaleFactor("LeptonEfficiencies/Muon/Run2016BtoH/Muon_IsoMu24_OR_TkIsoMu24_2016BtoH_eff.root");
-    ScaleFactor * myScaleFactor_trgMu19Leg = new ScaleFactor();
-    myScaleFactor_trgMu19Leg->init_ScaleFactor("LeptonEfficiencies/Muon/Run2016BtoH/Muon_Mu19leg_2016BtoH_eff.root");
-    ScaleFactor * myScaleFactor_trgMu22 = new ScaleFactor();
-    myScaleFactor_trgMu22->init_ScaleFactor("LeptonEfficiencies/Muon/Run2016BtoH/Muon_Mu22OR_eta2p1_eff.root");
+    //    myScaleFactor_trgMu24->init_ScaleFactor("LeptonEfficiencies/Muon/Run2016BtoH/Muon_IsoMu24_OR_TkIsoMu24_2016BtoH_eff.root"); 
+    myScaleFactor_trgMu24->init_ScaleFactor("LeptonEfficiencies/Muon/Run2017/Muon_IsoMu24orIsoMu27.root"); //KK
+    //    ScaleFactor * myScaleFactor_trgMu19Leg = new ScaleFactor();
+    //    myScaleFactor_trgMu19Leg->init_ScaleFactor("LeptonEfficiencies/Muon/Run2016BtoH/Muon_Mu19leg_2016BtoH_eff.root");
+    //    ScaleFactor * myScaleFactor_trgMu22 = new ScaleFactor();
+    //    myScaleFactor_trgMu22->init_ScaleFactor("LeptonEfficiencies/Muon/Run2016BtoH/Muon_Mu22OR_eta2p1_eff.root");
+    ScaleFactor * myScaleFactor_trgMu20Leg = new ScaleFactor();
+    myScaleFactor_trgMu20Leg->init_ScaleFactor("LeptonEfficiencies/Muon/Run2017/Muon_MuTau_IsoMu20.root");
+    //Here you will need to add SF for tau leg later on
+
+    //These need to be update for 2017
     ScaleFactor * myScaleFactor_trgMu19LegAnti = new ScaleFactor();
     myScaleFactor_trgMu19LegAnti->init_ScaleFactor("LeptonEfficiencies/Muon/Run2016BtoH/Muon_Mu19leg_eta2p1_antiisolated_Iso0p15to0p3_eff_rb.root");
     ScaleFactor * myScaleFactor_trgMu22Anti = new ScaleFactor();
     myScaleFactor_trgMu22Anti->init_ScaleFactor("LeptonEfficiencies/Muon/Run2016BtoH/Muon_Mu22OR_eta2p1_antiisolated_Iso0p15to0p3_eff_rb.root");
+    
+    //    ScaleFactor * myScaleFactor_id = new ScaleFactor();
+    //    myScaleFactor_id->init_ScaleFactor("LeptonEfficiencies/Muon/Run2016BtoH/Muon_IdIso_IsoLt0p15_2016BtoH_eff.root");
     ScaleFactor * myScaleFactor_id = new ScaleFactor();
-    myScaleFactor_id->init_ScaleFactor("LeptonEfficiencies/Muon/Run2016BtoH/Muon_IdIso_IsoLt0p15_2016BtoH_eff.root");
+    myScaleFactor_id->init_ScaleFactor("LeptonEfficiencies/Muon/Run2017/Muon_IdIso_IsoLt0.15_eff_RerecoFall17.root");
+    //These need to be updated for 2017
     ScaleFactor * myScaleFactor_idAnti = new ScaleFactor();
     myScaleFactor_idAnti->init_ScaleFactor("LeptonEfficiencies/Muon/Run2016BtoH/Muon_IdIso_antiisolated_Iso0p15to0p3_eff_rb.root");
 
@@ -303,29 +314,35 @@ int main(int argc, char** argv) {
       if (i % 10000 == 0) fprintf(stdout, "\r  Processed events: %8d of %8d ", i, nentries_wtn);
       fflush(stdout);
 
-
-      // 2016 trigger
-      /*
-      bool isSingleLep = (tree->passIsoMu22 && tree->matchIsoMu22_1 && tree->filterIsoMu22_1) or (tree->passIsoTkMu22 && tree->matchIsoTkMu22_1 && tree->filterIsoTkMu22_1) or (tree->passIsoMu22eta2p1 && tree->matchIsoMu22eta2p1_1 && tree->filterIsoMu22eta2p1_1) or (tree->passIsoTkMu22eta2p1 && tree->matchIsoTkMu22eta2p1_1 && tree->filterIsoTkMu22eta2p1_1);
-      bool isCrossTrigger = (tree->passIsoMu19Tau20 && tree->matchIsoMu19Tau20_1 && tree->filterIsoMu19Tau20_1 && tree->matchIsoMu19Tau20_2 && tree->filterIsoMu19Tau20_2);
-      if (sample!="embedded" && !isSingleLep && !isCrossTrigger) continue;
-      if (sample!="embedded" && (!((isSingleLep && tree->pt_1>23) or (isCrossTrigger && tree->pt_1<=23)))) continue;
-      */
-
+      // minimum lepton pT thresholds
+      if (tree->pt_1<21) continue;
+      if (tree->pt_2<32) continue;
+      // trigger
       bool isCrossTrigger = (tree->mMatchesIsoMu20Tau27Path && tree->mMatchesIsoMu20Tau27Filter && tree->tMatchesIsoMu20Tau27Path && tree->tMatchesIsoMu20Tau27Filter && tree->Mu20Tau27Pass);
       bool isSingleLep24 = (tree->mMatchesIsoMu24Path && tree->mMatchesIsoMu24Filter && tree->IsoMu24Pass);
       bool isSingleLep27 = (tree->mMatchesIsoMu27Path && tree->mMatchesIsoMu27Filter && tree->IsoMu27Pass);
-
+      // continue if fail to pass non of triggers
       if (!isSingleLep24 && !isCrossTrigger && sample!="data_obs") continue;
       if (!isSingleLep24 && !isSingleLep27 && !isCrossTrigger && sample=="data_obs") continue;
-      if (sample!="embedded" && sample!="data_obs" && (!((isSingleLep24 && tree->pt_1>24) or (isCrossTrigger && tree->pt_1<=24)))) continue;
-      if (sample!="embedded" && sample=="data_obs" && (!((isSingleLep24 && tree->pt_1>24) or (isSingleLep27 && tree->pt_1>27) or (isCrossTrigger && tree->pt_1<=24)))) continue;
+      // mu pT requirement depending on triggers
+      bool passTrigAndPt=false;
+      if (sample=="data_obs") {
+	if (tree->pt_1>28 && isSingleLep27) passTrigAndPt=true;
+	else if (tree->pt_1>25 && isSingleLep24) passTrigAndPt=true;
+	else if (tree->pt_1>21 && isCrossTrigger) passTrigAndPt=true;
+      }
+      else {
+	if (tree->pt_1>25 && isSingleLep24) passTrigAndPt=true;
+	else if (tree->pt_1>21 && isCrossTrigger) passTrigAndPt=true;
+      }
+      if (!passTrigAndPt) continue;
+
 
       if (sample=="data_obs" && tree->run<278820 && !tree->id_m_medium2016_1) continue;
       if (sample=="data_obs" && tree->run>=278820 && !tree->id_m_medium_1) continue;
       //if (sample=="embedded" && tZTTGenDR>0.2) continue;
 
-      if (tree->pt_1<21) continue;
+
       if (fabs(tree->eta_1)>2.1) continue;
 
       if (!tree->againstElectronVLooseMVA6_2 or !tree->againstMuonTight3_2) continue;
@@ -365,7 +382,7 @@ int main(int argc, char** argv) {
 	else if (tree->numGenJets==2) w_wjet=16.37649708;
 	else if (tree->numGenJets==3) w_wjet=2.532755448;
 	else if (tree->numGenJets==4) w_wjet=2.418989568;
-	weight=w_wjet;
+	//weight=w_wjet;
       }
       else w_wjet=1.00;
 
@@ -376,7 +393,7 @@ int main(int argc, char** argv) {
 	else if (tree->numGenJets==2) w_DYjet=1.042256272;
 	else if (tree->numGenJets==3) w_DYjet=0.656337234;
 	else if (tree->numGenJets==4) w_DYjet=0.458531131;
-	weight=w_DYjet;
+	//weight=w_DYjet;
       }      
       else w_DYjet=1.00;
 
@@ -388,19 +405,19 @@ int main(int argc, char** argv) {
       aweight=tree->genweight*weight*correction;
 	
       if (sample!="data_obs"){
-	if (tree->gen_match_2==5) aweight=aweight*0.95;
-	if (tree->gen_match_2==2 or tree->gen_match_2==4){//Yiwen reminiaod
-	  if (fabs(tree->eta_2)<0.4) aweight=aweight*1.263;
-	  else if (fabs(tree->eta_2)<0.8) aweight=aweight*1.364;
-	  else if (fabs(tree->eta_2)<1.2) aweight=aweight*0.854;
-	  else if (fabs(tree->eta_2)<1.7) aweight=aweight*1.712;
-	  else if (fabs(tree->eta_2)<2.3) aweight=aweight*2.324;
-	  if (name=="ZL" && tree->l2_decayMode==0) aweight=aweight*0.74; //ZL corrections Laura
+	if (tree->gen_match_2==5) aweight=aweight*0.89;
+	if (tree->gen_match_2==2 or tree->gen_match_2==4){//Anti-muon Tight
+	  if (fabs(tree->eta_2)<0.4) aweight=aweight*1.17;
+	  else if (fabs(tree->eta_2)<0.8) aweight=aweight*1.29;
+	  else if (fabs(tree->eta_2)<1.2) aweight=aweight*0.14;
+	  else if (fabs(tree->eta_2)<1.7) aweight=aweight*0.93;
+	  else if (fabs(tree->eta_2)<2.3) aweight=aweight*1.61;
+	  if (name=="ZL" && tree->l2_decayMode==0) aweight=aweight*0.74; //ZL corrections Laura //KK:To switch to 2017
 	  else if (name=="ZL" && tree->l2_decayMode==1) aweight=aweight*1.0;
 	}
-	if (tree->gen_match_2==1 or tree->gen_match_2==3){//Yiwen
-	  if (fabs(tree->eta_2)<1.460) aweight=aweight*1.213;
-	  else if (fabs(tree->eta_2)>1.558) aweight=aweight*1.375;
+	if (tree->gen_match_2==1 or tree->gen_match_2==3){//Anti-electrion VLoose
+	  if (fabs(tree->eta_2)<1.460) aweight=aweight*1.09;
+	  else if (fabs(tree->eta_2)>1.558) aweight=aweight*1.19;
 	}
 	aweight=aweight*h_Trk->Eval(tree->eta_1);
       }
@@ -485,7 +502,7 @@ int main(int argc, char** argv) {
       float var1_2=mjj;
       float dm_weight=1.0;
       if (njets==0) var2=(mymu+mytau).M();
-      if (mytau.Pt()<30) continue;
+      //if (mytau.Pt()<32) continue;
       //var1_0=mytau.Pt();
       //std::cout << "pass" << std::endl;
       var1_0=tree->l2_decayMode;//FIXME
@@ -494,17 +511,17 @@ int main(int argc, char** argv) {
       float mt=TMass_F(mymu.Pt(),mymet.Pt(),mymu.Px(),mymet.Px(),mymu.Py(),mymet.Py());
 	
       if (sample!="embedded" && sample!="data_obs"){
-	if (mymu.Pt()<23){ 
+	if (mymu.Pt()<25){ 
 	  w2->var("t_pt")->setVal(mytau.Pt());
 	  w2->var("t_eta")->setVal(mytau.Eta());
 	  w2->var("t_dm")->setVal(tree->l2_decayMode);
 	  float eff_tau_ratio = w2->function("t_genuine_TightIso_mt_ratio")->getVal();
-	  sf_trg=myScaleFactor_trgMu19Leg->get_ScaleFactor(tree->pt_1,tree->eta_1)*eff_tau_ratio;
-	  sf_trg_anti=myScaleFactor_trgMu19LegAnti->get_ScaleFactor(tree->pt_1,tree->eta_1)*eff_tau_ratio;
+	  sf_trg=myScaleFactor_trgMu20Leg->get_ScaleFactor(tree->pt_1,tree->eta_1)*eff_tau_ratio;
+	  sf_trg_anti=myScaleFactor_trgMu19LegAnti->get_ScaleFactor(tree->pt_1,tree->eta_1)*eff_tau_ratio;//KK: to switch to 2017
 	}
 	else{
-	  sf_trg=myScaleFactor_trgMu22->get_ScaleFactor(tree->pt_1,tree->eta_1);
-	  sf_trg_anti=myScaleFactor_trgMu22Anti->get_ScaleFactor(tree->pt_1,tree->eta_1);
+	  sf_trg=myScaleFactor_trgMu24->get_ScaleFactor(tree->pt_1,tree->eta_1);
+	  sf_trg_anti=myScaleFactor_trgMu22Anti->get_ScaleFactor(tree->pt_1,tree->eta_1);//KK: to switch to 2017
 	}
       }
       if (sample=="data_obs") {aweight=1.0; weight2=1.0;}
