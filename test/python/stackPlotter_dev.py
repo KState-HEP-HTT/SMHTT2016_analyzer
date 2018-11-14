@@ -58,7 +58,13 @@ titleMap = {
     'costhetastar': 'Cos(#theta*)',
     'nbjets': 'N(b-jets)',
     't1_decayMode': 'Tau1 decayMode',
-    't2_decayMode': 'Tau2 decayMode'    
+    't2_decayMode': 'Tau2 decayMode',
+    'j1_pt': 'Jet1 p_{T} [GeV]',
+    't1_eta': 'tau #eta',
+    'mu_eta': 'muon #eta',
+    'met' : 'MET [GeV]',
+    'mt' : 'MT [GeV]',
+    'unroll' : 'Unrolled'    
 }
 
 
