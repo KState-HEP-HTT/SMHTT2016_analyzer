@@ -405,35 +405,19 @@ int main(int argc, char** argv) {
       float aiRegion = ((tree->byMediumIsolationMVArun2v1DBnewDMwLT_1 && !tree->byTightIsolationMVArun2v1DBnewDMwLT_2 && tree->byLooseIsolationMVArun2v1DBnewDMwLT_2) || (tree->byMediumIsolationMVArun2v1DBnewDMwLT_2 && !tree->byTightIsolationMVArun2v1DBnewDMwLT_1 && tree->byLooseIsolationMVArun2v1DBnewDMwLT_1));
       if (!tree->byVLooseIsolationMVArun2v1DBnewDMwLT_1 || !tree->byVLooseIsolationMVArun2v1DBnewDMwLT_2) continue; 
 
+      // Taus quality
+      if (fabs(eta_1)<2.1 || fabs(eta_2)<2.1) continue;
+      if (pt_1<40 || pt_2<40) continue;
       // DoubleTau trigger
-      /*
-      if (sample=="data_obs" && input=="myntuples/Oct26_tt/data_H.root") {
-	if(!tree->passDoubleTauCmbIso35) continue;
-	if(!tree->matchDoubleTauCmbIso35_1  || !tree->matchDoubleTauCmbIso35_2) continue;
-	if(!tree->filterDoubleTauCmbIso35_1 || !tree->filterDoubleTauCmbIso35_2) continue;
-      }
-      if (sample=="data_obs" && input=="myntuples/Oct25_tt/data_H.root") {
-	if (!tree->passDoubleTau35) continue;
-	if (!tree->matchDoubleTau35_1  || !tree->matchDoubleTau35_2) continue;
-	if (!tree->filterDoubleTau35_1 || !tree->filterDoubleTau35_2) continue;
-      }
-      if (sample!="data_obs" && sample!="embedded") {
-	bool t35     =  tree->passDoubleTau35 && tree->filterDoubleTau35_1 && tree->filterDoubleTau35_2 && tree->matchDoubleTau35_1 && tree->matchDoubleTau35_2;
-	bool tcomb35 =  tree->passDoubleTauCmbIso35 && tree->filterDoubleTauCmbIso35_1 && tree->filterDoubleTauCmbIso35_2 && tree->matchDoubleTauCmbIso35_1 && tree->matchDoubleTauCmbIso35_2;
-	if (  !t35 && !tcomb35 ) continue;
-      }
-      */
       bool tight35 = tree->DoubleTightTau35Pass && tree->t1MatchesDoubleTightTau35Path && tree->t2MatchesDoubleTightTau35Path && tree->t1MatchesDoubleTightTau35Filter && tree->t2MatchesDoubleTightTau35Filter;
       bool medium40 = tree->DoubleMediumTau40Pass && tree->t1MatchesDoubleMediumTau40Path && tree->t2MatchesDoubleMediumTau40Path && tree->t1MatchesDoubleMediumTau40Filter && tree->t2MatchesDoubleMediumTau40Filter;
       bool tight40 = tree->DoubleTightTau40Pass && tree->t1MatchesDoubleTightTau40Path && tree->t2MatchesDoubleTightTau40Path && tree->t1MatchesDoubleTightTau40Filter && tree->t2MatchesDoubleTightTau40Filter;
       bool passTrigAndPt=false;
-      if (tree->pt_2>45 && (medium40 || tight40) ) passTrigAndPt = true;
-      else if (tree->pt_2>40 && tight35) passTrigAndPt=true;
-      else passTrigAndPt=false;
+      if (tree->pt_1>45 && tree->pt_2>45 && medium40) passTrigAndPt = true;
+      if (tree->pt_1>45 && tree->pt_2>45 && tight40) passTrigAndPt = true;
+      if (tree->pt_1>40 && tree->pt_2>40 && tight35) passTrigAndPt=true;
       if (!passTrigAndPt) continue;
-      //if ( !tight35 && !medium40 && !tight40 ) continue;
-      //if (!((tight35 && tree->pt_2<=45) || (medium40 && tree->pt_2>45) || (tight40 && tree->pt_2>45))) continue;
-      // Reject problomatic one event data G
+
       if (TMath::IsNaN(tree->Q2V2)) continue;
 
       float jpt_1 = scenario.get_jpt_1();
@@ -688,9 +672,9 @@ int main(int argc, char** argv) {
 	  if (shape=="DM10_UP" && tree->t2_decayMode==10) {mytau2*=1.012; mymet=mymet-(0.012/1.012)*mytau2;}
 	}
 
-	if (mytau1.Pt() < 41 || mytau2.Pt() < 41 ) continue;
-	if (mytau1.Pt() < 50) continue;	
-	if ((fabs(mytau1.Eta()))>2.1 || (fabs(mytau2.Eta())>2.1)) continue; // L770
+	//if (mytau1.Pt() < 41 || mytau2.Pt() < 41 ) continue;
+	//if (mytau1.Pt() < 50) continue;	
+	//if ((fabs(mytau1.Eta()))>2.1 || (fabs(mytau2.Eta())>2.1)) continue; // L770
 
 	float weight2=1.0;	  
 

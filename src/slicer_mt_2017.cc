@@ -1,3 +1,6 @@
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+// checklist : https://twiki.cern.ch/twiki/bin/viewauth/CMS/HiggsToTauTauWorking2017#tautau%20checklist  //
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 #include <vector>
 #include <string>
@@ -314,9 +317,10 @@ int main(int argc, char** argv) {
       if (i % 10000 == 0) fprintf(stdout, "\r  Processed events: %8d of %8d ", i, nentries_wtn);
       fflush(stdout);
 
-      // minimum lepton pT thresholds
-      if (tree->pt_1<21) continue;
-      if (tree->pt_2<32) continue;
+      // Muon quality
+      if (tree->pt_1<21 || tree->fabs(eta_1)<2.1) continue;
+      // Tau quality
+      if (tree->pt_2<23 || tree->fabs(eta_2)<2.3) continue;
       // trigger
       bool isCrossTrigger = (tree->mMatchesIsoMu20Tau27Path && tree->mMatchesIsoMu20Tau27Filter && tree->tMatchesIsoMu20Tau27Path && tree->tMatchesIsoMu20Tau27Filter && tree->Mu20Tau27Pass);
       bool isSingleLep24 = (tree->mMatchesIsoMu24Path && tree->mMatchesIsoMu24Filter && tree->IsoMu24Pass);
@@ -329,7 +333,7 @@ int main(int argc, char** argv) {
       if (sample=="data_obs") {
 	if (tree->pt_1>28 && isSingleLep27) passTrigAndPt=true;
 	else if (tree->pt_1>25 && isSingleLep24) passTrigAndPt=true;
-	else if (tree->pt_1>21 && isCrossTrigger) passTrigAndPt=true;
+	else if (tree->pt_1<=25 && tree->pt_2>32 && fabs(tree->eta_2)<2.1 && isCrossTrigger) passTrigAndPt=true;
       }
       else {
 	if (tree->pt_1>25 && isSingleLep24) passTrigAndPt=true;
