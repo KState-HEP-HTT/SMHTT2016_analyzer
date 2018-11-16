@@ -9,6 +9,8 @@ git clone https://github.com/CMS-HTT/LeptonEfficiencies
 
 Slicer is saparated for 2016 and 2017 ntuples. Plotter and DatacardMaker can be used for both 2016 and 2017 after slicing.
 
+Output root files of slicer is input of plotter and datacard maker. 
+
 ## Instruction of tree slicer :
 
 To compile,
@@ -16,6 +18,14 @@ To compile,
 cd SMHTT_analyzer/src
 ./Make.sh slicer_tt.cc 
 ./Make.sh slicer_mt.cc 
+```
+
+To run on one sample,
+
+```
+cd ../test
+./slicer_<ch>.exe <input.root> <output.root> <sample name> <output tag> <shape>
+./slicer_mt.exe myntuples/Nov07_mt/DY0.root test.root DY0 ZTT nominal
 ```
 
 To run the code and make the distribution plots,
@@ -39,13 +49,21 @@ cd SMHTT_analyzer/src
 ./Make.sh datacardMaker_mt.cc 
 ```
 
+To run on one sample,
+
+```
+cd ../test
+./datacardMaker_<ch>.exe <input.root> <output.roo> <output tag> <shape> <2016 for 2016 selection or any number>
+./datacardMaker_mt.exe output_Slicer/mt/ZTT.root output.root ZTT nominal 2016
+```
+
 To run the code and make the distribution plots,
 
 ```
 cd ../test
-source runDatacardMaker_<ch>.sh <inputfolder> <2016 to reproduce 2016 analysis result(fot now only tt)> <mc(or empty for embedded)> 
-source runDatacardMaker_tt.sh output_Slicer/tt (2016) (mc)
-source runDatacardMaker_mt.sh output_Slicer/mt (2016) (mc) 
+source runDatacardMaker_<ch>.sh <inputfolder> <2016 for 2016 selection or any number> <mc(or empty for embedded ZTT)> 
+source runDatacardMaker_tt.sh output_Slicer/tt 2016 (mc)
+source runDatacardMaker_mt.sh output_Slicer/mt 2016 (mc) 
 ```
 
 
@@ -59,6 +77,14 @@ cd SMHTT_analyzer/src
 ./Make.sh plotter_mt.cc 
 ```
 
+To run on one sample,
+```
+cd ../test
+./plotter_<ch>.exe <input.root> <output.root> <output tag> <min> <max> <obs> <ch>
+./plotter_mt.exe output_Slicer/mt/ZTT.root test.root ZTT 10 0 200 mjj mt
+```
+
+
 To run the code and make the distribution plots,
 
 ```
@@ -67,12 +93,11 @@ source quickPlot.sh <input folder> <numbin> <min> <max> <obs> <ch>
 source quickPlot.sh FREEZE_TREES/tt_qcdCRstudy 20 0 1 MELA tt
 ```
 
-This will give you the plots with embedded sample + two lines that enable you to make the same plots usint MC ZTT.
+This will give you the plots with embedded sample + three lines that enable you to make the same plots usint MC ZTT.
 
 
 One need to recompile the code to change VBF category definition.
 
-https://github.com/KState-HEP-HTT/SMHTT2016_analyzer/blob/master/src/plotter_tt.cc#L177-L179
 
 
 
