@@ -160,16 +160,16 @@ int main(int argc, char** argv) {
     //Binning for 0jet cat, x-axis
     float bins0X[] = {0,1,10,11};
     //Binning for 0jet cat, y-axis
-    float bins0Y[] = {0,60,65,70,75,80,85,90,95,100,105,110,400,10000};
+    float bins0Y[] = {0,60,65,70,75,80,85,90,95,100,105,110,400};
     //Binning for 1jet cat, x-axis
     float bins1X[] = {0,100,150,200,250,300,5000};
     //Binning for 1jet cat, y-axis
-    float bins1Y[] = {0,80,90,100,110,120,130,140,150,160,300,10000};
+    float bins1Y[] = {0,80,90,100,110,120,130,140,150,160,300};
     //Binning for 2jet cat, x-axis
     float bins2X[] = {300,700,1100,1500,10000};
     //float bins2X[] = {0,0.1,0.5,0.9,1.0};
     //Binning for 2jet cat, y-axis
-    float bins2Y[] = {0,95,115,135,155,400,10000};
+    float bins2Y[] = {0,95,115,135,155,400};
 
     int  binnum0X = sizeof(bins0X)/sizeof(Float_t) - 1;
     int  binnum0Y = sizeof(bins0Y)/sizeof(Float_t) - 1;
@@ -268,18 +268,18 @@ int main(int argc, char** argv) {
       for (int k=0; k<nbhist; ++k){
 	if (mt<50 && t1_charge*mu_charge<0) {
 	  // ################### signalRegion && OS ####################
-	  if (is_0jet && signalRegion)         h0_OS[k]->Fill(var_0jetX,var_0jetY,evtwt);
-	  if (is_boosted && signalRegion)	    h1_OS[k]->Fill(var_boostedX,var_boostedY,evtwt);
+	  if (is_0jet && signalRegion)      h0_OS[k]->Fill(var_0jetX,var_0jetY,evtwt);
+	  if (is_boosted && signalRegion)   h1_OS[k]->Fill(var_boostedX,var_boostedY,evtwt);
 	  if (is_VBF && signalRegion) 	    h2_OS[k]->Fill(var_vbfX,var_vbfY,evtwt); 
 	}
 
 	if (mt<50 && t1_charge*mu_charge>0) {
 	  // ################### signalRegion && SS ####################
-	  if (is_0jet && signalRegion)         h0_SS[k]->Fill(var_0jetX,var_0jetY,evtwt);
-	  if (is_boosted && signalRegion)	    h1_SS[k]->Fill(var_boostedX,var_boostedY,evtwt);
+	  if (is_0jet && signalRegion)      h0_SS[k]->Fill(var_0jetX,var_0jetY,evtwt);
+	  if (is_boosted && signalRegion)   h1_SS[k]->Fill(var_boostedX,var_boostedY,evtwt);
 	  if (is_VBF && signalRegion) 	    h2_SS[k]->Fill(var_vbfX,var_vbfY,evtwt);	  
 	  // ################### QCDRegion && SS ####################
-	  if (is_0jet && qcdRegion)            h0_QCD[k]->Fill(var_0jetX,var_0jetY,evtwt);
+	  if (is_0jet && qcdRegion)         h0_QCD[k]->Fill(var_0jetX,var_0jetY,evtwt);
 	  if (is_boosted && qcdRegion)	    h1_QCD[k]->Fill(var_boostedX,var_boostedY,evtwt);
 	  if (is_VBF && qcdRegion) 	    h2_QCD[k]->Fill(var_vbfX,var_vbfY,evtwt);	  
 	}
@@ -331,6 +331,7 @@ int main(int argc, char** argv) {
       h2_QCD[k]->SetName(name.c_str()+postfix);
       h2_QCD[k]->Write();
     }
+    cout<<h0_OS[0]->Integral()<<" "<<h1_OS[0]->Integral()<<" "<<h2_OS[0]->Integral()<<endl;
     fout->Close();
 } 
 

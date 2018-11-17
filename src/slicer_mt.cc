@@ -278,13 +278,13 @@ int main(int argc, char** argv) {
       /////////////////////////////////////
       //  For cross check with 2016 SVN  //
       /////////////////////////////////////
-      //if (!tree->decayModeFinding_2) continue;
-      if (!tree->byVLooseIsolationMVArun2v1DBnewDMwLT_2) continue;
-      float signalRegion=(tree->byTightIsolationMVArun2v1DBnewDMwLT_2 && tree->iso_1<0.15);
-      float qcdRegion=(tree->byMediumIsolationMVArun2v1DBnewDMwLT_2 && tree->iso_1<0.30);
-      float wRegion=(tree->byMediumIsolationMVArun2v1DBnewDMwLT_2 && tree->iso_1<0.30);
-      float wsfRegion=(tree->byTightIsolationMVArun2v1DBnewDMwLT_2 && tree->iso_1<0.15);
-      float qcdCR=(tree->byTightIsolationMVArun2v1DBnewDMwLT_2 && tree->iso_1<0.30 && tree->iso_1>0.15);      
+      if (!tree->decayModeFinding_2) continue;
+      if (!tree->byVLooseIsolationMVArun2v1DBoldDMwLT_2) continue;
+      float signalRegion=(tree->byTightIsolationMVArun2v1DBoldDMwLT_2 && tree->iso_1<0.15);
+      float qcdRegion=(tree->byMediumIsolationMVArun2v1DBoldDMwLT_2 && tree->iso_1<0.30);
+      float wRegion=(tree->byMediumIsolationMVArun2v1DBoldDMwLT_2 && tree->iso_1<0.30);
+      float wsfRegion=(tree->byTightIsolationMVArun2v1DBoldDMwLT_2 && tree->iso_1<0.15);
+      float qcdCR=(tree->byTightIsolationMVArun2v1DBoldDMwLT_2 && tree->iso_1<0.30 && tree->iso_1>0.15);      
       /////////////////////////////////////
       //tree->byVLooseIsolationMVArun2v1DBnewDMwLT_2
       if (i % 10000 == 0) fprintf(stdout, "\r  Processed events: %8d of %8d ", i, nentries_wtn);
@@ -345,7 +345,7 @@ int main(int argc, char** argv) {
 	weight=1.4184;
 	if (tree->numGenJets==1) weight=0.45729;
 	else if (tree->numGenJets==2) weight=0.4668;
-	else if (tree->numGenJets==3)	weight=0.47995;
+	else if (tree->numGenJets==3) weight=0.47995;
 	else if (tree->numGenJets==4) weight=0.39349;
       }
       
@@ -353,8 +353,9 @@ int main(int argc, char** argv) {
       if (sample!="embedded" && sample!="data_obs") correction=correction*LumiWeights_12->weight(tree->npu);
       if (sample=="embedded" && tree->genweight>1) continue;//genweight=0.10;
       float aweight = 1.0;
-      if (name.find("ggH")) aweight = tree->genweight*weight*correction;
-      else aweight=tree->genweight*weight*correction;
+      //if (name.find("ggH")) aweight = tree->genweight*weight*correction;
+      //else aweight=tree->genweight*weight*correction;
+      aweight=tree->genweight*weight*correction;
 	
       if (sample!="data_obs"){
 	if (tree->gen_match_2==5) aweight=aweight*0.95;
@@ -380,7 +381,6 @@ int main(int argc, char** argv) {
 	if (tree->Rivet_nJets30==2) aweight = aweight * g_NNLOPS_2jet->Eval(min(tree->Rivet_higgsPt,float(800.0))); 
 	if (tree->Rivet_nJets30>=3) aweight = aweight * g_NNLOPS_3jet->Eval(min(tree->Rivet_higgsPt,float(925.0))); 
       }
-
 
       NumV WG1unc = qcd_ggF_uncert_2017(tree->Rivet_nJets30, tree->Rivet_higgsPt, tree->Rivet_stage1_cat_pTjet30GeV);
 
@@ -446,6 +446,7 @@ int main(int argc, char** argv) {
       myrawmet.SetPtEtaPhiM(met,0,metphi,0);
       TLorentzVector myrawtau=mytau;
       float ratioantiraw=ratioanti;
+      
       float weight2=1.0;
       TLorentzVector mymet=myrawmet;
       mytau=myrawtau;
@@ -476,6 +477,8 @@ int main(int argc, char** argv) {
 	  sf_trg_anti=myScaleFactor_trgMu22Anti->get_ScaleFactor(tree->pt_1,tree->eta_1);
 	}
       }
+      //************************ Z mumu scale factors **************************
+      if (fabs(tes)!=13 && (sample=="EWKZLL" or sample=="EWKZNuNu" or sample=="ZTT" or sample=="ZJ" or sample=="ZL")) weight2=GetZmmSF(njets,mjj,pt_sv,mytau.Pt(),0);
       if (sample=="data_obs") {aweight=1.0; weight2=1.0;}
       /*
 	TLorentzVector myrawmet;

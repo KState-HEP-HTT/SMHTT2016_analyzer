@@ -34,7 +34,7 @@
 #include "../include/tt_Tree.h"
 #include "../include/SkimmedTree_tt.h"
 #include "../include/ScaleFactor.h"
-#include "../include/LumiReweightingStandAlone.h"
+#include "../include/LumiReweightingStandAlone_mt.h"
 #include "../include/lumiMap.h"
 #include "../include/btagSF.h"
 #include "../include/scenario_info.h"
@@ -80,8 +80,6 @@ int main(int argc, char** argv) {
     namu->Branch("t1_mass",             &t1_mass,             "t1_mass/F"            );
     namu->Branch("t1_charge",           &t1_charge,           "t1_charge/F"          );
     namu->Branch("t1_decayMode",        &t1_decayMode,        "t1_decayMode/F"       );
-    namu->Branch("t1_tightIso",         &t1_tightIso,         "t1_tightIso/F"        );//
-    namu->Branch("t1_mediumIso",        &t1_mediumIso,        "t1_mediumIso/F"       );//
     namu->Branch("t1_dmf",              &t1_dmf,              "t1_dmf/F"             );
     namu->Branch("t1_dmf_new",          &t1_dmf_new,          "t1_dmf_new/F"         );
     namu->Branch("t1_iso_VL",           &t1_iso_VL,           "t1_iso_VL/F"          );
@@ -184,6 +182,20 @@ int main(int argc, char** argv) {
     namu->Branch("is_signal",           &is_signal,           "is_signal/I"          );
     namu->Branch("is_ai",               &is_ai,               "is_ai/I"              );
 
+
+    TTree* w_namu = new TTree("w_tree", "w_tree");
+    w_namu->SetDirectory(0);
+    w_namu->Branch("w_lumi",               &w_lumi,               "w_lumi/F"             );
+    w_namu->Branch("w_wjet",               &w_wjet,               "w_wjet/F"             );
+    w_namu->Branch("w_DYjet",              &w_DYjet,              "w_DYjet/F"            );
+    w_namu->Branch("w_pu",                 &w_pu,                 "w_pu/F"               );
+    w_namu->Branch("genweight",            &genweight,            "genweight/F"          );
+    w_namu->Branch("sf_id",                &sf_id,                "sf_id/F"              );
+    w_namu->Branch("sf_trg1",              &sf_trg1,              "sf_trg1/F"            );
+    w_namu->Branch("sf_trg2",              &sf_trg2,              "sf_trg2/F"            );
+    w_namu->Branch("evtwt",                &evtwt,                "evtwt/F"              );
+
+
     //////////////////////////////////////////////////////////////////
     //                                                              //          
     //  Weights and Scale Factors                                   //
@@ -236,137 +248,10 @@ int main(int argc, char** argv) {
     std::cout.precision(10);
 
     scenario_info scenario(treePtr, shape);
-
-    // D.Kim : AN line 791~795
-    //Binning for 0jet cat. 1D: Msv. In AN it was 10GeV binning / official data card combined 0~50 as one bin
-    float bins0[] = {0,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,260,270,280,290,300};
-    float bins1[] = {0,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,260,270,280,290,300};
-    //Binning for 1jet cat, x-axis: HpT
-    float bins1X[] = {0,100,170,300,10000};
-    //Binning for 1jet cat, y-axis: Msv
-    float bins1Y[] = {0,40,60,70,80,90,100,110,120,130,150,200,250};
-    //Binning for 2jet cat, x-axis: Mjj
-    float bins2X[] = {0,300,500,800,10000};
-    //Binning for 2jet cat, y-axis: Msv
-    float bins2Y[] = {0,40,60,70,80,90,100,110,120,130,150,200,250};
-
-    int  binnum0 = sizeof(bins0)/sizeof(Float_t) - 1;
-    int  binnum1 = sizeof(bins1)/sizeof(Float_t) - 1;
-    int  binnum1X = sizeof(bins1X)/sizeof(Float_t) - 1;
-    int  binnum1Y = sizeof(bins1Y)/sizeof(Float_t) - 1;
-    int  binnum2X = sizeof(bins2X)/sizeof(Float_t) - 1;
-    int  binnum2Y = sizeof(bins2Y)/sizeof(Float_t) - 1;
-
-    // Categories
-    TH1F* h_0jet = new TH1F ("h_0jet", "h_0jet", binnum0, bins0); h_0jet->Sumw2();
-    TH1F* hx_boosted = new TH1F ("hx_boosted", "hx_boosted", binnum1X, bins1X); hx_boosted->Sumw2();
-    TH1F* hy_boosted = new TH1F ("hy_boosted", "hy_boosted", binnum1Y, bins1Y); hy_boosted->Sumw2();
-    TH1F* hx_vbf = new TH1F ("hx_vbf", "hx_vbf", binnum2X, bins2X); hx_vbf->Sumw2();
-    TH1F* hy_vbf = new TH1F ("hy_vbf", "hy_vbf", binnum2Y, bins2Y); hy_vbf->Sumw2();
-
-    // h0_ : 0jet, h1_ : boosted, h2_ : vbf, h3_ : vh, h2M*_ : vbf with MELA, h4M_ : 2jets with MEAL  h_ : inclusive
-    std::vector<TH1F*> h0_OS;
-    std::vector<TH1F*> h0_SS;
-    std::vector<TH1F*> h0_AIOS;
-    std::vector<TH1F*> h0_AISS;
-    std::vector<TH2F*> h1_OS;
-    std::vector<TH2F*> h1_SS;
-    std::vector<TH2F*> h1_AIOS;
-    std::vector<TH2F*> h1_AISS;
-    std::vector<TH2F*> h2_OS;
-    std::vector<TH2F*> h2_SS;
-    std::vector<TH2F*> h2_AIOS;
-    std::vector<TH2F*> h2_AISS;
-    std::vector<TH2F*> h3_OS;
-    std::vector<TH2F*> h3_SS;
-    std::vector<TH2F*> h3_AIOS;
-    std::vector<TH2F*> h3_AISS;
-    std::vector<TH1F*> h_OS;
-    std::vector<TH1F*> h_SS;
-    std::vector<TH1F*> h_AIOS;
-    std::vector<TH1F*> h_AISS;
-    // D.Kim : trg SF histo
-    std::vector<TH1F*> h_trgSF1;
-    std::vector<TH1F*> h_trgSF2;
-    std::vector<TH1F*> h_trgSF_RR;
-    std::vector<TH1F*> h_trgSF_FR;
-    std::vector<TH1F*> h_trgSF_RF;
-    std::vector<TH1F*> h_trgSF_FF;
-
     TString postfix = postfixMaps(shape);
     std::cout << postfix << std::endl;
     //For shape systematics
     int nbhist=1;
-    for (int k=0; k<nbhist; ++k){
-      std::ostringstream HNS0OS; HNS0OS << "h0_OS" << k;
-      std::ostringstream HNS1OS; HNS1OS << "h1_OS" << k;
-      std::ostringstream HNS2OS; HNS2OS << "h2_OS" << k;
-      std::ostringstream HNS2M1OS; HNS2M1OS << "h2M1_OS" << k;
-      std::ostringstream HNS2M2OS; HNS2M2OS << "h2M2_OS" << k;
-      std::ostringstream HNS2M3OS; HNS2M3OS << "h2M3_OS" << k;
-      std::ostringstream HNS4M1OS; HNS4M1OS << "h4M1_OS" << k;
-      std::ostringstream HNS4M2OS; HNS4M2OS << "h4M2_OS" << k;
-      std::ostringstream HNS3OS; HNS3OS << "h3_OS" << k;
-      std::ostringstream HNSOS; HNS2OS << "h_OS" << k;
-      // binnum2X,bins2X,binnum2Y,bins2Y
-      h0_OS.push_back(new TH1F (HNS0OS.str().c_str(),"",binnum0,bins0)); h0_OS[k]->Sumw2();
-      h1_OS.push_back(new TH2F (HNS1OS.str().c_str(),"",binnum1X,bins1X,binnum1Y,bins1Y)); h1_OS[k]->Sumw2();
-      h2_OS.push_back(new TH2F (HNS2OS.str().c_str(),"",binnum2X,bins2X,binnum2Y,bins2Y)); h2_OS[k]->Sumw2();      
-      h3_OS.push_back(new TH2F (HNS3OS.str().c_str(),"",binnum2X,bins2X,binnum2Y,bins2Y)); h3_OS[k]->Sumw2();
-      h_OS.push_back(new TH1F (HNSOS.str().c_str(),"",binnum0,bins0)); h_OS[k]->Sumw2();
-      
-      std::ostringstream HNS0SS; HNS0OS << "h0_SS" << k;
-      std::ostringstream HNS1SS; HNS1OS << "h1_SS" << k;
-      std::ostringstream HNS2SS; HNS2OS << "h2_SS" << k;
-      std::ostringstream HNS3SS; HNS2OS << "h3_SS" << k;
-      std::ostringstream HNSSS; HNSOS << "h_SS" << k;
-
-      h0_SS.push_back(new TH1F (HNS0SS.str().c_str(),"",binnum1,bins1)); h0_SS[k]->Sumw2();
-      h1_SS.push_back(new TH2F (HNS1SS.str().c_str(),"",binnum1X,bins1X,binnum1Y,bins1Y)); h1_SS[k]->Sumw2();
-      h2_SS.push_back(new TH2F (HNS2SS.str().c_str(),"",binnum2X,bins2X,binnum2Y,bins2Y)); h2_SS[k]->Sumw2();
-      h3_SS.push_back(new TH2F (HNS3SS.str().c_str(),"",binnum2X,bins2X,binnum2Y,bins2Y)); h3_SS[k]->Sumw2();
-      h_SS.push_back(new TH1F (HNSSS.str().c_str(),"",binnum1,bins1)); h_SS[k]->Sumw2();
-      
-      std::ostringstream HNS0AIOS; HNS0AIOS << "h0_AIOS" << k;
-      std::ostringstream HNS1AIOS; HNS1AIOS << "h1_AIOS" << k;
-      std::ostringstream HNS2AIOS; HNS2AIOS << "h2_AIOS" << k;
-      std::ostringstream HNS3AIOS; HNS3AIOS << "h3_AIOS" << k;
-      std::ostringstream HNSAIOS; HNSAIOS << "h_AIOS" << k;
-
-      h0_AIOS.push_back(new TH1F (HNS0AIOS.str().c_str(),"",binnum0,bins0)); h0_AIOS[k]->Sumw2();
-      h1_AIOS.push_back(new TH2F (HNS1AIOS.str().c_str(),"",binnum1X,bins1X,binnum1Y,bins1Y)); h1_AIOS[k]->Sumw2();
-      h2_AIOS.push_back(new TH2F (HNS2AIOS.str().c_str(),"",binnum2X,bins2X,binnum2Y,bins2Y)); h2_AIOS[k]->Sumw2();
-      h3_AIOS.push_back(new TH2F (HNS3AIOS.str().c_str(),"",binnum2X,bins2X,binnum2Y,bins2Y)); h3_AIOS[k]->Sumw2();
-      h_AIOS.push_back(new TH1F (HNSAIOS.str().c_str(),"",binnum0,bins0)); h_AIOS[k]->Sumw2();
-        
-      std::ostringstream HNS0AISS; HNS0AISS << "h0_AISS" << k;
-      std::ostringstream HNS1AISS; HNS1AISS << "h1_AISS" << k;
-      std::ostringstream HNS2AISS; HNS2AISS << "h2_AISS" << k;
-      std::ostringstream HNS3AISS; HNS3AISS << "h3_AISS" << k;
-      std::ostringstream HNSAISS; HNSAISS << "h_AISS" << k;
-
-      h0_AISS.push_back(new TH1F (HNS0AISS.str().c_str(),"",binnum1,bins1)); h0_AISS[k]->Sumw2();
-      h1_AISS.push_back(new TH2F (HNS1AISS.str().c_str(),"",binnum1X,bins1X,binnum1Y,bins1Y)); h1_AISS[k]->Sumw2();
-      h2_AISS.push_back(new TH2F (HNS2AISS.str().c_str(),"",binnum2X,bins2X,binnum2Y,bins2Y)); h2_AISS[k]->Sumw2();
-      h3_AISS.push_back(new TH2F (HNS3AISS.str().c_str(),"",binnum2X,bins2X,binnum2Y,bins2Y)); h3_AISS[k]->Sumw2();
-      h_AISS.push_back(new TH1F (HNSAISS.str().c_str(),"",binnum1,bins1)); h_AISS[k]->Sumw2();
-      
-      // D.Kim trgSF
-      std::ostringstream HTRGSF1; HTRGSF1 << "h_trgSF1" << k;
-      std::ostringstream HTRGSF2; HTRGSF2 << "h_trgSF2" << k;
-      std::ostringstream HTRGSFRR; HTRGSFRR << "h_trgSF_RR" << k;
-      std::ostringstream HTRGSFFR; HTRGSFFR << "h_trgSF_FR" << k;
-      std::ostringstream HTRGSFRF; HTRGSFRF << "h_trgSF_RF" << k;
-      std::ostringstream HTRGSFFF; HTRGSFFF << "h_trgSF_FF" << k;
-      h_trgSF1.push_back(new TH1F (HTRGSF1.str().c_str(),"trgSF1", 80,1.00,1.10)); h_trgSF1[k]->Sumw2();
-      h_trgSF2.push_back(new TH1F (HTRGSF2.str().c_str(),"trgSF2", 80,0.97,1.15)); h_trgSF2[k]->Sumw2();
-      h_trgSF_RR.push_back(new TH1F (HTRGSFRR.str().c_str(),"trgSF_RR", 100,0.9,1.5)); h_trgSF_RR[k]->Sumw2();
-      h_trgSF_FR.push_back(new TH1F (HTRGSFFR.str().c_str(),"trgSF_FR", 100,0.9,1.5)); h_trgSF_FR[k]->Sumw2();
-      h_trgSF_RF.push_back(new TH1F (HTRGSFRF.str().c_str(),"trgSF_RF", 100,0.9,1.5)); h_trgSF_RF[k]->Sumw2();
-      h_trgSF_FF.push_back(new TH1F (HTRGSFFF.str().c_str(),"trgSF_FF", 100,0.9,1.5)); h_trgSF_FF[k]->Sumw2();
-      
-    }
-    
     // Loop over all events
     Int_t nentries_wtn = (Int_t) treePtr->GetEntries();
     for (Int_t i = 0; i < nentries_wtn; i++) {
@@ -378,27 +263,27 @@ int main(int argc, char** argv) {
       //////////////////////////////////
       // Added for yield cross check  //
       //////////////////////////////////
-      /*
       if (!tree->byVLooseIsolationMVArun2v1DBoldDMwLT_1 || !tree->byVLooseIsolationMVArun2v1DBoldDMwLT_2) continue; 
       // Regions
       float signalRegion = tree->byTightIsolationMVArun2v1DBoldDMwLT_1 && tree->byTightIsolationMVArun2v1DBoldDMwLT_2;
       float aiRegion = ((tree->byMediumIsolationMVArun2v1DBoldDMwLT_1 && !tree->byTightIsolationMVArun2v1DBoldDMwLT_2 && tree->byLooseIsolationMVArun2v1DBoldDMwLT_2) || (tree->byMediumIsolationMVArun2v1DBoldDMwLT_2 && !tree->byTightIsolationMVArun2v1DBoldDMwLT_1 && tree->byLooseIsolationMVArun2v1DBoldDMwLT_1));
       if (!tree->byLooseIsolationMVArun2v1DBoldDMwLT_1 && !tree->byLooseIsolationMVArun2v1DBoldDMwLT_2) continue; // Fig 43(a)
-      */
       //////////////////////////////////
 
       // Regions
+      /*
       float signalRegion = tree->byTightIsolationMVArun2v1DBnewDMwLT_1 && tree->byTightIsolationMVArun2v1DBnewDMwLT_2;
       float aiRegion = ((tree->byMediumIsolationMVArun2v1DBnewDMwLT_1 && !tree->byTightIsolationMVArun2v1DBnewDMwLT_2 && tree->byLooseIsolationMVArun2v1DBnewDMwLT_2) || (tree->byMediumIsolationMVArun2v1DBnewDMwLT_2 && !tree->byTightIsolationMVArun2v1DBnewDMwLT_1 && tree->byLooseIsolationMVArun2v1DBnewDMwLT_1));
       if (!tree->byVLooseIsolationMVArun2v1DBnewDMwLT_1 || !tree->byVLooseIsolationMVArun2v1DBnewDMwLT_2) continue; 
+      */
 
       // DoubleTau trigger
-      if (sample=="data_obs" && input=="myntuples/Oct26_tt/data_H.root") {
+      if (sample=="data_obs" && input.find("data_H") != string::npos) {
 	if(!tree->passDoubleTauCmbIso35) continue;
 	if(!tree->matchDoubleTauCmbIso35_1  || !tree->matchDoubleTauCmbIso35_2) continue;
 	if(!tree->filterDoubleTauCmbIso35_1 || !tree->filterDoubleTauCmbIso35_2) continue;
       }
-      if (sample=="data_obs" && input=="myntuples/Oct25_tt/data_H.root") {
+      if (sample=="data_obs" && input.find("data_H") == string::npos) {
 	if (!tree->passDoubleTau35) continue;
 	if (!tree->matchDoubleTau35_1  || !tree->matchDoubleTau35_2) continue;
 	if (!tree->filterDoubleTau35_1 || !tree->filterDoubleTau35_2) continue;
@@ -507,21 +392,27 @@ int main(int argc, char** argv) {
       
       // Weights depending in the generated jet multiplicity
       if (sample=="W"){
-	weight=25.446;
-	if (tree->numGenJets==1) weight=6.8176;
-	else if (tree->numGenJets==2) weight=2.1038;
-	else if (tree->numGenJets==3) weight=0.6889;
-	else if (tree->numGenJets==4) weight=0.6900;
+	w_wjet=25.446;
+	if (tree->numGenJets==1) w_wjet=6.8176;
+	else if (tree->numGenJets==2) w_wjet=2.1038;
+	else if (tree->numGenJets==3) w_wjet=0.6889;
+	else if (tree->numGenJets==4) w_wjet=0.6900;
+	weight=w_wjet;
 	//std::cout << weight << std::endl;
       }
+      else w_wjet=1.00;
+
       
       if (sample=="DY" or sample=="ZTT" or sample=="ZLL" or sample=="ZL" or sample=="ZJ"){
-	weight=1.41957039;
-	if (tree->numGenJets==1)  weight=0.457675455;
-	else if (tree->numGenJets==2) weight=0.467159142;
-	else if (tree->numGenJets==3) weight=0.480349711;
-	else if (tree->numGenJets==4) weight=0.3938184351;
+	w_DYjet=1.41957039;
+	if (tree->numGenJets==1)  w_DYjet=0.457675455;
+	else if (tree->numGenJets==2) w_DYjet=0.467159142;
+	else if (tree->numGenJets==3) w_DYjet=0.480349711;
+	else if (tree->numGenJets==4) w_DYjet=0.3938184351;
+	weight=w_DYjet;
       }
+      else w_DYjet=1.00;
+
       
       // Multiply some weights and scale factors together
       // ID and iso corrections
@@ -717,6 +608,15 @@ int main(int argc, char** argv) {
 		   Phi, Phi1, costheta1, costheta2, costhetastar, Q2V1, Q2V2,
 		   signalRegion, aiRegion, weight2*aweight
 		   );
+	  fillWeightTree(w_namu,
+			 w_lumi,
+			 w_wjet, w_DYjet,
+			 LumiWeights_12->weight(tree->npu),
+			 tree->genweight,
+			 sf_id,sf_trg1,sf_trg2,
+			 0,//w_trk
+			 weight2*aweight
+			 );
 	}
       }
     } // end of loop over events
@@ -724,10 +624,10 @@ int main(int argc, char** argv) {
     TFile *fout = TFile::Open(output.c_str(), "RECREATE");
     fout->cd();
     namu->Write();
+    w_namu->Write();
     nbevt->Write();
 
     fout->Close();
     Py_Finalize();
 } 
-
 
