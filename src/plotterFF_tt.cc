@@ -13,6 +13,12 @@
 // my includes
 #include "../include/myHelper.h"
 #include "../include/tt_Tree.h"
+#include "HTTutilities/Jet2TauFakes/interface/FakeFactor.h"
+#include "HTTutilities/Jet2TauFakes/interface/IFunctionWrapper.h"
+#include "HTTutilities/Jet2TauFakes/interface/WrapperTFormula.h"
+#include "HTTutilities/Jet2TauFakes/interface/WrapperTGraph.h"
+#include "HTTutilities/Jet2TauFakes/interface/WrapperTH2F.h"
+#include "HTTutilities/Jet2TauFakes/interface/WrapperTH3D.h"
 
 int main(int argc, char** argv) {    
     std::string input = *(argv + 1);
@@ -25,7 +31,7 @@ int main(int argc, char** argv) {
     float is2016 = atof(argv[8]);
 
     TFile *f_Double = new TFile(input.c_str());
-    std::cout<<"input file: "<<input.c_str()<< std::endl;
+    std::cout<<"XXXXXXXXXXXXX "<<input.c_str()<<" XXXXXXXXXXXX"<<std::endl;
     TTree* namu = (TTree*) f_Double->Get("tautau_tree");
     TH1F* nbevt = (TH1F*) f_Double->Get("nevents");
     float ngen = nbevt->GetBinContent(2);
@@ -159,28 +165,32 @@ int main(int argc, char** argv) {
     TBranch* br = namu->GetBranch(tvar.c_str());
     if (br) namu->SetBranchAddress(tvar.c_str(), &var);
 
-    TH1F *h_os_0jet = new TH1F("","",num,min,max);
-    TH1F *h_ss_0jet = new TH1F("","",num,min,max);
-    TH1F *h_aios_0jet = new TH1F("","",num,min,max);
-    TH1F *h_aiss_0jet = new TH1F("","",num,min,max);
-    TH1F *h_os_boosted = new TH1F("","",num,min,max);
-    TH1F *h_ss_boosted = new TH1F("","",num,min,max);
-    TH1F *h_aios_boosted = new TH1F("","",num,min,max);
-    TH1F *h_aiss_boosted = new TH1F("","",num,min,max);
-    TH1F *h_os_vbf = new TH1F("","",num,min,max);
-    TH1F *h_ss_vbf = new TH1F("","",num,min,max);
-    TH1F *h_aios_vbf = new TH1F("","",num,min,max);
-    TH1F *h_aiss_vbf = new TH1F("","",num,min,max);
-    TH1F *h_os_inclusive = new TH1F("","",num,min,max);
-    TH1F *h_ss_inclusive = new TH1F("","",num,min,max);
-    TH1F *h_aios_inclusive = new TH1F("","",num,min,max);
-    TH1F *h_aiss_inclusive = new TH1F("","",num,min,max);
+    TFile *fakefactor = new TFile("../weightROOTs/JetFakesFraction_tt_Oct26_embed.root");
+    TH2F *frac_w_vbf=(TH2F*) fakefactor->Get("tt_vbf_ff/frac_w");
+    TH2F *frac_tt_vbf=(TH2F*) fakefactor->Get("tt_vbf_ff/frac_tt"); 
+    TH2F *frac_real_vbf=(TH2F*) fakefactor->Get("tt_vbf_ff/frac_real"); 
+    TH2F *frac_w_boosted=(TH2F*) fakefactor->Get("tt_boosted_ff/frac_w");
+    TH2F *frac_tt_boosted=(TH2F*) fakefactor->Get("tt_boosted_ff/frac_tt"); 
+    TH2F *frac_real_boosted=(TH2F*) fakefactor->Get("tt_boosted_ff/frac_real"); 
+    TH2F *frac_w_0jet=(TH2F*) fakefactor->Get("tt_0jet_ff/frac_w");
+    TH2F *frac_tt_0jet=(TH2F*) fakefactor->Get("tt_0jet_ff/frac_tt"); 
+    TH2F *frac_real_0jet=(TH2F*) fakefactor->Get("tt_0jet_ff/frac_real"); 
+
+    TFile *fakefactor_tight = new TFile("${CMSSW_BASE}/src/HTTutilities/Jet2TauFakes/data2016/SM2016_ML/tight/tt/fakeFactors_tight.root");
+    FakeFactor *fakefactor_weight;
+    fakefactor_weight = (FakeFactor*)fakefactor_tight->Get("ff_comb");
+    fakefactor_tight->Close();
+
+    TH1F *h_0jet = new TH1F("","",num,min,max);
+    TH1F *h_boosted = new TH1F("","",num,min,max);
+    TH1F *h_vbf = new TH1F("","",num,min,max);
+    TH1F *h_inclusive = new TH1F("","",num,min,max);
     
     // Loop over all events
     Int_t nentries_wtn = (Int_t) namu->GetEntries();
     for (Int_t i = 0; i < nentries_wtn; i++) {
       namu->GetEntry(i);
-      //if (i % 1000 == 0) fprintf(stdout, "\r  Processed events: %8d of %8d ", i, nentries_wtn);
+      if (i % 1000 == 0) fprintf(stdout, "\r  Processed events: %8d of %8d ", i, nentries_wtn);
       fflush(stdout);
 
       /////////////////////////
@@ -222,121 +232,86 @@ int main(int argc, char** argv) {
       // User obs
       if(tvar == "MELA") var = ME_sm_VBF/(ME_sm_VBF+45*ME_bkg);   
       if(tvar == "MELAggH") var = ME_sm_ggH/(ME_sm_ggH+45*ME_bkg);   
+      
+      // FF weight
+      int bin_x = frac_w_vbf->GetXaxis()->FindBin(vis_mass);
+      int bin_y = frac_w_vbf->GetYaxis()->FindBin(njets);
+      float frac_qcd_vbf = 1-frac_w_vbf->GetBinContent(bin_x,bin_y)-frac_tt_vbf->GetBinContent(bin_x,bin_y);
+      if (frac_qcd_vbf<0) frac_qcd_vbf=0;
+      float frac_qcd_boosted = 1-frac_w_boosted->GetBinContent(bin_x,bin_y)-frac_tt_boosted->GetBinContent(bin_x,bin_y);
+      if (frac_qcd_boosted<0) frac_qcd_boosted=0;
+      float frac_qcd_0jet = 1-frac_w_0jet->GetBinContent(bin_x,bin_y)-frac_tt_0jet->GetBinContent(bin_x,bin_y);
+      if (frac_qcd_0jet<0) frac_qcd_0jet=0;
+      
+      float weight_FF1_vbf = fakefactor_weight->value({t1_pt, t2_pt, t1_decayMode, njets, vis_mass, 
+	    frac_qcd_vbf,
+	    frac_w_vbf->GetBinContent(bin_x,bin_y),
+	    frac_tt_vbf->GetBinContent(bin_x,bin_y)});
+      float weight_FF2_vbf = fakefactor_weight->value({t1_pt, t2_pt, t2_decayMode, njets, vis_mass, 
+	    frac_qcd_vbf,
+	    frac_w_vbf->GetBinContent(bin_x,bin_y),
+	    frac_tt_vbf->GetBinContent(bin_x,bin_y)});
+      float weight_FF1_boosted = fakefactor_weight->value({t1_pt, t2_pt, t1_decayMode, njets, vis_mass,
+	    frac_qcd_boosted,
+	    frac_w_boosted->GetBinContent(bin_x,bin_y),
+	    frac_tt_boosted->GetBinContent(bin_x,bin_y)});
+      float weight_FF2_boosted = fakefactor_weight->value({t1_pt, t2_pt, t2_decayMode, njets, vis_mass,
+	    frac_qcd_boosted,
+	    frac_w_boosted->GetBinContent(bin_x,bin_y),
+	    frac_tt_boosted->GetBinContent(bin_x,bin_y)});
+      float weight_FF1_0jet = fakefactor_weight->value({t1_pt, t2_pt, t1_decayMode, njets, vis_mass, 
+	    frac_qcd_0jet,
+	    frac_w_0jet->GetBinContent(bin_x,bin_y),
+	    frac_tt_0jet->GetBinContent(bin_x,bin_y)});
+      float weight_FF2_0jet = fakefactor_weight->value({t1_pt, t2_pt, t2_decayMode, njets, vis_mass, 
+	    frac_qcd_0jet,
+	    frac_w_0jet->GetBinContent(bin_x,bin_y),
+	    frac_tt_0jet->GetBinContent(bin_x,bin_y)});
 
-
-      if (signalRegion && t1_charge*t2_charge<0) {
-	h_os_inclusive->Fill(var,evtwt);
-	if (is_0jet) h_os_0jet->Fill(var,evtwt);
-	else if (is_boosted) h_os_boosted->Fill(var,evtwt);
-	else if (is_VBF) h_os_vbf->Fill(var,evtwt);
-      }
-
-      if (signalRegion && t1_charge*t2_charge>0) {
-	h_ss_inclusive->Fill(var,evtwt);
-	if (is_0jet) h_ss_0jet->Fill(var,evtwt);
-	else if (is_boosted) h_ss_boosted->Fill(var,evtwt);
-	else if (is_VBF) h_ss_vbf->Fill(var,evtwt);
-      }
       if (aiRegion && t1_charge*t2_charge<0) {
-	h_aios_inclusive->Fill(var,evtwt);
-	if (is_0jet) h_aios_0jet->Fill(var,evtwt);
-	else if (is_boosted) h_aios_boosted->Fill(var,evtwt);
-	else if (is_VBF) h_aios_vbf->Fill(var,evtwt);
-      }
-
-      if (aiRegion && t1_charge*t2_charge<0) {
-	h_aiss_inclusive->Fill(var,evtwt);
-	if (is_0jet) h_aiss_0jet->Fill(var,evtwt);
-	else if (is_boosted) h_aiss_boosted->Fill(var,evtwt);
-	else if (is_VBF) h_aiss_vbf->Fill(var,evtwt);
+	if (is_0jet) {
+	  h_0jet->Fill(var,evtwt*(weight_FF1_0jet*0.5+weight_FF2_0jet*0.5));
+	  h_inclusive->Fill(var,evtwt*(weight_FF1_0jet*0.5+weight_FF2_0jet*0.5));
+	}
+	else if (is_boosted) {
+	  h_boosted->Fill(var,evtwt*(weight_FF1_boosted*0.5+weight_FF2_boosted*0.5));
+	  h_inclusive->Fill(var,evtwt*(weight_FF1_boosted*0.5+weight_FF2_boosted*0.5));
+	}
+	else if (is_VBF) {
+	  h_vbf->Fill(var,evtwt*(weight_FF1_vbf*0.5+weight_FF2_vbf*0.5));
+	  h_inclusive->Fill(var,evtwt*(weight_FF1_vbf*0.5+weight_FF2_vbf*0.5));
+	}
       }
     }
-    
+    std::cout << "Out Loop" << std::endl;
     TFile *fout = TFile::Open(output.c_str(), "RECREATE");
-    std::cout<<"output file: "<<output.c_str()<< std::endl;
+    std::cout << "Opened "<< output.c_str() << std::endl;
     fout->cd();
-    TDirectory *OS0jet =fout->mkdir("tt_0jet");
-    TDirectory *SS0jet =fout->mkdir("ttSS_0jet");
-    TDirectory *AIOS0jet =fout->mkdir("AIOS_0jet");
-    TDirectory *AISS0jet =fout->mkdir("AISS_0jet");
-    TDirectory *OSboosted =fout->mkdir("tt_boosted");
-    TDirectory *SSboosted =fout->mkdir("ttSS_boosted");
-    TDirectory *AIOSboosted =fout->mkdir("AIOS_boosted");
-    TDirectory *AISSboosted =fout->mkdir("AISS_boosted");
-    TDirectory *OSvbf =fout->mkdir("tt_vbf");
-    TDirectory *SSvbf =fout->mkdir("ttSS_vbf");
-    TDirectory *AIOSvbf =fout->mkdir("AIOS_vbf");
-    TDirectory *AISSvbf =fout->mkdir("AISS_vbf");
-    TDirectory *OSinclusive =fout->mkdir("tt_inclusive");
-    TDirectory *SSinclusive =fout->mkdir("ttSS_inclusive");
-    TDirectory *AIOSinclusive =fout->mkdir("AIOS_inclusive");
-    TDirectory *AISSinclusive =fout->mkdir("AISS_inclusive");
+    TDirectory *dir_zerojet =fout->mkdir("tt_0jet");
+    TDirectory *dir_boosted =fout->mkdir("tt_boosted");
+    TDirectory *dir_vbf =fout->mkdir("tt_vbf"); 
+    TDirectory *dir_inclusive =fout->mkdir("tt_inclusive");
 
-    OS0jet->cd();
-    h_os_0jet->SetName(name.c_str());
-    h_os_0jet->Write();
-    
-    SS0jet->cd();
-    h_ss_0jet->SetName(name.c_str());
-    h_ss_0jet->Write();
 
-    AIOS0jet->cd();
-    h_aios_0jet->SetName(name.c_str());
-    h_aios_0jet->Write();
-    
-    AISS0jet->cd();
-    h_aiss_0jet->SetName(name.c_str());
-    h_aiss_0jet->Write();
+    dir_zerojet->cd();
+    h_0jet->SetName(name.c_str());
+    h_0jet->Write();
 
-    OSboosted->cd();
-    h_os_boosted->SetName(name.c_str());
-    h_os_boosted->Write();
-    
-    SSboosted->cd();
-    h_ss_boosted->SetName(name.c_str());
-    h_ss_boosted->Write();
+    dir_boosted->cd();
+    h_boosted->SetName(name.c_str());
+    h_boosted->Write();
 
-    AIOSboosted->cd();
-    h_aios_boosted->SetName(name.c_str());
-    h_aios_boosted->Write();
-    
-    AISSboosted->cd();
-    h_aiss_boosted->SetName(name.c_str());
-    h_aiss_boosted->Write();
+    dir_vbf->cd();
+    h_vbf->SetName(name.c_str());
+    h_vbf->Write();
 
-    OSvbf->cd();
-    h_os_vbf->SetName(name.c_str());
-    h_os_vbf->Write();
-    
-    SSvbf->cd();
-    h_ss_vbf->SetName(name.c_str());
-    h_ss_vbf->Write();
+    dir_inclusive->cd();
+    h_inclusive->SetName(name.c_str());
+    h_inclusive->Write();
 
-    AIOSvbf->cd();
-    h_aios_vbf->SetName(name.c_str());
-    h_aios_vbf->Write();
-    
-    AISSvbf->cd();
-    h_aiss_vbf->SetName(name.c_str());
-    h_aiss_vbf->Write();
-
-    OSinclusive->cd();
-    h_os_inclusive->SetName(name.c_str());
-    h_os_inclusive->Write();
-    
-    SSinclusive->cd();
-    h_ss_inclusive->SetName(name.c_str());
-    h_ss_inclusive->Write();
-
-    AIOSinclusive->cd();
-    h_aios_inclusive->SetName(name.c_str());
-    h_aios_inclusive->Write();
-    
-    AISSinclusive->cd();
-    h_aiss_inclusive->SetName(name.c_str());
-    h_aiss_inclusive->Write();
-    
+    std::cout << "Close"<< std::endl;    
     fout->Close();
+    std::cout << "DONE"<< std::endl;    
 } 
 
 
