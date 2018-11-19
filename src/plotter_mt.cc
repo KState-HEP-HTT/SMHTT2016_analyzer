@@ -24,6 +24,7 @@ int main(int argc, char** argv) {
     float min = atof(argv[5]);
     float max = atof(argv[6]);
     std::string tvar = *(argv + 7);
+    float is2016 = atof(argv[8]);
 
     TFile *f_Double = new TFile(input.c_str());
     std::cout<<"XXXXXXXXXXXXX "<<input.c_str()<<" XXXXXXXXXXXX"<<std::endl;
@@ -160,9 +161,18 @@ int main(int argc, char** argv) {
     TBranch* br = namu->GetBranch(tvar.c_str());
     if (br) namu->SetBranchAddress(tvar.c_str(), &var);
 
-    TH1F *h_sig = new TH1F("","",num,min,max);
-    TH1F *h_ss = new TH1F("","",num,min,max);
-    TH1F *h_qcd = new TH1F("","",num,min,max);
+    TH1F *h_sig_0jet = new TH1F("","",num,min,max);
+    TH1F *h_ss_0jet = new TH1F("","",num,min,max);
+    TH1F *h_qcd_0jet = new TH1F("","",num,min,max);
+    TH1F *h_sig_boosted = new TH1F("","",num,min,max);
+    TH1F *h_ss_boosted = new TH1F("","",num,min,max);
+    TH1F *h_qcd_boosted = new TH1F("","",num,min,max);
+    TH1F *h_sig_vbf = new TH1F("","",num,min,max);
+    TH1F *h_ss_vbf = new TH1F("","",num,min,max);
+    TH1F *h_qcd_vbf = new TH1F("","",num,min,max);
+    TH1F *h_sig_inclusive = new TH1F("","",num,min,max);
+    TH1F *h_ss_inclusive = new TH1F("","",num,min,max);
+    TH1F *h_qcd_inclusive = new TH1F("","",num,min,max);
     
     // Loop over all events
     Int_t nentries_wtn = (Int_t) namu->GetEntries();
@@ -188,53 +198,115 @@ int main(int argc, char** argv) {
       bool is_0jet = false;
       bool is_boosted = false;
       bool is_VBF = false;
-      //////////////////////////// 
-      // 2016 analysis category //
-      ////////////////////////////
-      //if (njets==0) is_0jet=true;
-      //if (njets==1 || (njets>=2 && (mjj<=300 || pt_sv<=50 || t1_pt<=40))) is_boosted=true;
-      if (cat_vbf && t1_pt>40) is_VBF=true;
-      
-      ////////////////////////
-      // KSU study category //
-      ////////////////////////
-      //if (njets==0) is_0jet=true;
-      //if (cat_vbf ) is_VBF=true; 
-      //else is_boosted=true;   
+      if (is2016 == 2016) {
+	//////////////////////////// 
+	// 2016 analysis category //
+	////////////////////////////
+	if (njets==0) is_0jet=true;
+	if (njets==1 || (njets>=2 && (mjj<=300 || pt_sv<=50 || t1_pt<=40))) is_boosted=true;
+	if (cat_vbf && t1_pt>40) is_VBF=true;
+      }
+      else {
+	////////////////////////
+	// KSU study category //
+	////////////////////////
+	if (njets==0) is_0jet=true;
+	if (cat_vbf ) is_VBF=true; 
+	else is_boosted=true;   
+      }
 
       // User obs
       if(tvar == "MELA") var = ME_sm_VBF/(ME_sm_VBF+45*ME_bkg);   
 
-      if (mt<50 && t1_charge*mu_charge<0) {
+      if (mt<50 && t1_charge*mu_charge<0 && signalRegion) {
 	// ################### signalRegion && OS ####################
-	if (is_VBF && signalRegion) 	    h_sig->Fill(var,evtwt);
+	h_sig_inclusive->Fill(var,evtwt);
+	if (is_0jet) h_sig_0jet->Fill(var,evtwt);
+	if (is_boosted) h_sig_boosted->Fill(var,evtwt);
+	if (is_VBF) h_sig_vbf->Fill(var,evtwt);
+	}
       }
       
       if (mt<50 && t1_charge*mu_charge>0) {
 	// ################### signalRegion && SS ####################
-	if (is_VBF && signalRegion) 	    h_ss->Fill(var,evtwt);
+	if (signalRegion) {
+	  h_ss_inclusive->Fill(var,evtwt);
+	  if (is_0jet) h_ss_0jet->Fill(var,evtwt);
+	  if (is_boosted) h_ss_boosted->Fill(var,evtwt);
+	  if (is_VBF) h_ss_vbf->Fill(var,evtwt);
+	}
 	// ################### QCDRegion && SS ####################
-	if (is_VBF && qcdRegion) 	    h_qcd->Fill(var,evtwt);
+	if (qcdRegion) {
+	  h_qcd_inclusive->Fill(var,evtwt);
+	  if (is_0jet) h_qcd_0jet->Fill(var,evtwt);
+	  if (is_boosted) h_qcd_boosted->Fill(var,evtwt);
+	  if (is_VBF) h_qcd_vbf->Fill(var,evtwt);
+	}
       }
     }
     
     TFile *fout = TFile::Open(output.c_str(), "RECREATE");
     fout->cd();
+    TDirectory *OS0jet_tt =fout->mkdir("mt_0jet");
+    TDirectory *SS0jet =fout->mkdir("SS0jet");
+    TDirectory *QCD0jet =fout->mkdir("QCD0jet");
+    TDirectory *OSboosted_tt =fout->mkdir("mt_boosted");
+    TDirectory *SSboosted =fout->mkdir("SSboosted");
+    TDirectory *QCDboosted =fout->mkdir("QCDboosted");
     TDirectory *OSvbf_tt =fout->mkdir("mt_vbf");
     TDirectory *SSvbf =fout->mkdir("SSvbf");
     TDirectory *QCDvbf =fout->mkdir("QCDvbf");
+    TDirectory *OSinclusive_tt =fout->mkdir("mt_inclusive");
+    TDirectory *SSinclusive =fout->mkdir("SSinclusive");
+    TDirectory *QCDinclusive =fout->mkdir("QCDinclusive");
+
+    OS0jet_tt->cd();
+    h_sig_0jet->SetName(name.c_str());
+    h_sig_0jet->Write();
+    
+    SS0jet->cd();
+    h_ss_0jet->SetName(name.c_str());
+    h_ss_0jet->Write();
+    
+    QCD0jet->cd();
+    h_qcd_0jet->SetName(name.c_str());
+    h_qcd_0jet->Write();
+
+    OSboosted_tt->cd();
+    h_sig_boosted->SetName(name.c_str());
+    h_sig_boosted->Write();
+    
+    SSboosted->cd();
+    h_ss_boosted->SetName(name.c_str());
+    h_ss_boosted->Write();
+    
+    QCDboosted->cd();
+    h_qcd_boosted->SetName(name.c_str());
+    h_qcd_boosted->Write();
 
     OSvbf_tt->cd();
-    h_sig->SetName(name.c_str());
-    h_sig->Write();
+    h_sig_vbf->SetName(name.c_str());
+    h_sig_vbf->Write();
     
     SSvbf->cd();
-    h_ss->SetName(name.c_str());
-    h_ss->Write();
+    h_ss_vbf->SetName(name.c_str());
+    h_ss_vbf->Write();
     
     QCDvbf->cd();
-    h_qcd->SetName(name.c_str());
-    h_qcd->Write();
+    h_qcd_vbf->SetName(name.c_str());
+    h_qcd_vbf->Write();
+
+    OSinclusive_tt->cd();
+    h_sig_inclusive->SetName(name.c_str());
+    h_sig_inclusive->Write();
+    
+    SSinclusive->cd();
+    h_ss_inclusive->SetName(name.c_str());
+    h_ss_inclusive->Write();
+    
+    QCDinclusive->cd();
+    h_qcd_inclusive->SetName(name.c_str());
+    h_qcd_inclusive->Write();
 
     fout->Close();
 } 
