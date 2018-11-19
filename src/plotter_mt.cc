@@ -214,7 +214,7 @@ int main(int argc, char** argv) {
 	if (cat_vbf ) is_VBF=true; 
 	else is_boosted=true;   
       }
-
+      
       // User obs
       if(tvar == "MELA") var = ME_sm_VBF/(ME_sm_VBF+45*ME_bkg);   
 
@@ -224,9 +224,9 @@ int main(int argc, char** argv) {
 	if (is_0jet) h_sig_0jet->Fill(var,evtwt);
 	if (is_boosted) h_sig_boosted->Fill(var,evtwt);
 	if (is_VBF) h_sig_vbf->Fill(var,evtwt);
-	}
       }
-      
+
+    
       if (mt<50 && t1_charge*mu_charge>0) {
 	// ################### signalRegion && SS ####################
 	if (signalRegion) {
