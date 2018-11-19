@@ -14,6 +14,10 @@ if __name__ == "__main__":
                       default='output_FakeFraction', dest='outputs_xxx',
                       help='run on output dof analyzer or template'
                       )
+    parser.add_option('--channel', '-c', action='store',
+                      default='tt', dest='ch',
+                      help='channels: tt, mt'
+                      )
     (options, args) = parser.parse_args()
 
     regions = ["AIOS"]
@@ -29,7 +33,7 @@ if __name__ == "__main__":
     #                                        #
     ##########################################
     samples_w = ["W", "ZJ", "VVJ"]
-    samples_real = ["embedded", "TTT", "VVT"]
+    samples_real = ["embedded", "TTT", "VVT", "EWKZ", "ZL"]
     samples_tt = ["TTJ"]
     if options.is_zttMC:
         del files[:]
@@ -79,15 +83,14 @@ if __name__ == "__main__":
                     histos[cates.index(cate)].append(files[samples.index(sample_real)].Get(region+"_"+cate+"_ff/"+sample_real))
                 else:
                     histos[cates.index(cate)][-1].Add(files[samples.index(sample_real)].Get(region+"_"+cate+"_ff/"+sample_real),1)
-            print "---------------------"
-
+            print "---------------------\n\n"
 
     #################################
     #  Dividing each group by data  #
     #################################
     for k in range(0,len(cates)):  # loop over categories
         fout.cd()
-        dir = fout.mkdir("tt_"+cates[k]+"_ff")
+        dir = fout.mkdir(options.ch+cates[k]+"_ff")
         dir.cd()
         # Save control region histograms for checking.
         histos[k][0].SetName("frac_w")
@@ -100,5 +103,8 @@ if __name__ == "__main__":
         histos[k][2].Divide(files[samples.index("data_obs")].Get("AIOS_"+cate+"_ff/data_obs"))
         histos[k][2].Write()
 
-
-    
+        print "Integral of fractions : "+ cates[k]
+        print histos[k][0].Integral()
+        print histos[k][1].Integral()
+        print histos[k][2].Integral()
+        print "\n"
