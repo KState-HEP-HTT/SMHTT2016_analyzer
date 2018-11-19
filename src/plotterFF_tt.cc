@@ -165,7 +165,7 @@ int main(int argc, char** argv) {
     TBranch* br = namu->GetBranch(tvar.c_str());
     if (br) namu->SetBranchAddress(tvar.c_str(), &var);
 
-    TFile *fakefactor = new TFile("../weightROOTs/JetFakesFraction_tt_Oct26_embed.root");
+    TFile *fakefactor = new TFile("../weightROOTs/JetFakesFraction.root");
     TH2F *frac_w_vbf=(TH2F*) fakefactor->Get("tt_vbf_ff/frac_w");
     TH2F *frac_tt_vbf=(TH2F*) fakefactor->Get("tt_vbf_ff/frac_tt"); 
     TH2F *frac_real_vbf=(TH2F*) fakefactor->Get("tt_vbf_ff/frac_real"); 
@@ -236,11 +236,11 @@ int main(int argc, char** argv) {
       // FF weight
       int bin_x = frac_w_vbf->GetXaxis()->FindBin(vis_mass);
       int bin_y = frac_w_vbf->GetYaxis()->FindBin(njets);
-      float frac_qcd_vbf = 1-frac_w_vbf->GetBinContent(bin_x,bin_y)-frac_tt_vbf->GetBinContent(bin_x,bin_y);
+      float frac_qcd_vbf = 1-frac_w_vbf->GetBinContent(bin_x,bin_y)-frac_tt_vbf->GetBinContent(bin_x,bin_y)-frac_real_vbf->GetBinContent(bin_x,bin_y);
       if (frac_qcd_vbf<0) frac_qcd_vbf=0;
-      float frac_qcd_boosted = 1-frac_w_boosted->GetBinContent(bin_x,bin_y)-frac_tt_boosted->GetBinContent(bin_x,bin_y);
+      float frac_qcd_boosted = 1-frac_w_boosted->GetBinContent(bin_x,bin_y)-frac_tt_boosted->GetBinContent(bin_x,bin_y)-frac_real_boosted->GetBinContent(bin_x,bin_y);
       if (frac_qcd_boosted<0) frac_qcd_boosted=0;
-      float frac_qcd_0jet = 1-frac_w_0jet->GetBinContent(bin_x,bin_y)-frac_tt_0jet->GetBinContent(bin_x,bin_y);
+      float frac_qcd_0jet = 1-frac_w_0jet->GetBinContent(bin_x,bin_y)-frac_tt_0jet->GetBinContent(bin_x,bin_y)-frac_real_0jet->GetBinContent(bin_x,bin_y);
       if (frac_qcd_0jet<0) frac_qcd_0jet=0;
       
       float weight_FF1_vbf = fakefactor_weight->value({t1_pt, t2_pt, t1_decayMode, njets, vis_mass, 
