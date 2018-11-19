@@ -38,10 +38,10 @@
  # Embedded or MC (default(no 2nd input) is embedded)
  if [ -z ${4} ]; then
       ./JetFakesFractionMaker_${3}.exe ${1}/embedded.root output_FakeFraction/${3}/embedded.root embedded nominal ${2}
-      python python/JetFakesCreator_tt.py -i output_FakeFraction/${3} -c ${3}
+      python python/JetFakesCreator.py -i output_FakeFraction/${3} -c ${3}
 
  elif [ ${4} = "mc" ]; then
      ./JetFakesFractionMaker_${3}.exe ${1}/ZTT.root output_FakeFraction/${3}/ZTT.root ZTT nominal ${2}
-     python python/JetFakesCreator_tt.py -i output_FakeFraction/${3} -z -c ${3}
+     python python/JetFakesCreator.py -i output_FakeFraction/${3} -z -c ${3}
  fi
  

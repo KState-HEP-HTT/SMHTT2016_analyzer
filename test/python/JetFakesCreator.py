@@ -90,20 +90,21 @@ if __name__ == "__main__":
     #################################
     for k in range(0,len(cates)):  # loop over categories
         fout.cd()
-        dir = fout.mkdir(options.ch+cates[k]+"_ff")
+        dir = fout.mkdir(options.ch+"_"+cates[k]+"_ff")
         dir.cd()
         # Save control region histograms for checking.
         histos[k][0].SetName("frac_w")
-        histos[k][0].Divide(files[samples.index("data_obs")].Get("AIOS_"+cate+"_ff/data_obs"))
+        histos[k][0].Divide(files[samples.index("data_obs")].Get("AIOS_"+cates[k]+"_ff/data_obs"))
         histos[k][0].Write()
         histos[k][1].SetName("frac_tt")
-        histos[k][1].Divide(files[samples.index("data_obs")].Get("AIOS_"+cate+"_ff/data_obs"))
+        histos[k][1].Divide(files[samples.index("data_obs")].Get("AIOS_"+cates[k]+"_ff/data_obs"))
         histos[k][1].Write()
         histos[k][2].SetName("frac_real")
-        histos[k][2].Divide(files[samples.index("data_obs")].Get("AIOS_"+cate+"_ff/data_obs"))
+        histos[k][2].Divide(files[samples.index("data_obs")].Get("AIOS_"+cates[k]+"_ff/data_obs"))
         histos[k][2].Write()
 
         print "Integral of fractions : "+ cates[k]
+        print files[samples.index("data_obs")].Get("AIOS_"+cates[k]+"_ff/data_obs").Integral()
         print histos[k][0].Integral()
         print histos[k][1].Integral()
         print histos[k][2].Integral()
