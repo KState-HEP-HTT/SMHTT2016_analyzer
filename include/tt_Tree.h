@@ -3,8 +3,8 @@
 
 TTree* namu;
 Int_t cat_0jet, cat_boosted, cat_vbf, cat_inclusive, cat_antiiso, cat_antiiso_0jet, cat_antiiso_boosted, cat_antiiso_vbf,
-  cat_qcd, cat_qcd_0jet, cat_qcd_boosted, cat_qcd_vbf, is_signal, is_ai, is_qcd;
-Float_t evtwt,
+  cat_qcd, cat_qcd_0jet, cat_qcd_boosted, cat_qcd_vbf, is_signal, is_ai, is_qcd, is_w, is_wsf, is_qcdcr;
+Float_t evtwt, ratioanti,
   el_pt, el_eta, el_phi, el_mass, el_charge, el_iso,
   mu_pt, mu_eta, mu_phi, mu_mass, mu_charge, mu_iso,
   t1_pt, t1_eta, t1_phi, t1_mass, t1_charge, t1_dmf, t1_dmf_new, t1_decayMode,
@@ -16,8 +16,8 @@ Float_t evtwt,
   njets, nbjets,
   j1_pt, j1_eta, j1_phi,
   j2_pt, j2_eta, j2_phi,
-  b1_pt, b1_eta, b1_phi,
-  b2_pt, b2_eta, b2_phi,
+  b1_pt, b1_eta, b1_phi, b1_flavor,
+  b2_pt, b2_eta, b2_phi, b2_flavor,
   met, metphi, mjj,  numGenJets, mt, 
   pt_sv, m_sv, Dbkg_VBF, Dbkg_ggH,
   Phi, Phi1, costheta1, costheta2, costhetastar, Q2V1, Q2V2,
@@ -161,7 +161,7 @@ void fillTree(TTree* namu, SkimmedTree_tt* tree, int index, TLorentzVector Higgs
   namu->Fill();
 }
 
-void fillTree_mt(TTree* namu, SkimmedTree_mt* tree, int index, TLorentzVector Higgs, TLorentzVector tau1, TLorentzVector mu, TLorentzVector jet1, TLorentzVector jet2, Float_t mjj_, Float_t met_, Float_t metphi_, Float_t m_sv_, Float_t pt_sv_, Float_t njets_, Float_t Dbkg_VBF_, Float_t Dbkg_ggH_, Float_t ME_sm_VBF_, Float_t ME_sm_ggH_, Float_t ME_sm_WH_, Float_t ME_sm_ZH_, Float_t ME_bkg_, Float_t ME_bkg1_, Float_t ME_bkg2_, Float_t Phi_, Float_t Phi1_, Float_t costheta1_, Float_t costheta2_, Float_t costhetastar_, Float_t Q2V1_, Float_t Q2V2_, bool signalRegion, bool qcdRegion , float weight, float mt_) {
+void fillTree_mt(TTree* namu, SkimmedTree_mt* tree, int index, TLorentzVector Higgs, TLorentzVector tau1, TLorentzVector mu, TLorentzVector jet1, TLorentzVector jet2, Float_t mjj_, Float_t met_, Float_t metphi_, Float_t m_sv_, Float_t pt_sv_, Float_t njets_, Float_t Dbkg_VBF_, Float_t Dbkg_ggH_, Float_t ME_sm_VBF_, Float_t ME_sm_ggH_, Float_t ME_sm_WH_, Float_t ME_sm_ZH_, Float_t ME_bkg_, Float_t ME_bkg1_, Float_t ME_bkg2_, Float_t Phi_, Float_t Phi1_, Float_t costheta1_, Float_t costheta2_, Float_t costhetastar_, Float_t Q2V1_, Float_t Q2V2_, bool signalRegion, bool qcdRegion, bool wRegion, bool wsfRegion, bool qcdCR,float ratioanti_, float weight, float mt_) {
   tree->GetEntry(index);
   // reset the categories
   cat_0jet = 0;
@@ -179,7 +179,9 @@ void fillTree_mt(TTree* namu, SkimmedTree_mt* tree, int index, TLorentzVector Hi
   cat_qcd_vbf = 0;
   is_signal = signalRegion;
   is_qcd = qcdRegion;
-
+  is_w = wRegion;
+  is_wsf = wsfRegion;
+  is_qcdcr = qcdCR;
 
   if (njets_ == 0) cat_0jet = 1;
   else if (njets_ == 1) cat_boosted = 1;
@@ -228,9 +230,11 @@ void fillTree_mt(TTree* namu, SkimmedTree_mt* tree, int index, TLorentzVector Hi
   b1_pt = tree->bpt_1;
   b1_eta = tree->beta_1;
   b1_phi = tree->bphi_1;
+  b1_flavor = tree->bflavor_1;
   b2_pt = tree->bpt_2;
   b2_eta = tree->beta_2;
   b2_phi = tree->bphi_2;
+  b2_flavor = tree->bflavor_2;
   // met
   met = met_;
   metphi = metphi_;
@@ -265,7 +269,7 @@ void fillTree_mt(TTree* namu, SkimmedTree_mt* tree, int index, TLorentzVector Hi
   vis_mass = (tau1+mu).M();
   numGenJets = tree->numGenJets;
   evtwt = weight;
-
+  ratioanti = ratioanti_;
   // Placeholder branches for Tyler's NN
   el_pt = 0;
   el_eta = 0;

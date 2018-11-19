@@ -132,9 +132,11 @@ int main(int argc, char** argv) {
     namu->Branch("b1_pt",               &b1_pt,               "b1_pt/F"              );
     namu->Branch("b1_eta",              &b1_eta,              "b1_eta/F"             );
     namu->Branch("b1_phi",              &b1_phi,              "b1_phi/F"             );
+    namu->Branch("b1_flavor",           &b1_flavor,           "b1_flavor/F"          );
     namu->Branch("b2_pt",               &b2_pt,               "b2_pt/F"              );
     namu->Branch("b2_eta",              &b2_eta,              "b2_eta/F"             );
     namu->Branch("b2_phi",              &b2_phi,              "b2_phi/F"             );
+    namu->Branch("b2_flavor",           &b2_flavor,           "b2_flavor/F"          );
 
     namu->Branch("met",                 &met,                 "met/F"                );
     namu->Branch("metphi",              &metphi,              "metphi/F"             );
@@ -186,7 +188,10 @@ int main(int argc, char** argv) {
 
     namu->Branch("is_signal",           &is_signal,           "is_signal/I"          );
     namu->Branch("is_qcd",              &is_qcd,              "is_qcd/I"             );
-
+    namu->Branch("is_w",                &is_w,                "is_w/I"               );
+    namu->Branch("is_wsf",              &is_wsf,              "is_wsf/I"             );
+    namu->Branch("is_qcdcr",            &is_qcdcr,            "is_qcdcr/I"           );
+    namu->Branch("ratioanti",           &ratioanti,           "ratioanti/F"          );
 
     TFile *f_Trk=new TFile("../weightROOTs/Tracking_EfficienciesAndSF_BCDEFGH.root");
     TGraph *h_Trk=(TGraph*) f_Trk->Get("ratio_eff_eta3_dr030e030_corr");
@@ -416,8 +421,8 @@ int main(int argc, char** argv) {
       // ###########################################################
       
       if (sample=="ZL" && tree->gen_match_2>4) continue;
-      if ((sample=="TTT" or sample=="ZTT") && tree->gen_match_2!=5) continue;
-      if ((sample=="TTJ" or sample=="ZLL") && tree->gen_match_2==5) continue;
+      if ((sample=="TTT" or sample=="ZTT" or sample=="VVT") && tree->gen_match_2!=5) continue;
+      if ((sample=="TTJ" or sample=="ZLL" or sample=="VVJ") && tree->gen_match_2==5) continue;
       if (sample=="ZJ" && tree->gen_match_2!=6) continue;
       
       // #############################################################
@@ -520,7 +525,8 @@ int main(int argc, char** argv) {
 		  Dbkg_VBF, Dbkg_ggH,
 		  ME_sm_VBF, ME_sm_ggH, ME_sm_WH, ME_sm_ZH, ME_bkg, ME_bkg1, ME_bkg2,
 		  Phi, Phi1, costheta1, costheta2, costhetastar, Q2V1, Q2V2,
-		  signalRegion, qcdRegion,weight2*aweight, mt
+		  signalRegion, qcdRegion, wRegion, wsfRegion, qcdCR, 
+		  ratioanti, weight2*aweight, mt
 		  );
       lastindex = i;
     } // end of loop over events
