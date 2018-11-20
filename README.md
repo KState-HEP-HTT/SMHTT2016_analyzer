@@ -100,5 +100,11 @@ One need to recompile the code to change VBF category definition.
 
 
 
+## Instruction of fake factor method :
 
+```
+source runFakeFractionMaker.sh output_Slicer/tt 2016 tt
+```
+
+This will generate JetFakesFraction.root which has fractions as 2D distributions.
 
