@@ -40,6 +40,7 @@
 #include "../include/scenario_info.h"
 #include "../include/zmumuSF.h"
 #include "../include/EmbedWeight.h"
+#include "TauTriggerSFs2017/TauTriggerSFs2017/interface/TauTriggerSFs2017.h"
 
 int main(int argc, char** argv) {
     
@@ -229,6 +230,7 @@ int main(int argc, char** argv) {
     RooWorkspace *wEmbed = (RooWorkspace*)fem.Get("w");
     fem.Close();
 
+    /*
     // D.Kim
     const char *scriptDirectoryName = "./../python/";
     Py_Initialize();
@@ -239,6 +241,7 @@ int main(int argc, char** argv) {
     // The line below breaks the code
     PyObject* compute_sf = PyObject_GetAttrString(fitFunctions,"compute_SF");
     if (sample=="embedded") compute_sf = PyObject_GetAttrString(fitFunctions,"compute_Trg_Eff_Data");
+    */
     float weight = 1.0;
     // Lumi weight  
     float w_lumi = lumiWeight(sample, ngen);
@@ -250,136 +253,12 @@ int main(int argc, char** argv) {
     std::cout.precision(10);
     scenario_info scenario(treePtr, shape);
 
-    // D.Kim : AN line 791~795
-    //Binning for 0jet cat. 1D: Msv. In AN it was 10GeV binning / official data card combined 0~50 as one bin
-    float bins0[] = {0,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,260,270,280,290,300};
-    float bins1[] = {0,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,260,270,280,290,300};
-    //Binning for 1jet cat, x-axis: HpT
-    float bins1X[] = {0,100,170,300,10000};
-    //Binning for 1jet cat, y-axis: Msv
-    float bins1Y[] = {0,40,60,70,80,90,100,110,120,130,150,200,250};
-    //Binning for 2jet cat, x-axis: Mjj
-    float bins2X[] = {0,300,500,800,10000};
-    //Binning for 2jet cat, y-axis: Msv
-    float bins2Y[] = {0,40,60,70,80,90,100,110,120,130,150,200,250};
-
-    int  binnum0 = sizeof(bins0)/sizeof(Float_t) - 1;
-    int  binnum1 = sizeof(bins1)/sizeof(Float_t) - 1;
-    int  binnum1X = sizeof(bins1X)/sizeof(Float_t) - 1;
-    int  binnum1Y = sizeof(bins1Y)/sizeof(Float_t) - 1;
-    int  binnum2X = sizeof(bins2X)/sizeof(Float_t) - 1;
-    int  binnum2Y = sizeof(bins2Y)/sizeof(Float_t) - 1;
-
-    // Categories
-    TH1F* h_0jet = new TH1F ("h_0jet", "h_0jet", binnum0, bins0); h_0jet->Sumw2();
-    TH1F* hx_boosted = new TH1F ("hx_boosted", "hx_boosted", binnum1X, bins1X); hx_boosted->Sumw2();
-    TH1F* hy_boosted = new TH1F ("hy_boosted", "hy_boosted", binnum1Y, bins1Y); hy_boosted->Sumw2();
-    TH1F* hx_vbf = new TH1F ("hx_vbf", "hx_vbf", binnum2X, bins2X); hx_vbf->Sumw2();
-    TH1F* hy_vbf = new TH1F ("hy_vbf", "hy_vbf", binnum2Y, bins2Y); hy_vbf->Sumw2();
-
-    // h0_ : 0jet, h1_ : boosted, h2_ : vbf, h3_ : vh, h2M*_ : vbf with MELA, h4M_ : 2jets with MEAL  h_ : inclusive
-    std::vector<TH1F*> h0_OS;
-    std::vector<TH1F*> h0_SS;
-    std::vector<TH1F*> h0_AIOS;
-    std::vector<TH1F*> h0_AISS;
-    std::vector<TH2F*> h1_OS;
-    std::vector<TH2F*> h1_SS;
-    std::vector<TH2F*> h1_AIOS;
-    std::vector<TH2F*> h1_AISS;
-    std::vector<TH2F*> h2_OS;
-    std::vector<TH2F*> h2_SS;
-    std::vector<TH2F*> h2_AIOS;
-    std::vector<TH2F*> h2_AISS;
-    std::vector<TH2F*> h3_OS;
-    std::vector<TH2F*> h3_SS;
-    std::vector<TH2F*> h3_AIOS;
-    std::vector<TH2F*> h3_AISS;
-    std::vector<TH1F*> h_OS;
-    std::vector<TH1F*> h_SS;
-    std::vector<TH1F*> h_AIOS;
-    std::vector<TH1F*> h_AISS;
-    // D.Kim : trg SF histo
-    std::vector<TH1F*> h_trgSF1;
-    std::vector<TH1F*> h_trgSF2;
-    std::vector<TH1F*> h_trgSF_RR;
-    std::vector<TH1F*> h_trgSF_FR;
-    std::vector<TH1F*> h_trgSF_RF;
-    std::vector<TH1F*> h_trgSF_FF;
-
+    TauTriggerSFs2017* tauSFs = new TauTriggerSFs2017("${CMSSW_BASE}/src/TauTriggerSFs2017/TauTriggerSFs2017/data/tauTriggerEfficiencies2017_New.root", "${CMSSW_BASE}/src/TauTriggerSFs2017/TauTriggerSFs2017/data/tauTriggerEfficiencies2017.root", "tight", "MVA");
     TString postfix = postfixMaps(shape);
     std::cout << postfix << std::endl;
     //For shape systematics
     int nbhist=1;
-    for (int k=0; k<nbhist; ++k){
-      std::ostringstream HNS0OS; HNS0OS << "h0_OS" << k;
-      std::ostringstream HNS1OS; HNS1OS << "h1_OS" << k;
-      std::ostringstream HNS2OS; HNS2OS << "h2_OS" << k;
-      std::ostringstream HNS2M1OS; HNS2M1OS << "h2M1_OS" << k;
-      std::ostringstream HNS2M2OS; HNS2M2OS << "h2M2_OS" << k;
-      std::ostringstream HNS2M3OS; HNS2M3OS << "h2M3_OS" << k;
-      std::ostringstream HNS4M1OS; HNS4M1OS << "h4M1_OS" << k;
-      std::ostringstream HNS4M2OS; HNS4M2OS << "h4M2_OS" << k;
-      std::ostringstream HNS3OS; HNS3OS << "h3_OS" << k;
-      std::ostringstream HNSOS; HNS2OS << "h_OS" << k;
-      // binnum2X,bins2X,binnum2Y,bins2Y
-      h0_OS.push_back(new TH1F (HNS0OS.str().c_str(),"",binnum0,bins0)); h0_OS[k]->Sumw2();
-      h1_OS.push_back(new TH2F (HNS1OS.str().c_str(),"",binnum1X,bins1X,binnum1Y,bins1Y)); h1_OS[k]->Sumw2();
-      h2_OS.push_back(new TH2F (HNS2OS.str().c_str(),"",binnum2X,bins2X,binnum2Y,bins2Y)); h2_OS[k]->Sumw2();      
-      h3_OS.push_back(new TH2F (HNS3OS.str().c_str(),"",binnum2X,bins2X,binnum2Y,bins2Y)); h3_OS[k]->Sumw2();
-      h_OS.push_back(new TH1F (HNSOS.str().c_str(),"",binnum0,bins0)); h_OS[k]->Sumw2();
-      
-      std::ostringstream HNS0SS; HNS0OS << "h0_SS" << k;
-      std::ostringstream HNS1SS; HNS1OS << "h1_SS" << k;
-      std::ostringstream HNS2SS; HNS2OS << "h2_SS" << k;
-      std::ostringstream HNS3SS; HNS2OS << "h3_SS" << k;
-      std::ostringstream HNSSS; HNSOS << "h_SS" << k;
 
-      h0_SS.push_back(new TH1F (HNS0SS.str().c_str(),"",binnum1,bins1)); h0_SS[k]->Sumw2();
-      h1_SS.push_back(new TH2F (HNS1SS.str().c_str(),"",binnum1X,bins1X,binnum1Y,bins1Y)); h1_SS[k]->Sumw2();
-      h2_SS.push_back(new TH2F (HNS2SS.str().c_str(),"",binnum2X,bins2X,binnum2Y,bins2Y)); h2_SS[k]->Sumw2();
-      h3_SS.push_back(new TH2F (HNS3SS.str().c_str(),"",binnum2X,bins2X,binnum2Y,bins2Y)); h3_SS[k]->Sumw2();
-      h_SS.push_back(new TH1F (HNSSS.str().c_str(),"",binnum1,bins1)); h_SS[k]->Sumw2();
-      
-      std::ostringstream HNS0AIOS; HNS0AIOS << "h0_AIOS" << k;
-      std::ostringstream HNS1AIOS; HNS1AIOS << "h1_AIOS" << k;
-      std::ostringstream HNS2AIOS; HNS2AIOS << "h2_AIOS" << k;
-      std::ostringstream HNS3AIOS; HNS3AIOS << "h3_AIOS" << k;
-      std::ostringstream HNSAIOS; HNSAIOS << "h_AIOS" << k;
-
-      h0_AIOS.push_back(new TH1F (HNS0AIOS.str().c_str(),"",binnum0,bins0)); h0_AIOS[k]->Sumw2();
-      h1_AIOS.push_back(new TH2F (HNS1AIOS.str().c_str(),"",binnum1X,bins1X,binnum1Y,bins1Y)); h1_AIOS[k]->Sumw2();
-      h2_AIOS.push_back(new TH2F (HNS2AIOS.str().c_str(),"",binnum2X,bins2X,binnum2Y,bins2Y)); h2_AIOS[k]->Sumw2();
-      h3_AIOS.push_back(new TH2F (HNS3AIOS.str().c_str(),"",binnum2X,bins2X,binnum2Y,bins2Y)); h3_AIOS[k]->Sumw2();
-      h_AIOS.push_back(new TH1F (HNSAIOS.str().c_str(),"",binnum0,bins0)); h_AIOS[k]->Sumw2();
-        
-      std::ostringstream HNS0AISS; HNS0AISS << "h0_AISS" << k;
-      std::ostringstream HNS1AISS; HNS1AISS << "h1_AISS" << k;
-      std::ostringstream HNS2AISS; HNS2AISS << "h2_AISS" << k;
-      std::ostringstream HNS3AISS; HNS3AISS << "h3_AISS" << k;
-      std::ostringstream HNSAISS; HNSAISS << "h_AISS" << k;
-
-      h0_AISS.push_back(new TH1F (HNS0AISS.str().c_str(),"",binnum1,bins1)); h0_AISS[k]->Sumw2();
-      h1_AISS.push_back(new TH2F (HNS1AISS.str().c_str(),"",binnum1X,bins1X,binnum1Y,bins1Y)); h1_AISS[k]->Sumw2();
-      h2_AISS.push_back(new TH2F (HNS2AISS.str().c_str(),"",binnum2X,bins2X,binnum2Y,bins2Y)); h2_AISS[k]->Sumw2();
-      h3_AISS.push_back(new TH2F (HNS3AISS.str().c_str(),"",binnum2X,bins2X,binnum2Y,bins2Y)); h3_AISS[k]->Sumw2();
-      h_AISS.push_back(new TH1F (HNSAISS.str().c_str(),"",binnum1,bins1)); h_AISS[k]->Sumw2();
-      
-      // D.Kim trgSF
-      std::ostringstream HTRGSF1; HTRGSF1 << "h_trgSF1" << k;
-      std::ostringstream HTRGSF2; HTRGSF2 << "h_trgSF2" << k;
-      std::ostringstream HTRGSFRR; HTRGSFRR << "h_trgSF_RR" << k;
-      std::ostringstream HTRGSFFR; HTRGSFFR << "h_trgSF_FR" << k;
-      std::ostringstream HTRGSFRF; HTRGSFRF << "h_trgSF_RF" << k;
-      std::ostringstream HTRGSFFF; HTRGSFFF << "h_trgSF_FF" << k;
-      h_trgSF1.push_back(new TH1F (HTRGSF1.str().c_str(),"trgSF1", 80,1.00,1.10)); h_trgSF1[k]->Sumw2();
-      h_trgSF2.push_back(new TH1F (HTRGSF2.str().c_str(),"trgSF2", 80,0.97,1.15)); h_trgSF2[k]->Sumw2();
-      h_trgSF_RR.push_back(new TH1F (HTRGSFRR.str().c_str(),"trgSF_RR", 100,0.9,1.5)); h_trgSF_RR[k]->Sumw2();
-      h_trgSF_FR.push_back(new TH1F (HTRGSFFR.str().c_str(),"trgSF_FR", 100,0.9,1.5)); h_trgSF_FR[k]->Sumw2();
-      h_trgSF_RF.push_back(new TH1F (HTRGSFRF.str().c_str(),"trgSF_RF", 100,0.9,1.5)); h_trgSF_RF[k]->Sumw2();
-      h_trgSF_FF.push_back(new TH1F (HTRGSFFF.str().c_str(),"trgSF_FF", 100,0.9,1.5)); h_trgSF_FF[k]->Sumw2();
-      
-    }
-    
     // Loop over all events
     Int_t nentries_wtn = (Int_t) treePtr->GetEntries();
     for (Int_t i = 0; i < nentries_wtn; i++) {
@@ -406,8 +285,8 @@ int main(int argc, char** argv) {
       if (!tree->byVLooseIsolationMVArun2v1DBnewDMwLT_1 || !tree->byVLooseIsolationMVArun2v1DBnewDMwLT_2) continue; 
 
       // Taus quality
-      if (fabs(eta_1)<2.1 || fabs(eta_2)<2.1) continue;
-      if (pt_1<40 || pt_2<40) continue;
+      if (fabs(tree->eta_1)>2.1 || fabs(tree->eta_2)>2.1) continue;
+      if (tree->pt_1<40 || tree->pt_2<40) continue;
       // DoubleTau trigger
       bool tight35 = tree->DoubleTightTau35Pass && tree->t1MatchesDoubleTightTau35Path && tree->t2MatchesDoubleTightTau35Path && tree->t1MatchesDoubleTightTau35Filter && tree->t2MatchesDoubleTightTau35Filter;
       bool medium40 = tree->DoubleMediumTau40Pass && tree->t1MatchesDoubleMediumTau40Path && tree->t2MatchesDoubleMediumTau40Path && tree->t1MatchesDoubleMediumTau40Filter && tree->t2MatchesDoubleMediumTau40Filter;
@@ -476,42 +355,6 @@ int main(int argc, char** argv) {
       float sf_id=1.00;//0.89*0.89;
       //float eff_tau=1.0;
 
-      // D.Kim : Trigger SF
-      float sf_trg1 = 1.0;
-      float sf_trg2 = 1.0;
-      float sf_trg_RR = 1.0;
-      float sf_trg_FR = 1.0;
-      float sf_trg_RF = 1.0;
-      float sf_trg_FF = 1.0;
-      PyObject* trgSF = PyObject_CallFunction(compute_sf,(char*)"[f,i]",0.0,0);
-      if (sample!="data_obs"){
-	if (tree->t1_decayMode==0 || tree->t1_decayMode==5) trgSF = PyObject_CallFunction(compute_sf,(char*)"[f,i]",mytau1.Pt(),0);
-	else if (tree->t1_decayMode==1 || tree->t1_decayMode==6) trgSF = PyObject_CallFunction(compute_sf,(char*)"[f,i]",mytau1.Pt(),1);
-	else if (tree->t1_decayMode==10) trgSF = PyObject_CallFunction(compute_sf,(char*)"[f,i]",mytau1.Pt(),10);
-	sf_trg1 = PyFloat_AsDouble(trgSF);
-	if (tree->gen_match_1==5)  {
-	  sf_trg_RR = PyFloat_AsDouble(trgSF);
-	  sf_trg_RF = PyFloat_AsDouble(trgSF);
-	}
-	if (tree->gen_match_1==6) {
-	  sf_trg_FR = PyFloat_AsDouble(trgSF);
-	  sf_trg_FF = PyFloat_AsDouble(trgSF);
-	}
-	if (tree->t2_decayMode==0 || tree->t2_decayMode==5) trgSF = PyObject_CallFunction(compute_sf,(char*)"[f,i]",mytau2.Pt(),0);
-	else if (tree->t2_decayMode==1 || tree->t2_decayMode==6) trgSF = PyObject_CallFunction(compute_sf,(char*)"[f,i]",mytau2.Pt(),1);
-	else if (tree->t2_decayMode==10) trgSF = PyObject_CallFunction(compute_sf,(char*)"[f,i]",mytau2.Pt(),10);
-	sf_trg2 = PyFloat_AsDouble(trgSF);
-	if (tree->gen_match_2==5)  {
-	  sf_trg_RR = sf_trg_RR*PyFloat_AsDouble(trgSF);
-          sf_trg_FR = sf_trg_FR*PyFloat_AsDouble(trgSF);
-        }
-        if (tree->gen_match_2==6) {
-          sf_trg_RF = sf_trg_RF*PyFloat_AsDouble(trgSF);
-          sf_trg_FF = sf_trg_FF*PyFloat_AsDouble(trgSF);
-	}
-
-      }
-          
 
       // Weights depending in the generated jet multiplicity
       if (sample.find("WJets")!= string::npos){ 
@@ -589,6 +432,12 @@ int main(int argc, char** argv) {
       if ((sample.find("TT")!= string::npos) && (shape!="ttbarShape_Up" && shape!="ttbarShape_Down")) aweight*=sqrt(exp(0.0615-0.0005*pttop1)*exp(0.0615-0.0005*pttop2));
       //aweight*=sqrt(exp(0.156-0.00137*pttop1)*exp(0.156-0.00137*pttop2));
       if ((sample.find("TT")!= string::npos) && shape=="ttbarShape_Up") aweight*=(1+2*(sqrt(exp(0.0615-0.0005*pttop1)*exp(0.0615-0.0005*pttop2))-1));
+
+      // Tau Trigger SFs
+      float diTauLeg1SF = tauSFs->getDiTauScaleFactor(mytau1.Pt(), mytau1.Eta(), mytau1.Phi());
+      float diTauLeg2SF = tauSFs->getDiTauScaleFactor(mytau2.Pt(), mytau2.Eta(), mytau2.Phi());
+      float w_tauTrgSF = diTauLeg1SF*diTauLeg2SF;
+      aweight*=w_tauTrgSF;
 
       if (sample=="data_obs") aweight=1.0;
       
