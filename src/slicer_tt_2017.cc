@@ -183,71 +183,73 @@ int main(int argc, char** argv) {
     namu->Branch("is_signal",           &is_signal,           "is_signal/I"          );
     namu->Branch("is_ai",               &is_ai,               "is_ai/I"              );
 
-
-    TTree* w_namu = new TTree("w_tree", "w_tree");
-    w_namu->SetDirectory(0);
-    w_namu->Branch("w_lumi",               &w_lumi,               "w_lumi/F"             );
-    w_namu->Branch("w_wjet",               &w_wjet,               "w_wjet/F"             );
-    w_namu->Branch("w_DYjet",              &w_DYjet,              "w_DYjet/F"            );
-    w_namu->Branch("w_pu",                 &w_pu,                 "w_pu/F"               );
-    w_namu->Branch("genweight",            &genweight,            "genweight/F"          );
-    w_namu->Branch("sf_id",                &sf_id,                "sf_id/F"              );
-    w_namu->Branch("sf_trg1",              &sf_trg1,              "sf_trg1/F"            );
-    w_namu->Branch("sf_trg2",              &sf_trg2,              "sf_trg2/F"            );
-    w_namu->Branch("evtwt",                &evtwt,                "evtwt/F"              );
-
-
-    //////////////////////////////////////////////////////////////////
-    //                                                              //          
-    //  Weights and Scale Factors                                   //
-    //  1. PU reweighting : # of PV                                 //
-    //  2. Tau ID eff SF : below                                    //
-    //  3. Anti-lepton discriminator tau ID SF : below with 2.      //
-    //  4. Trigger efficiencies ??                                  //
-    //  5. Reweighting of LO Madgraph DY samples                    //
-    //  6. Top pT reweighting                                       //
-    //  7. Recoil correction                                        //
-    //  8. Generator event weights                                  //
-    //                                                              //
-    /////////////////////////////////////////////////////////////////
-
+    TNamed* dbsName = (TNamed*)f_Double->Get("MiniAOD_name");
+    std::string datasetName = dbsName->GetTitle();
+    if (datasetName.find("Not Found") != std::string::npos && sample!="data_obs" && sample!="embedded") {
+      f_Double->Close();
+      return 2;
+    }
+    std::replace(datasetName.begin(), datasetName.end(), '/', '#');
     reweight::LumiReWeighting* LumiWeights_12;
-    LumiWeights_12 = new reweight::LumiReWeighting("../weightROOTs/MC_nPU_081118.root", "../weightROOTs/Data_nPU_081118.root", "mc", "pileup");
-    //LumiWeights_12 = new reweight::LumiReWeighting("../weightROOTs/MC_Moriond17_PU25ns_V1.root", "../weightROOTs/Data_Pileup_2016_271036-284044_80bins.root", "pileup", "pileup");
+    if (datasetName.find("Not Found") != std::string::npos && sample!="data_obs" && sample!="embedded") LumiWeights_12 = new reweight::LumiReWeighting("../weightROOTs/pudistributions_mc_2017.root", "../weightROOTs/pudistributions_data_2017.root",  datasetName.c_str(), "pileup");
+    std::cout << datasetName << std::endl;
+    
+
     
     TFile *fZ=new TFile("../weightROOTs/zpt_weights_2016_BtoH.root");
     TH2F *histZ=(TH2F*) fZ->Get("zptmass_histo");
     
-    TFile fw("../weightROOTs/htt_scalefactors_v16_3.root");
-    RooWorkspace *w = (RooWorkspace*)fw.Get("w");
-    fw.Close();
+    //TFile fw("../weightROOTs/htt_scalefactors_v16_3.root");
+    //RooWorkspace *w = (RooWorkspace*)fw.Get("w");
+    //fw.Close();
     
-    TFile fw2("../weightROOTs/htt_scalefactors_sm_moriond_v1.root");
-    RooWorkspace *w2 = (RooWorkspace*)fw2.Get("w");
-    fw2.Close();
+    //TFile fw2("../weightROOTs/htt_scalefactors_sm_moriond_v1.root");
+    //RooWorkspace *w2 = (RooWorkspace*)fw2.Get("w");
+    //fw2.Close();
 
-    TFile fem("../weightROOTs/htt_scalefactors_v16_9_embedded.root");
+    TFile fem("../weightROOTs/htt_scalefactors_v17_5.root");
     RooWorkspace *wEmbed = (RooWorkspace*)fem.Get("w");
     fem.Close();
 
-    /*
-    // D.Kim
-    const char *scriptDirectoryName = "./../python/";
-    Py_Initialize();
-    PyObject *sysPath = PySys_GetObject((char *)"path");
-    PyObject *path = PyString_FromString(scriptDirectoryName);
-    PyList_Insert(sysPath, 0, path);
-    PyObject* fitFunctions =  PyImport_ImportModule((char *)"FitFunctions");
-    // The line below breaks the code
-    PyObject* compute_sf = PyObject_GetAttrString(fitFunctions,"compute_SF");
-    if (sample=="embedded") compute_sf = PyObject_GetAttrString(fitFunctions,"compute_Trg_Eff_Data");
-    */
-    float weight = 1.0;
+    TFile* fhtt2017sf = new TFile("../weightROOTs/htt_scalefactors_2017_v2.root");
+    RooWorkspace* htt_sf = (RooWorkspace*)fhtt2017sf->Get("w");
+    fhtt2017sf->Close();
+
+    TFile bTag_eff_file("../weightROOTs/tagging_efficiencies_march2018_btageff-all_samp-inc-DeepCSV_medium.root", "READ");
+    TH2F* btag_eff_b = (TH2F*)bTag_eff_file.Get("btag_eff_b")->Clone();
+    TH2F* btag_eff_c = (TH2F*)bTag_eff_file.Get("btag_eff_c")->Clone();
+    TH2F* btag_eff_oth = (TH2F*)bTag_eff_file.Get("btag_eff_oth")->Clone();
+
+    float weightLumi = 1.0;
     // Lumi weight  
     float w_lumi = lumiWeight(sample, ngen);
     if (w_lumi==0) std::cout << std::endl << "!!!!!!!!!!!!!!!!!!!!!!!! ATTENTION - can't find lumi weight. Check the sample. !!!!!!!!!!!!!!!!!!!!!!!!" << std::endl << std::endl;
-    weight = w_lumi;
+    weightLumi = w_lumi;
     std::cout << "============== map weight: " << w_lumi << std::endl;
+
+    ////////////////////////////////////////////////////////
+    // Stitching Weights for W and DY - Don't use for now //
+    ////////////////////////////////////////////////////////
+    if (sample.find("WJets")!= string::npos){ 
+      w_wjet=61.98299933;
+      if (tree->numGenJets==1) w_wjet=6.963370836;
+      else if (tree->numGenJets==2) w_wjet=16.37649708;
+      else if (tree->numGenJets==3) w_wjet=2.532755448;
+      else if (tree->numGenJets==4) w_wjet=2.418989568;
+      weightLumi=w_wjet;
+    }
+    else w_wjet=1.00;
+    
+    if (sample.find("DY")!= string::npos) { 
+      w_DYjet=2.873324952;
+      if (tree->numGenJets==1) w_DYjet=0.502938039;
+      else if (tree->numGenJets==2) w_DYjet=1.042256272;
+      else if (tree->numGenJets==3) w_DYjet=0.656337234;
+      else if (tree->numGenJets==4) w_DYjet=0.458531131;
+      weightLumi=w_DYjet;
+    }      
+    else w_DYjet=1.00;
+
 
     std::cout.setf(std::ios::fixed, std::ios::floatfield);
     std::cout.precision(10);
@@ -256,8 +258,6 @@ int main(int argc, char** argv) {
     TauTriggerSFs2017* tauSFs = new TauTriggerSFs2017("${CMSSW_BASE}/src/TauTriggerSFs2017/TauTriggerSFs2017/data/tauTriggerEfficiencies2017_New.root", "${CMSSW_BASE}/src/TauTriggerSFs2017/TauTriggerSFs2017/data/tauTriggerEfficiencies2017.root", "tight", "MVA");
     TString postfix = postfixMaps(shape);
     std::cout << postfix << std::endl;
-    //For shape systematics
-    int nbhist=1;
 
     // Loop over all events
     Int_t nentries_wtn = (Int_t) treePtr->GetEntries();
@@ -265,40 +265,9 @@ int main(int argc, char** argv) {
       treePtr->GetEntry(i);
       if (i % 1000 == 0) fprintf(stdout, "\r  Processed events: %8d of %8d ", i, nentries_wtn);
       fflush(stdout);
-
-
-      //////////////////////////////////
-      // Added for yield cross check  //
-      //////////////////////////////////
-      /*
-      if (!tree->byVLooseIsolationMVArun2v1DBoldDMwLT_1 || !tree->byVLooseIsolationMVArun2v1DBoldDMwLT_2) continue; 
-      // Regions
-      float signalRegion = tree->byTightIsolationMVArun2v1DBoldDMwLT_1 && tree->byTightIsolationMVArun2v1DBoldDMwLT_2;
-      float aiRegion = ((tree->byMediumIsolationMVArun2v1DBoldDMwLT_1 && !tree->byTightIsolationMVArun2v1DBoldDMwLT_2 && tree->byLooseIsolationMVArun2v1DBoldDMwLT_2) || (tree->byMediumIsolationMVArun2v1DBoldDMwLT_2 && !tree->byTightIsolationMVArun2v1DBoldDMwLT_1 && tree->byLooseIsolationMVArun2v1DBoldDMwLT_1));
-      if (!tree->byLooseIsolationMVArun2v1DBoldDMwLT_1 && !tree->byLooseIsolationMVArun2v1DBoldDMwLT_2) continue; // Fig 43(a)
-      */
-      //////////////////////////////////
-
-      // Regions
-      float signalRegion = tree->byTightIsolationMVArun2v1DBnewDMwLT_1 && tree->byTightIsolationMVArun2v1DBnewDMwLT_2;
-      float aiRegion = ((tree->byMediumIsolationMVArun2v1DBnewDMwLT_1 && !tree->byTightIsolationMVArun2v1DBnewDMwLT_2 && tree->byLooseIsolationMVArun2v1DBnewDMwLT_2) || (tree->byMediumIsolationMVArun2v1DBnewDMwLT_2 && !tree->byTightIsolationMVArun2v1DBnewDMwLT_1 && tree->byLooseIsolationMVArun2v1DBnewDMwLT_1));
-      if (!tree->byVLooseIsolationMVArun2v1DBnewDMwLT_1 || !tree->byVLooseIsolationMVArun2v1DBnewDMwLT_2) continue; 
-
-      // Taus quality
-      if (fabs(tree->eta_1)>2.1 || fabs(tree->eta_2)>2.1) continue;
-      if (tree->pt_1<40 || tree->pt_2<40) continue;
-      // DoubleTau trigger
-      bool tight35 = tree->DoubleTightTau35Pass && tree->t1MatchesDoubleTightTau35Path && tree->t2MatchesDoubleTightTau35Path && tree->t1MatchesDoubleTightTau35Filter && tree->t2MatchesDoubleTightTau35Filter;
-      bool medium40 = tree->DoubleMediumTau40Pass && tree->t1MatchesDoubleMediumTau40Path && tree->t2MatchesDoubleMediumTau40Path && tree->t1MatchesDoubleMediumTau40Filter && tree->t2MatchesDoubleMediumTau40Filter;
-      bool tight40 = tree->DoubleTightTau40Pass && tree->t1MatchesDoubleTightTau40Path && tree->t2MatchesDoubleTightTau40Path && tree->t1MatchesDoubleTightTau40Filter && tree->t2MatchesDoubleTightTau40Filter;
-      bool passTrigAndPt=false;
-      if (tree->pt_1>45 && tree->pt_2>45 && medium40) passTrigAndPt = true;
-      if (tree->pt_1>45 && tree->pt_2>45 && tight40) passTrigAndPt = true;
-      if (tree->pt_1>40 && tree->pt_2>40 && tight35) passTrigAndPt=true;
-      if (!passTrigAndPt) continue;
-
-      if (TMath::IsNaN(tree->Q2V2)) continue;
-
+      ///////////////
+      // shortcuts //
+      ///////////////
       float jpt_1 = scenario.get_jpt_1();
       float jpt_2 = scenario.get_jpt_2();
       float njets = scenario.get_njets();
@@ -324,14 +293,11 @@ int main(int argc, char** argv) {
       float Q2V1 = scenario.get_Q2V1();
       float Q2V2 = scenario.get_Q2V2();
 
-      // mytau1 is the highest pT tau
+      //////////////////
+      // Taus sorting //
+      //////////////////
       float charge1=tree->q_1;
       float charge2=tree->q_2;
-      bool OS = false;
-      bool SS = false;
-      if (charge1*charge2>0.0) SS = true;
-      else if (charge1*charge2<0.0) OS = true;
-
       TLorentzVector mytau1;
       mytau1.SetPtEtaPhiM(tree->pt_1,tree->eta_1,tree->phi_1,tree->m_1);
       TLorentzVector mytau2;
@@ -342,135 +308,34 @@ int main(int argc, char** argv) {
 	mytau2.SetPtEtaPhiM(tree->pt_1,tree->eta_1,tree->phi_1,tree->m_1);
 	mytau1.SetPtEtaPhiM(tree->pt_2,tree->eta_2,tree->phi_2,tree->m_2);
       }
-      
+
+      ////////////////
+      // Selections //
+      ////////////////
+      // Regions
+      float signalRegion = tree->byTightIsolationMVArun2v1DBoldDMwLT_1 && tree->byTightIsolationMVArun2v1DBoldDMwLT_2;
+      float aiRegion = ((tree->byMediumIsolationMVArun2v1DBoldDMwLT_1 && !tree->byTightIsolationMVArun2v1DBoldDMwLT_2 && tree->byLooseIsolationMVArun2v1DBoldDMwLT_2) || (tree->byMediumIsolationMVArun2v1DBoldDMwLT_2 && !tree->byTightIsolationMVArun2v1DBoldDMwLT_1 && tree->byLooseIsolationMVArun2v1DBoldDMwLT_1));
+      if (!tree->byVLooseIsolationMVArun2v1DBoldDMwLT_1 || !tree->byVLooseIsolationMVArun2v1DBoldDMwLT_2) continue; 
+      // Taus quality
+      if (fabs(tree->eta_1)>2.1 || fabs(tree->eta_2)>2.1) continue;
+      if (tree->pt_1<40 || tree->pt_2<40) continue;
+      // DoubleTau trigger
+      bool tight35 = tree->DoubleTightTau35Pass && tree->t1MatchesDoubleTightTau35Path && tree->t2MatchesDoubleTightTau35Path && tree->t1MatchesDoubleTightTau35Filter && tree->t2MatchesDoubleTightTau35Filter;
+      bool medium40 = tree->DoubleMediumTau40Pass && tree->t1MatchesDoubleMediumTau40Path && tree->t2MatchesDoubleMediumTau40Path && tree->t1MatchesDoubleMediumTau40Filter && tree->t2MatchesDoubleMediumTau40Filter;
+      bool tight40 = tree->DoubleTightTau40Pass && tree->t1MatchesDoubleTightTau40Path && tree->t2MatchesDoubleTightTau40Path && tree->t1MatchesDoubleTightTau40Filter && tree->t2MatchesDoubleTightTau40Filter;
+      bool passTrigAndPt=false;
+      if (tree->pt_1>45 && tree->pt_2>45 && medium40) passTrigAndPt = true;
+      if (tree->pt_1>45 && tree->pt_2>45 && tight40) passTrigAndPt = true;
+      if (tree->pt_1>40 && tree->pt_2>40 && tight35) passTrigAndPt=true;
+      if (!passTrigAndPt) continue;
+      if (TMath::IsNaN(tree->Q2V2)) continue;      
       if (mytau1.DeltaR(mytau2) < 0.5) continue;
       if (tree->againstElectronVLooseMVA6_1 < 0.5) continue; // L773
       if (tree->againstElectronVLooseMVA6_2 < 0.5) continue;
       if (tree->againstMuonLoose3_1 < 0.5) continue; //774
       if (tree->againstMuonLoose3_2 < 0.5) continue;
-      // if (!tree->byLooseIsolationMVArun2v1DBnewDMwLT_1 && !tree->byLooseIsolationMVArun2v1DBnewDMwLT_2) continue; // Fig 43(a)
       if (tree->extramuon_veto) continue;
       if (tree->extraelec_veto) continue;
-      //float sf_trg=1.0;
-      float sf_id=1.00;//0.89*0.89;
-      //float eff_tau=1.0;
-
-
-      // Weights depending in the generated jet multiplicity
-      if (sample.find("WJets")!= string::npos){ 
-	w_wjet=61.98299933;
-	if (tree->numGenJets==1) w_wjet=6.963370836;
-	else if (tree->numGenJets==2) w_wjet=16.37649708;
-	else if (tree->numGenJets==3) w_wjet=2.532755448;
-	else if (tree->numGenJets==4) w_wjet=2.418989568;
-	//weight=w_wjet;
-      }
-      else w_wjet=1.00;
-      
-      if (sample.find("DY")!= string::npos) { 
-	w_DYjet=2.873324952;
-	if (tree->numGenJets==1) w_DYjet=0.502938039;
-	else if (tree->numGenJets==2) w_DYjet=1.042256272;
-	else if (tree->numGenJets==3) w_DYjet=0.656337234;
-	else if (tree->numGenJets==4) w_DYjet=0.458531131;
-	//weight=w_DYjet;
-      }      
-      else w_DYjet=1.00;
-
-      // Multiply some weights and scale factors together
-      // ID and iso corrections
-      float correction=sf_id;
-      if (sample!="data_obs") correction=correction*LumiWeights_12->weight(tree->npu);
-      float aweight=tree->genweight*weight*correction;
-      if (sample!="data_obs"){
-	//Tau ID SF (Tight WP)
-	if (tree->gen_match_1==5) aweight=aweight*0.89;
-	if (tree->gen_match_2==5) aweight=aweight*0.89;
-	//e->tau fakes VLoose
-	if (tree->gen_match_1==1 or tree->gen_match_1==3){
-	  if (std::abs(mytau1.Eta())<1.460) aweight=aweight*1.09;
-	  else if (std::abs(mytau1.Eta())>1.558) aweight=aweight*1.19;
-	}
-	if (tree->gen_match_2==1 or tree->gen_match_2==3){
-	  if (std::abs(mytau2.Eta())<1.460) aweight=aweight*1.09;
-	  else if (std::abs(mytau2.Eta())>1.558) aweight=aweight*1.19;
-	}
-	// mu->tau fakes Loose
-	else if (tree->gen_match_1==2 or tree->gen_match_1==4){
-	  if (std::abs(mytau1.Eta())<0.4) aweight=aweight*1.06;
-	  else if (std::abs(mytau1.Eta())<0.8) aweight=aweight*1.02;
-	  else if (std::abs(mytau1.Eta())<1.2) aweight=aweight*1.10;
-	  else if (std::abs(mytau1.Eta())<1.7) aweight=aweight*1.03;
-	  else aweight=aweight*1.94;
-	}
-	else if (tree->gen_match_2==2 or tree->gen_match_2==4){
-	  if (std::abs(mytau2.Eta())<0.4) aweight=aweight*1.06;
-	  else if (std::abs(mytau2.Eta())<0.8) aweight=aweight*1.02;
-	  else if (std::abs(mytau2.Eta())<1.2) aweight=aweight*1.10;
-	  else if (std::abs(mytau2.Eta())<1.7) aweight=aweight*1.03;
-	  else aweight=aweight*1.94;
-	}
-	//aweight=aweight*h_Trk->Eval(eta_1);
-      }
-
-      // Z pt reweighting for DY events
-      if (sample.find("DY")!= string::npos || sample.find("EWKZ")!= string::npos) {
-	float zpt_corr=histZ->GetBinContent(histZ->GetXaxis()->FindBin(tree->genM),histZ->GetYaxis()->FindBin(tree->genpT));
-	if (shape=="dyShape_Up") // up
-	  aweight=aweight*(1+1.10*(zpt_corr-1));
-	else if (shape=="dyShape_Down") // down
-	  aweight=aweight*(1+0.90*(zpt_corr-1));
-	else 
-	  aweight=aweight*zpt_corr; // nominal
-      }
-
-      //  Top pT reweighting for ttbar events
-      float pttop1=tree->pt_top1;
-      if (pttop1>400) pttop1=400;
-      float pttop2=tree->pt_top2;
-      if (pttop2>400) pttop2=400;
-      if ((sample.find("TT")!= string::npos) && (shape!="ttbarShape_Up" && shape!="ttbarShape_Down")) aweight*=sqrt(exp(0.0615-0.0005*pttop1)*exp(0.0615-0.0005*pttop2));
-      //aweight*=sqrt(exp(0.156-0.00137*pttop1)*exp(0.156-0.00137*pttop2));
-      if ((sample.find("TT")!= string::npos) && shape=="ttbarShape_Up") aweight*=(1+2*(sqrt(exp(0.0615-0.0005*pttop1)*exp(0.0615-0.0005*pttop2))-1));
-
-      // Tau Trigger SFs
-      float diTauLeg1SF = tauSFs->getDiTauScaleFactor(mytau1.Pt(), mytau1.Eta(), mytau1.Phi());
-      float diTauLeg2SF = tauSFs->getDiTauScaleFactor(mytau2.Pt(), mytau2.Eta(), mytau2.Phi());
-      float w_tauTrgSF = diTauLeg1SF*diTauLeg2SF;
-      aweight*=w_tauTrgSF;
-
-      if (sample=="data_obs") aweight=1.0;
-      
-      // D.Kim : https://github.com/cecilecaillol/SMHTT2016/blob/master/mt/Analyze/FinalSelection2D_relaxed.cc#L744-L754
-      //************************ Jet to tau FR shape **************************
-      if (shape=="jetToTauFake_Up" && (name=="TTJ" or name=="ZJ" or name=="W")) {
-	  float jtotau1=1.0;
-	  if (tree->gen_match_1==6) {
-	    jtotau1=1-(0.2*mytau1.Pt()/100);
-	    if (mytau1.Pt()>200) jtotau1=1-(0.2*200.0/100);
-	  }
-	  float jtotau2=1.0;
-	  if (tree->gen_match_2==6) {
-	    jtotau2=1-(0.2*mytau2.Pt()/100);
-	    if (mytau2.Pt()>200) jtotau2=1-(0.2*200.0/100);
-	  }
-	  aweight=aweight*jtotau1*jtotau2;
-      }
-
-	if (shape=="jetToTauFake_Down" && (name=="TTJ" or name=="ZJ" or name=="W")) {
-	  float jtotau1=1.0;
-	  if (tree->gen_match_1==6) {
-	    jtotau1=1+(0.2*mytau1.Pt()/100);
-	    if (mytau1.Pt()>200) jtotau1=1+(0.2*200.0/100);
-	  }
-	  float jtotau2=1.0;
-	  if (tree->gen_match_2==6) {
-	    jtotau2=1+(0.2*mytau2.Pt()/100);
-	    if (mytau2.Pt()>200) jtotau2=1+(0.2*200.0/100);
-	  }
-	  aweight=aweight*jtotau1*jtotau2;
-      }
-
 
       // D.Kim : Separation between L, T and J (for DY, TT, and VV)
       // https://github.com/truggles/Z_to_TauTau_13TeV/blob/SM-HTT-2016/analysis1BaselineCuts.py#L444-L457
@@ -483,118 +348,162 @@ int main(int argc, char** argv) {
       if ((name=="ZTT") && !isZTT) continue;
       if ((name=="ZL") && !isZL) continue;
       if ((name=="ZJ") && !isZJ) continue;
-
-      // TT & VV : line 895~897
       if (!(tree->gen_match_1==5 && tree->gen_match_2==5) && (name=="VVT"|| name=="TTT")) continue;
       if ((tree->gen_match_1==5 && tree->gen_match_2==5) && (name=="VVJ" || name=="TTJ")) continue;
 
-      for (int k=0; k<nbhist; ++k){
-	// njets count only jets with pT > 30
-        if (jpt_1<30) {jpt_1=-9999.0; tree->jeta_1=-9999.0; tree->jphi_1=-9999.0;}
-        if (jpt_2<30) {jpt_2=-9999.0; tree->jeta_2=-9999.0; tree->jphi_2=-9999.0;}
-	TLorentzVector myjet1;
-	myjet1.SetPtEtaPhiM(jpt_1,tree->jeta_1,tree->jphi_1,0);
-	TLorentzVector myjet2;
-	myjet2.SetPtEtaPhiM(jpt_2,tree->jeta_2,tree->jphi_2,0);
-	TLorentzVector jets=myjet2+myjet1;
-	//mjj = jets.M();
-
-	TLorentzVector myrawmet;
-	myrawmet.SetPtEtaPhiM(met,0,metphi,0);
-	TLorentzVector mymet=myrawmet;
-	TLorentzVector Higgs = mytau1+mytau2+mymet;	
-
-	// TES 
-	if (tree->gen_match_2==5 && tree->gen_match_1==5) {
-	  if (shape=="DM0_DOWN" && tree->t1_decayMode==0) {mytau1*=0.988; mymet=mymet+(0.012/0.988)*mytau1;}
-	  if (shape=="DM1_DOWN" && tree->t1_decayMode==1) {mytau1*=0.988; mymet=mymet+(0.012/0.988)*mytau1;}
-	  if (shape=="DM10_DOWN" && tree->t1_decayMode==10) {mytau1*=0.988; mymet=mymet+(0.012/0.988)*mytau1;}
-	  if (shape=="DM0_DOWN" && tree->t2_decayMode==0) {mytau2*=0.988; mymet=mymet+(0.012/0.988)*mytau2;}
-	  if (shape=="DM1_DOWN" && tree->t2_decayMode==1) {mytau2*=0.988; mymet=mymet+(0.012/0.988)*mytau2;}
-	  if (shape=="DM10_DOWN" && tree->t2_decayMode==10) {mytau2*=0.988; mymet=mymet+(0.012/0.988)*mytau2;}
-
-	  if (shape=="DM0_UP" && tree->t1_decayMode==0) {mytau1*=1.012; mymet=mymet-(0.012/1.012)*mytau1;}
-	  if (shape=="DM1_UP" && tree->t1_decayMode==1) {mytau1*=1.012; mymet=mymet-(0.012/1.012)*mytau1;}
-	  if (shape=="DM10_UP" && tree->t1_decayMode==10) {mytau1*=1.012; mymet=mymet-(0.012/1.012)*mytau1;}
-	  if (shape=="DM0_UP" && tree->t2_decayMode==0) {mytau2*=1.012; mymet=mymet-(0.012/1.012)*mytau2;}
-	  if (shape=="DM1_UP" && tree->t2_decayMode==1) {mytau2*=1.012; mymet=mymet-(0.012/1.012)*mytau2;}
-	  if (shape=="DM10_UP" && tree->t2_decayMode==10) {mytau2*=1.012; mymet=mymet-(0.012/1.012)*mytau2;}
+      ///////////////////////
+      // Correction for MC //
+      ///////////////////////
+      float correctionMC = 1.0;
+      if (sample!="data_obs" && sample!="embedded"){
+	correctionMC*=LumiWeights_12->weight(tree->npu);
+	correctionMC*=tree->genweight;
+	// Tau ID eff
+	if (tree->gen_match_1==5) correctionMC*=0.89;
+	if (tree->gen_match_2==5) correctionMC*=0.89;
+	//e->tau fakes VLoose ES // FIXME
+	//e->tau fakes VLoose eff
+	if (tree->gen_match_1==1 or tree->gen_match_1==3){
+	  if (std::abs(mytau1.Eta())<1.460) correctionMC*=1.09;
+	  else if (std::abs(mytau1.Eta())>1.558) correctionMC*=1.19;
 	}
-
-	//if (mytau1.Pt() < 41 || mytau2.Pt() < 41 ) continue;
-	//if (mytau1.Pt() < 50) continue;	
-	//if ((fabs(mytau1.Eta()))>2.1 || (fabs(mytau2.Eta())>2.1)) continue; // L770
-
-	float weight2=1.0;	  
-
-	// D.Kim
-	//weight2=weight2*sf_trg1*sf_trg2;
-
-       	// Additional selections
-	bool selection =true;
-
-	// Z mumu SF -- Need to be changed for new category!! FIXME
-	/*
-	if (is_boosted && (sample=="DY" || sample=="ZTT" || sample=="ZLL" || sample=="ZL" || sample=="ZJ" || sample=="EWKZLL" || sample=="EWKZNuNu")) 
-	  aweight*=zmumuSF_boosted(pt_sv,shape);
-	if (is_VBF && (sample=="DY" || sample=="ZTT" || sample=="ZLL" || sample=="ZL" || sample=="ZJ" || sample=="EWKZLL" || sample=="EWKZNuNu")) 
-	  aweight*=zmumuSF_vbf(mjj,shape);
-	*/
-	if (sample=="data_obs") {aweight=1.0; weight2=1.0;}       
-
-	//////////////////////
-	// Embedded weights //
-	//////////////////////
-	if (sample=="embedded") {
-	  if( tree->genweight > 1) continue;
-	  aweight=1.0; weight2=1.0;
-	  //float Stitching_Weight= 1.0/0.899;
-          float Stitching_Weight= 1.0;
-          float Total_Embed_Weight=0;
-	  if((tree->run >= 272007) && (tree->run < 275657)) Stitching_Weight=(1.0/0.897 * 1.02* 1.02);
-	  if((tree->run >= 275657) && (tree->run < 276315))  Stitching_Weight=(1.0/0.908* 1.02* 1.02);
-	  if((tree->run >= 276315) && (tree->run < 276831))  Stitching_Weight=(1.0/0.950* 1.02* 1.02);
-	  if((tree->run >= 276831) && (tree->run < 277772))  Stitching_Weight=(1.0/0.861* 1.02* 1.02);
-	  if((tree->run >= 277772) && (tree->run < 278820))  Stitching_Weight=(1.0/0.941* 1.02* 1.02);
-	  if((tree->run >= 278820) && (tree->run < 280919))  Stitching_Weight=(1.0/0.908* 1.02* 1.02);
-	  if((tree->run >= 280919) && (tree->run < 284045))  Stitching_Weight=(1.0/0.949* 1.02* 1.02);
-          double EmbedWeight=  sf_trg1*sf_trg2 ;
-          float WEIGHT_sel_trg_ratio= m_sel_trg_ratio(wEmbed,mytau1.Pt(),mytau1.Eta(),mytau2.Pt(),mytau2.Eta());
-	  aweight=EmbedWeight * tree->genweight * Stitching_Weight * WEIGHT_sel_trg_ratio;
-	  //std::cout << "embedded weight : " << aweight << std::endl;
-	  //std::cout << "embedded weight : " << aweight << "\t" << tree->genweight << std::endl;
-	  //std::cout << tree->evt << "\t" << mytau1.Pt() << "\t" << mytau2.Pt() << std::endl;
+	if (tree->gen_match_2==1 or tree->gen_match_2==3){
+	  if (std::abs(mytau2.Eta())<1.460) correctionMC*=1.09;
+	  else if (std::abs(mytau2.Eta())>1.558) correctionMC*=1.19;
 	}
-	//std::cout << aweight << "\t" << weight2 << "\t" << weight2*aweight << std::endl;
-
-	if (selection){
-	  // Anything related to systematics should be included i.e. picked by scenario
-	  fillTree(namu, tree, i,
-		   Higgs, mytau1, mytau2, myjet1, myjet2,
-		   mjj, met, metphi, m_sv, pt_sv, njets,
-		   Dbkg_VBF, Dbkg_ggH,
-		   ME_sm_VBF, ME_sm_ggH, ME_sm_WH, ME_sm_ZH, ME_bkg, ME_bkg1, ME_bkg2,
-		   Phi, Phi1, costheta1, costheta2, costhetastar, Q2V1, Q2V2,
-		   signalRegion, aiRegion, weight2*aweight
-		   );
-	  fillWeightTree(w_namu,
-			 w_lumi,
-			 w_wjet, w_DYjet,
-			 LumiWeights_12->weight(tree->npu),
-			 tree->genweight,
-			 sf_id,sf_trg1,sf_trg2,
-			 0,//w_trk
-			 weight2*aweight
-			 );
-			 
+	// mu->tau fakes Loose ES : (gen_match_2=2 or 4): no correction, only uncertainty
+	// mu->tau fakes Loose eff
+	else if (tree->gen_match_1==2 or tree->gen_match_1==4){
+	  if (std::abs(mytau1.Eta())<0.4) correctionMC*=1.06;
+	  else if (std::abs(mytau1.Eta())<0.8) correctionMC*=1.02;
+	  else if (std::abs(mytau1.Eta())<1.2) correctionMC*=1.10;
+	  else if (std::abs(mytau1.Eta())<1.7) correctionMC*=1.03;
+	  else correctionMC*=1.94;
 	}
+	else if (tree->gen_match_2==2 or tree->gen_match_2==4){
+	  if (std::abs(mytau2.Eta())<0.4) correctionMC*=1.06;
+	  else if (std::abs(mytau2.Eta())<0.8) correctionMC*=1.02;
+	  else if (std::abs(mytau2.Eta())<1.2) correctionMC*=1.10;
+	  else if (std::abs(mytau2.Eta())<1.7) correctionMC*=1.03;
+	  else correctionMC*=1.94;
+	}
+	
+	//////////////////////////////////////////////////
+	// Correction factors available in RooWorkspace //
+	//////////////////////////////////////////////////
+	// Z(pt,mass) reweighting for DY events // FIXME - RooWorkspace
+	if (sample.find("DY")!= string::npos || sample.find("EWKZ")!= string::npos) {
+	  float zpt_corr=histZ->GetBinContent(histZ->GetXaxis()->FindBin(tree->genM),histZ->GetYaxis()->FindBin(tree->genpT));
+	  if (shape=="dyShape_Up") // up
+	    correctionMC*=(1+1.10*(zpt_corr-1));
+	  else if (shape=="dyShape_Down") // down
+	    correctionMC*=(1+0.90*(zpt_corr-1));
+	  else 
+	    correctionMC*=zpt_corr; // nominal
+	}
+	// Tau Trigger SFs
+	float diTauLeg1SF = tauSFs->getDiTauScaleFactor(mytau1.Pt(), mytau1.Eta(), mytau1.Phi());
+	float diTauLeg2SF = tauSFs->getDiTauScaleFactor(mytau2.Pt(), mytau2.Eta(), mytau2.Phi());
+	float w_tauTrgSF = diTauLeg1SF*diTauLeg2SF;
+	correctionMC*=w_tauTrgSF;
+	
+	
+	//  Top pT reweighting for ttbar events
+	float pttop1=tree->pt_top1;
+	if (pttop1>400) pttop1=400;
+	float pttop2=tree->pt_top2;
+	if (pttop2>400) pttop2=400;
+	if ((sample.find("TT")!= string::npos) && (shape!="ttbarShape_Up" && shape!="ttbarShape_Down")) correctionMC*=sqrt(exp(0.0615-0.0005*pttop1)*exp(0.0615-0.0005*pttop2));
+	if ((sample.find("TT")!= string::npos) && shape=="ttbarShape_Up") correctionMC*=(1+2*(sqrt(exp(0.0615-0.0005*pttop1)*exp(0.0615-0.0005*pttop2))-1));
+	
+	// b-tagging corrections // FIXME - NEED TO ADD
+	
       }
+      
+      ////////////////////////////
+      // Construct Jets and MET //
+      ////////////////////////////
+      // njets count only jets with pT > 30
+      if (jpt_1<30) {jpt_1=-9999.0; tree->jeta_1=-9999.0; tree->jphi_1=-9999.0;}
+      if (jpt_2<30) {jpt_2=-9999.0; tree->jeta_2=-9999.0; tree->jphi_2=-9999.0;}
+      TLorentzVector myjet1, myjet2, myrawmet;
+      myjet1.SetPtEtaPhiM(jpt_1,tree->jeta_1,tree->jphi_1,0);
+      myjet2.SetPtEtaPhiM(jpt_2,tree->jeta_2,tree->jphi_2,0);
+      myrawmet.SetPtEtaPhiM(met,0,metphi,0);
+      TLorentzVector jets=myjet2+myjet1;
+      TLorentzVector mymet=myrawmet; // for ES
+      TLorentzVector Higgs = mytau1+mytau2+mymet;	
+
+      // Z mumu SF -- Need to be changed for new category!! FIXME
+      /*
+      if (is_boosted && (sample=="DY" || sample=="ZTT" || sample=="ZLL" || sample=="ZL" || sample=="ZJ" || sample=="EWKZLL" || sample=="EWKZNuNu")) 
+	aweight*=zmumuSF_boosted(pt_sv,shape);
+      if (is_VBF && (sample=="DY" || sample=="ZTT" || sample=="ZLL" || sample=="ZL" || sample=="ZJ" || sample=="EWKZLL" || sample=="EWKZNuNu")) 
+	aweight*=zmumuSF_vbf(mjj,shape);
+      */
+
+      //////////////////////
+      // Embedded weights //    >> Everyting coming from 2016 but for Tau ID eff <<
+      //////////////////////
+      float weightEmbded=1.0;
+      if (sample=="embedded") {
+	if( tree->genweight > 1) continue;
+	// Tau ID eff
+	if (tree->gen_match_1==5) weightEmbded*=0.89;
+	if (tree->gen_match_2==5) weightEmbded*=0.89;	  
+	
+	// set workspace variables : will be included in RooWorkspace in next iteration
+	float SF_Tau1 = 1.00;
+	float SF_Tau2 = 1.00;
+	if (mytau1.Pt()>=30 && mytau1.Pt()<35) SF_Tau1 = 0.18321;
+	else if (mytau1.Pt()<40) SF_Tau1 = 0.53906;
+	else if (mytau1.Pt()<45) SF_Tau1 = 0.63658;
+	else if (mytau1.Pt()<50) SF_Tau1 = 0.73152;
+	else if (mytau1.Pt()<60) SF_Tau1 = 0.79002;
+	else if (mytau1.Pt()<80) SF_Tau1 = 0.84666;
+	else if (mytau1.Pt()<100) SF_Tau1 = 0.84919;
+	else if (mytau1.Pt()<150) SF_Tau1 = 0.86819;
+	else if (mytau1.Pt()<200) SF_Tau1 = 0.88206;
+	if (mytau2.Pt()>=30 && mytau2.Pt()<35) SF_Tau2 = 0.18321;
+	else if (mytau2.Pt()<40) SF_Tau2 = 0.53906;
+	else if (mytau2.Pt()<45) SF_Tau2 = 0.63658;
+	else if (mytau2.Pt()<50) SF_Tau2 = 0.73152;
+	else if (mytau2.Pt()<60) SF_Tau2 = 0.79002;
+	else if (mytau2.Pt()<80) SF_Tau2 = 0.84666;
+	else if (mytau2.Pt()<100) SF_Tau2 = 0.84919;
+	else if (mytau2.Pt()<150) SF_Tau2 = 0.86819;
+	else if (mytau2.Pt()<200) SF_Tau2 = 0.88206;
+
+	float WEIGHT_sel_trg_ratio= m_sel_trg_ratio(wEmbed,mytau1.Pt(),mytau1.Eta(),mytau2.Pt(),mytau2.Eta());
+	weightEmbded*=EmbedWeight * tree->genweight * WEIGHT_sel_trg_ratio;
+      }
+
+      // Construct evtwt
+      float evtwt = weightLumi*correctionMC*weightEmbded;
+      // Clean weight on data for just in case 
+      if (sample=="data_obs") evtwt=1.0; 
+
+      // Additional selections
+      bool selection =true;
+
+      if (selection){
+	// Anything related to systematics should be included i.e. picked by scenario
+	fillTree(namu, tree, i,
+		 Higgs, mytau1, mytau2, myjet1, myjet2,
+		 mjj, met, metphi, m_sv, pt_sv, njets,
+		 Dbkg_VBF, Dbkg_ggH,
+		 ME_sm_VBF, ME_sm_ggH, ME_sm_WH, ME_sm_ZH, ME_bkg, ME_bkg1, ME_bkg2,
+		 Phi, Phi1, costheta1, costheta2, costhetastar, Q2V1, Q2V2,
+		 signalRegion, aiRegion, evtwt
+		 );
+	
+      }
+      
     } // end of loop over events
     
     TFile *fout = TFile::Open(output.c_str(), "RECREATE");
     fout->cd();
     namu->Write();
-    w_namu->Write();
     nbevt->Write();
 
     fout->Close();
