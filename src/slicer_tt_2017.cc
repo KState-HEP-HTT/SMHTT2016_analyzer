@@ -183,30 +183,37 @@ int main(int argc, char** argv) {
     namu->Branch("is_signal",           &is_signal,           "is_signal/I"          );
     namu->Branch("is_ai",               &is_ai,               "is_ai/I"              );
 
-    TNamed* dbsName = (TNamed*)f_Double->Get("MiniAOD_name");
-    std::string datasetName = dbsName->GetTitle();
-    if (datasetName.find("Not Found") != std::string::npos && sample!="data_obs" && sample!="embedded") {
-      f_Double->Close();
-      return 2;
-    }
-    std::replace(datasetName.begin(), datasetName.end(), '/', '#');
-    reweight::LumiReWeighting* LumiWeights_12;
-    if (datasetName.find("Not Found") != std::string::npos && sample!="data_obs" && sample!="embedded") LumiWeights_12 = new reweight::LumiReWeighting("../weightROOTs/pudistributions_mc_2017.root", "../weightROOTs/pudistributions_data_2017.root",  datasetName.c_str(), "pileup");
-    std::cout << datasetName << std::endl;
-    
+    TTree* w_namu = new TTree("w_tree", "w_tree");
+    w_namu->SetDirectory(0);
+    w_namu->Branch("weightLumi",        &weightLumi,          "weightLumi/F"         );
+    w_namu->Branch("correctionMC",      &correctionMC,        "correctionMC/F"       );
+    w_namu->Branch("genweight",         &genweight,           "genweight/F"          );
+    w_namu->Branch("PUweight",          &PUweight,            "PUweight/F"           );
+    w_namu->Branch("evtwt",             &evtwt,               "evtwt/F"              );
+    /*
+    w_namu->Branch("",        &,          "/F"         );
+    w_namu->Branch("",        &,          "/F"         );
+    w_namu->Branch("",        &,          "/F"         );
+    w_namu->Branch("",        &,          "/F"         );
+    w_namu->Branch("",        &,          "/F"         );
+    */
 
-    
+    reweight::LumiReWeighting* LumiWeights_12;
+    if (sample!="data_obs" && sample!="embedded") {
+      TNamed* dbsName = (TNamed*)f_Double->Get("MiniAOD_name");
+      std::string datasetName = dbsName->GetTitle();
+      if (datasetName.find("Not Found") != std::string::npos) {
+	f_Double->Close();
+	return 2;
+      }
+      std::replace(datasetName.begin(), datasetName.end(), '/', '#');
+      LumiWeights_12 = new reweight::LumiReWeighting("../weightROOTs/pudistributions_mc_2017.root", "../weightROOTs/pudistributions_data_2017.root",  datasetName.c_str(), "pileup");
+      std::cout << datasetName << std::endl;
+    }
+
     TFile *fZ=new TFile("../weightROOTs/zpt_weights_2016_BtoH.root");
     TH2F *histZ=(TH2F*) fZ->Get("zptmass_histo");
     
-    //TFile fw("../weightROOTs/htt_scalefactors_v16_3.root");
-    //RooWorkspace *w = (RooWorkspace*)fw.Get("w");
-    //fw.Close();
-    
-    //TFile fw2("../weightROOTs/htt_scalefactors_sm_moriond_v1.root");
-    //RooWorkspace *w2 = (RooWorkspace*)fw2.Get("w");
-    //fw2.Close();
-
     TFile fem("../weightROOTs/htt_scalefactors_v17_5.root");
     RooWorkspace *wEmbed = (RooWorkspace*)fem.Get("w");
     fem.Close();
@@ -231,29 +238,30 @@ int main(int argc, char** argv) {
     // Stitching Weights for W and DY - Don't use for now //
     ////////////////////////////////////////////////////////
     if (sample.find("WJets")!= string::npos){ 
-      w_wjet=61.98299933;
-      if (tree->numGenJets==1) w_wjet=6.963370836;
-      else if (tree->numGenJets==2) w_wjet=16.37649708;
-      else if (tree->numGenJets==3) w_wjet=2.532755448;
-      else if (tree->numGenJets==4) w_wjet=2.418989568;
+      w_wjet=62.038;
+      if (tree->numGenJets==1) w_wjet=6.969;
+      else if (tree->numGenJets==2) w_wjet=16.393;
+      else if (tree->numGenJets==3) w_wjet=2.537;
+      else if (tree->numGenJets==4) w_wjet=2.425;
       weightLumi=w_wjet;
     }
     else w_wjet=1.00;
     
     if (sample.find("DY")!= string::npos) { 
-      w_DYjet=2.873324952;
-      if (tree->numGenJets==1) w_DYjet=0.502938039;
-      else if (tree->numGenJets==2) w_DYjet=1.042256272;
-      else if (tree->numGenJets==3) w_DYjet=0.656337234;
-      else if (tree->numGenJets==4) w_DYjet=0.458531131;
+      w_DYjet=2.873;
+      if (tree->numGenJets==1) w_DYjet=0.495;
+      else if (tree->numGenJets==2) w_DYjet=1.042;
+      else if (tree->numGenJets==3) w_DYjet=0.753;
+      else if (tree->numGenJets==4) w_DYjet=0.452;
       weightLumi=w_DYjet;
     }      
     else w_DYjet=1.00;
-
+    
 
     std::cout.setf(std::ios::fixed, std::ios::floatfield);
     std::cout.precision(10);
     scenario_info scenario(treePtr, shape);
+
 
     TauTriggerSFs2017* tauSFs = new TauTriggerSFs2017("${CMSSW_BASE}/src/TauTriggerSFs2017/TauTriggerSFs2017/data/tauTriggerEfficiencies2017_New.root", "${CMSSW_BASE}/src/TauTriggerSFs2017/TauTriggerSFs2017/data/tauTriggerEfficiencies2017.root", "tight", "MVA");
     TString postfix = postfixMaps(shape);
@@ -351,17 +359,17 @@ int main(int argc, char** argv) {
       if (!(tree->gen_match_1==5 && tree->gen_match_2==5) && (name=="VVT"|| name=="TTT")) continue;
       if ((tree->gen_match_1==5 && tree->gen_match_2==5) && (name=="VVJ" || name=="TTJ")) continue;
 
-      ///////////////////////
-      // Correction for MC //
-      ///////////////////////
       float correctionMC = 1.0;
+      ////////////////////////
+      // Correctoion for MC //
+      ////////////////////////
       if (sample!="data_obs" && sample!="embedded"){
-	correctionMC*=LumiWeights_12->weight(tree->npu);
+	float PUweight = LumiWeights_12->weight(tree->npu);
+	correctionMC*=PUweight;
 	correctionMC*=tree->genweight;
 	// Tau ID eff
 	if (tree->gen_match_1==5) correctionMC*=0.89;
 	if (tree->gen_match_2==5) correctionMC*=0.89;
-	//e->tau fakes VLoose ES // FIXME
 	//e->tau fakes VLoose eff
 	if (tree->gen_match_1==1 or tree->gen_match_1==3){
 	  if (std::abs(mytau1.Eta())<1.460) correctionMC*=1.09;
@@ -387,11 +395,15 @@ int main(int argc, char** argv) {
 	  else if (std::abs(mytau2.Eta())<1.7) correctionMC*=1.03;
 	  else correctionMC*=1.94;
 	}
-	
+
 	//////////////////////////////////////////////////
 	// Correction factors available in RooWorkspace //
 	//////////////////////////////////////////////////
 	// Z(pt,mass) reweighting for DY events // FIXME - RooWorkspace
+	if (name == "EWKZLL" || name == "EWKZNuNu" || name == "ZTT" || name == "ZLL" || name == "ZL" || name == "ZJ") {
+	  correctionMC *= htt_sf->function("zptmass_weight_nom")->getVal();
+	} 
+	/*
 	if (sample.find("DY")!= string::npos || sample.find("EWKZ")!= string::npos) {
 	  float zpt_corr=histZ->GetBinContent(histZ->GetXaxis()->FindBin(tree->genM),histZ->GetYaxis()->FindBin(tree->genpT));
 	  if (shape=="dyShape_Up") // up
@@ -401,6 +413,7 @@ int main(int argc, char** argv) {
 	  else 
 	    correctionMC*=zpt_corr; // nominal
 	}
+	*/
 	// Tau Trigger SFs
 	float diTauLeg1SF = tauSFs->getDiTauScaleFactor(mytau1.Pt(), mytau1.Eta(), mytau1.Phi());
 	float diTauLeg2SF = tauSFs->getDiTauScaleFactor(mytau2.Pt(), mytau2.Eta(), mytau2.Phi());
@@ -453,6 +466,8 @@ int main(int argc, char** argv) {
 	if (tree->gen_match_2==5) weightEmbded*=0.89;	  
 	
 	// set workspace variables : will be included in RooWorkspace in next iteration
+	//wEmbed->var("gt1_pt")->setVal(electron.getPt());
+
 	float SF_Tau1 = 1.00;
 	float SF_Tau2 = 1.00;
 	if (mytau1.Pt()>=30 && mytau1.Pt()<35) SF_Tau1 = 0.18321;
@@ -474,15 +489,15 @@ int main(int argc, char** argv) {
 	else if (mytau2.Pt()<150) SF_Tau2 = 0.86819;
 	else if (mytau2.Pt()<200) SF_Tau2 = 0.88206;
 
-	float WEIGHT_sel_trg_ratio= m_sel_trg_ratio(wEmbed,mytau1.Pt(),mytau1.Eta(),mytau2.Pt(),mytau2.Eta());
-	weightEmbded*=EmbedWeight * tree->genweight * WEIGHT_sel_trg_ratio;
+	
+	//float WEIGHT_sel_trg_ratio= m_sel_trg_ratio(wEmbed,mytau1.Pt(),mytau1.Eta(),mytau2.Pt(),mytau2.Eta());
+	//weightEmbded*=EmbedWeight * tree->genweight * WEIGHT_sel_trg_ratio;
       }
 
       // Construct evtwt
       float evtwt = weightLumi*correctionMC*weightEmbded;
       // Clean weight on data for just in case 
-      if (sample=="data_obs") evtwt=1.0; 
-
+      if (sample=="data_obs") evtwt=1.0;  
       // Additional selections
       bool selection =true;
 
@@ -496,7 +511,10 @@ int main(int argc, char** argv) {
 		 Phi, Phi1, costheta1, costheta2, costhetastar, Q2V1, Q2V2,
 		 signalRegion, aiRegion, evtwt
 		 );
-	
+	fillweight(w_namu,
+		   weightLumi, correctionMC, genweight, PUweight,
+		   evtwt
+		   );
       }
       
     } // end of loop over events
@@ -505,7 +523,7 @@ int main(int argc, char** argv) {
     fout->cd();
     namu->Write();
     nbevt->Write();
-
+    w_namu->Write();
     fout->Close();
     Py_Finalize();
 } 
