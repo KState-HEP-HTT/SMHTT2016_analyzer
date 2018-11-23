@@ -8,6 +8,10 @@ diboson="false"
 electroweak="false"
 all="false"
 out="false"
+ztt="false"
+embed="false"
+dyinclusive="false"
+
 while [ -n "$1" ]; do # while loop starts
     case "$1" in
 	-da)
@@ -16,7 +20,12 @@ while [ -n "$1" ]; do # while loop starts
             ;;
         -dy)
             dy="true"
+	    ztt="true"
             echo "Running over DY ... "
+            ;;
+        -ztt)
+            ztt="true"
+            echo "Running over ZTT ... "
             ;;
         -w)
             w="true"
@@ -37,6 +46,14 @@ while [ -n "$1" ]; do # while loop starts
 	-ew)
 	    electroweak="true"
 	    echo "Running over Electro Weak ... "
+	    ;;
+	-em)
+	    embed="true"
+	    echo "Running over Embedded ... "
+	    ;;
+	-dyi)
+	    dyinclusive="true"
+	    echo "Running over DY inclusive ... "
 	    ;;
 	-mc) 
 	    dy="true"
@@ -85,6 +102,7 @@ fi
 
 if [ $out = "true" ]; then
     echo ./slicer_${channel}_2017.exe ${input}/data_B.root output_Slicer/${channel}/data/data_B.root data_obs data_obs nominal
+    echo ./slicer_${channel}_2017.exe ${input}/DY0_1.root output_Slicer/${channel}/ZTT/ZTT0_1.root DY0 ZTT nominal 
 fi
 
 if [ $data = "true" ]; then
@@ -97,7 +115,7 @@ if [ $data = "true" ]; then
     hadd -f output_Slicer/tt/data_obs.root output_Slicer/tt/data/*.root
 fi
 
-if [ $dy = "true" ]; then
+if [ $ztt = "true" ]; then
     # DY1_1, DY1_3, DY3_1, DY4_1 are unsafe
     rm output_Slicer/${channel}/ZTT/*.root
     rm output_Slicer/${channel}/ZJ/*.root
@@ -108,32 +126,49 @@ if [ $dy = "true" ]; then
     ./slicer_${channel}_2017.exe ${input}/DY1_2.root output_Slicer/${channel}/ZTT/ZTT1_2.root DY1 ZTT nominal
     ./slicer_${channel}_2017.exe ${input}/DY1_4.root output_Slicer/${channel}/ZTT/ZTT1_4.root DY1 ZTT nominal
     ./slicer_${channel}_2017.exe ${input}/DY2_1.root output_Slicer/${channel}/ZTT/ZTT2_1.root DY2 ZTT nominal
-    ./slicer_${channel}_2017.exe ${input}/DY2_2.root output_Slicer/${channel}/ZTT/ZTT2_2.root DY2 ZTT nominal
+    #./slicer_${channel}_2017.exe ${input}/DY2_2.root output_Slicer/${channel}/ZTT/ZTT2_2.root DY2 ZTT nominal
     ./slicer_${channel}_2017.exe ${input}/DY3_2.root output_Slicer/${channel}/ZTT/ZTT3_2.root DY3 ZTT nominal
     ./slicer_${channel}_2017.exe ${input}/DY4_2.root output_Slicer/${channel}/ZTT/ZTT4_2.root DY4 ZTT nominal
     hadd -f output_Slicer/${channel}/ZTT.root output_Slicer/${channel}/ZTT/ZTT*.root
-    
-    ./slicer_${channel}_2017.exe ${input}/DY0_1.root output_Slicer/${channel}/ZJ/ZJ0_1.root DY0 ZJ nominal 
-    ./slicer_${channel}_2017.exe ${input}/DY0_2.root output_Slicer/${channel}/ZJ/ZJ0_2.root DY0 ZJ nominal
-    ./slicer_${channel}_2017.exe ${input}/DY1_2.root output_Slicer/${channel}/ZJ/ZJ1_2.root DY1 ZJ nominal
-    ./slicer_${channel}_2017.exe ${input}/DY1_4.root output_Slicer/${channel}/ZJ/ZJ1_4.root DY1 ZJ nominal
-    ./slicer_${channel}_2017.exe ${input}/DY2_1.root output_Slicer/${channel}/ZJ/ZJ2_1.root DY2 ZJ nominal
-    ./slicer_${channel}_2017.exe ${input}/DY2_2.root output_Slicer/${channel}/ZJ/ZJ2_2.root DY2 ZJ nominal
-    ./slicer_${channel}_2017.exe ${input}/DY3_2.root output_Slicer/${channel}/ZJ/ZJ3_2.root DY3 ZJ nominal
-    ./slicer_${channel}_2017.exe ${input}/DY4_2.root output_Slicer/${channel}/ZJ/ZJ4_2.root DY4 ZJ nominal
-    hadd -f output_Slicer/${channel}/ZJ.root output_Slicer/${channel}/ZJ/ZJ*.root
-
-    ./slicer_${channel}_2017.exe ${input}/DY0_1.root output_Slicer/${channel}/ZL/ZL0_1.root DY0 ZL nominal 
-    ./slicer_${channel}_2017.exe ${input}/DY0_2.root output_Slicer/${channel}/ZL/ZL0_2.root DY0 ZL nominal
-    ./slicer_${channel}_2017.exe ${input}/DY1_2.root output_Slicer/${channel}/ZL/ZL1_2.root DY1 ZL nominal
-    ./slicer_${channel}_2017.exe ${input}/DY1_4.root output_Slicer/${channel}/ZL/ZL1_4.root DY1 ZL nominal
-    ./slicer_${channel}_2017.exe ${input}/DY2_1.root output_Slicer/${channel}/ZL/ZL2_1.root DY2 ZL nominal
-    ./slicer_${channel}_2017.exe ${input}/DY2_2.root output_Slicer/${channel}/ZL/ZL2_2.root DY2 ZL nominal
-    ./slicer_${channel}_2017.exe ${input}/DY3_2.root output_Slicer/${channel}/ZL/ZL3_2.root DY3 ZL nominal
-    ./slicer_${channel}_2017.exe ${input}/DY4_2.root output_Slicer/${channel}/ZL/ZL4_2.root DY4 ZL nominal
-    hadd -f output_Slicer/${channel}/ZL.root output_Slicer/${channel}/ZL/ZL*.root
+    if [ $dy = "true" ]; then    
+	./slicer_${channel}_2017.exe ${input}/DY0_1.root output_Slicer/${channel}/ZJ/ZJ0_1.root DY0 ZJ nominal 
+	./slicer_${channel}_2017.exe ${input}/DY0_2.root output_Slicer/${channel}/ZJ/ZJ0_2.root DY0 ZJ nominal
+	./slicer_${channel}_2017.exe ${input}/DY1_2.root output_Slicer/${channel}/ZJ/ZJ1_2.root DY1 ZJ nominal
+	./slicer_${channel}_2017.exe ${input}/DY1_4.root output_Slicer/${channel}/ZJ/ZJ1_4.root DY1 ZJ nominal
+	./slicer_${channel}_2017.exe ${input}/DY2_1.root output_Slicer/${channel}/ZJ/ZJ2_1.root DY2 ZJ nominal
+	#./slicer_${channel}_2017.exe ${input}/DY2_2.root output_Slicer/${channel}/ZJ/ZJ2_2.root DY2 ZJ nominal
+	./slicer_${channel}_2017.exe ${input}/DY3_2.root output_Slicer/${channel}/ZJ/ZJ3_2.root DY3 ZJ nominal
+	./slicer_${channel}_2017.exe ${input}/DY4_2.root output_Slicer/${channel}/ZJ/ZJ4_2.root DY4 ZJ nominal
+	hadd -f output_Slicer/${channel}/ZJ.root output_Slicer/${channel}/ZJ/ZJ*.root
+	
+	./slicer_${channel}_2017.exe ${input}/DY0_1.root output_Slicer/${channel}/ZL/ZL0_1.root DY0 ZL nominal 
+	./slicer_${channel}_2017.exe ${input}/DY0_2.root output_Slicer/${channel}/ZL/ZL0_2.root DY0 ZL nominal
+	./slicer_${channel}_2017.exe ${input}/DY1_2.root output_Slicer/${channel}/ZL/ZL1_2.root DY1 ZL nominal
+	./slicer_${channel}_2017.exe ${input}/DY1_4.root output_Slicer/${channel}/ZL/ZL1_4.root DY1 ZL nominal
+	./slicer_${channel}_2017.exe ${input}/DY2_1.root output_Slicer/${channel}/ZL/ZL2_1.root DY2 ZL nominal
+	#./slicer_${channel}_2017.exe ${input}/DY2_2.root output_Slicer/${channel}/ZL/ZL2_2.root DY2 ZL nominal
+	./slicer_${channel}_2017.exe ${input}/DY3_2.root output_Slicer/${channel}/ZL/ZL3_2.root DY3 ZL nominal
+	./slicer_${channel}_2017.exe ${input}/DY4_2.root output_Slicer/${channel}/ZL/ZL4_2.root DY4 ZL nominal
+	hadd -f output_Slicer/${channel}/ZL.root output_Slicer/${channel}/ZL/ZL*.root
+    fi
 fi
 
+
+if [ $dyinclusive = "true" ]; then    
+    rm output_Slicer/${channel}/ZTT/*.root
+    rm output_Slicer/${channel}/ZJ/*.root
+    rm output_Slicer/${channel}/ZL/*.root
+    ./slicer_${channel}_2017.exe ${input}/DY0_1.root output_Slicer/${channel}/ZTT/ZTT1.root DY0 ZTT nominal
+    ./slicer_${channel}_2017.exe ${input}/DY0_1.root output_Slicer/${channel}/ZJ/ZJ1.root DY0 ZJ nominal
+    ./slicer_${channel}_2017.exe ${input}/DY0_1.root output_Slicer/${channel}/ZL/ZL1.root DY0 ZL nominal
+    ./slicer_${channel}_2017.exe ${input}/DY0_2.root output_Slicer/${channel}/ZTT/ZTT2.root DY0 ZTT nominal
+    ./slicer_${channel}_2017.exe ${input}/DY0_2.root output_Slicer/${channel}/ZJ/ZJ2.root DY0 ZJ nominal
+    ./slicer_${channel}_2017.exe ${input}/DY0_2.root output_Slicer/${channel}/ZL/ZL2.root DY0 ZL nominal
+    hadd -f output_Slicer/${channel}/ZTT.root output_Slicer/${channel}/ZTT/ZTT*.root
+    hadd -f output_Slicer/${channel}/ZJ.root output_Slicer/${channel}/ZJ/ZJ*.root
+    hadd -f output_Slicer/${channel}/ZL.root output_Slicer/${channel}/ZL/ZL*.root
+fi
+	
 
 if [ $electroweak = "true" ]; then
     rm output_Slicer/${channel}/EWKZ/*.root
@@ -221,11 +256,16 @@ if [ $signal = "true" ]; then
     ./slicer_${channel}_2017.exe ${input}/ZHTauTau125.root output_Slicer/${channel}/ZH125.root ZH125 ZH125 nominal
 fi
 
-echo ls -lrt output_Slicer/${channel}
 
-# embedded
-#./slicer_${channel}_2017.exe ${input}/embed_B.root output_Slicer/${channel}/embed_B.root embedded embedded nominal
-#./slicer_${channel}_2017.exe ${input}/embed_C.root output_Slicer/${channel}/embed_C.root embedded embedded nominal
-#./slicer_${channel}_2017.exe ${input}/embed_D.root output_Slicer/${channel}/embed_D.root embedded embedded nominal
-#./slicer_${channel}_2017.exe ${input}/embed_E.root output_Slicer/${channel}/embed_E.root embedded embedded nominal
-#./slicer_${channel}_2017.exe ${input}/embed_F.root output_Slicer/${channel}/embed_F.root embedded embedded nominal
+if [ $embed = "true" ]; then
+    rm output_Slicer/${channel}/embed/*.root
+    rm output_Slicer/${channel}/embed.root
+    ./slicer_${channel}_2017.exe ${input}/embed_B.root output_Slicer/${channel}/embed/embed_B.root embedded embedded nominal
+    ./slicer_${channel}_2017.exe ${input}/embed_C.root output_Slicer/${channel}/embed/embed_C.root embedded embedded nominal
+    ./slicer_${channel}_2017.exe ${input}/embed_D.root output_Slicer/${channel}/embed/embed_D.root embedded embedded nominal
+    ./slicer_${channel}_2017.exe ${input}/embed_E.root output_Slicer/${channel}/embed/embed_E.root embedded embedded nominal
+    ./slicer_${channel}_2017.exe ${input}/embed_F.root output_Slicer/${channel}/embed/embed_F.root embedded embedded nominal
+    hadd -f output_Slicer/${channel}/embed.root output_Slicer/${channel}/embed/*.root
+fi
+
+echo ls -lrt output_Slicer/${channel}
