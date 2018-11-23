@@ -57,7 +57,7 @@ int main(int argc, char** argv) {
     float ngen = nbevt->GetBinContent(2);
     SkimmedTree_tt* tree = new SkimmedTree_tt (treePtr);
     std::cout.precision(11);
-
+    TH1F *h_cutflow = new TH1F("","",15,0,15);
     TTree* namu = new TTree("tautau_tree", "tautau_tree");
     namu->SetDirectory(0);
 
@@ -321,12 +321,18 @@ int main(int argc, char** argv) {
       // Selections //
       ////////////////
       // Regions
-      float signalRegion = tree->byTightIsolationMVArun2v1DBoldDMwLT_1 && tree->byTightIsolationMVArun2v1DBoldDMwLT_2;
-      float aiRegion = ((tree->byMediumIsolationMVArun2v1DBoldDMwLT_1 && !tree->byTightIsolationMVArun2v1DBoldDMwLT_2 && tree->byLooseIsolationMVArun2v1DBoldDMwLT_2) || (tree->byMediumIsolationMVArun2v1DBoldDMwLT_2 && !tree->byTightIsolationMVArun2v1DBoldDMwLT_1 && tree->byLooseIsolationMVArun2v1DBoldDMwLT_1));
-      if (!tree->byVLooseIsolationMVArun2v1DBoldDMwLT_1 || !tree->byVLooseIsolationMVArun2v1DBoldDMwLT_2) continue; 
+      //float signalRegion = tree->byTightIsolationMVArun2v1DBoldDMwLT_1 && tree->byTightIsolationMVArun2v1DBoldDMwLT_2;
+      //float aiRegion = ((tree->byMediumIsolationMVArun2v1DBoldDMwLT_1 && !tree->byTightIsolationMVArun2v1DBoldDMwLT_2 && tree->byLooseIsolationMVArun2v1DBoldDMwLT_2) || (tree->byMediumIsolationMVArun2v1DBoldDMwLT_2 && !tree->byTightIsolationMVArun2v1DBoldDMwLT_1 && tree->byLooseIsolationMVArun2v1DBoldDMwLT_1));
+      //if (!tree->byVLooseIsolationMVArun2v1DBoldDMwLT_1 || !tree->byVLooseIsolationMVArun2v1DBoldDMwLT_2) continue;
+      h_cutflow->Fill(0.0,1.0); 
+      float aiRegion = ((tree->t1RerunMVArun2v2DBoldDMwLTMedium && !tree->t2RerunMVArun2v2DBoldDMwLTTight && tree->t2RerunMVArun2v2DBoldDMwLTLoose) || (tree->t2RerunMVArun2v2DBoldDMwLTMedium && !tree->t1RerunMVArun2v2DBoldDMwLTTight && tree->t1RerunMVArun2v2DBoldDMwLTLoose));
+      float signalRegion = tree->t1RerunMVArun2v2DBoldDMwLTTight && tree->t2RerunMVArun2v2DBoldDMwLTTight;
+      if (!tree->t1RerunMVArun2v2DBoldDMwLTVLoose && tree->t2RerunMVArun2v2DBoldDMwLTVLoose) continue;
+      h_cutflow->Fill(1.0,1.0);
       // Taus quality
       if (fabs(tree->eta_1)>2.1 || fabs(tree->eta_2)>2.1) continue;
       if (tree->pt_1<40 || tree->pt_2<40) continue;
+      h_cutflow->Fill(2.0,1.0);
       // DoubleTau trigger
       bool tight35 = tree->DoubleTightTau35Pass && tree->t1MatchesDoubleTightTau35Path && tree->t2MatchesDoubleTightTau35Path && tree->t1MatchesDoubleTightTau35Filter && tree->t2MatchesDoubleTightTau35Filter;
       bool medium40 = tree->DoubleMediumTau40Pass && tree->t1MatchesDoubleMediumTau40Path && tree->t2MatchesDoubleMediumTau40Path && tree->t1MatchesDoubleMediumTau40Filter && tree->t2MatchesDoubleMediumTau40Filter;
@@ -336,15 +342,19 @@ int main(int argc, char** argv) {
       if (tree->pt_1>45 && tree->pt_2>45 && tight40) passTrigAndPt = true;
       if (tree->pt_1>40 && tree->pt_2>40 && tight35) passTrigAndPt=true;
       if (!passTrigAndPt) continue;
+      h_cutflow->Fill(3.0,1.0);
       if (TMath::IsNaN(tree->Q2V2)) continue;      
+      h_cutflow->Fill(4.0,1.0);
       if (mytau1.DeltaR(mytau2) < 0.5) continue;
+      h_cutflow->Fill(5.0,1.0);
       if (tree->againstElectronVLooseMVA6_1 < 0.5) continue; // L773
       if (tree->againstElectronVLooseMVA6_2 < 0.5) continue;
       if (tree->againstMuonLoose3_1 < 0.5) continue; //774
       if (tree->againstMuonLoose3_2 < 0.5) continue;
+      h_cutflow->Fill(6.0,1.0);
       if (tree->extramuon_veto) continue;
       if (tree->extraelec_veto) continue;
-
+      h_cutflow->Fill(7.0,1.0);
       // D.Kim : Separation between L, T and J (for DY, TT, and VV)
       // https://github.com/truggles/Z_to_TauTau_13TeV/blob/SM-HTT-2016/analysis1BaselineCuts.py#L444-L457
       bool isZTT=false;
@@ -358,7 +368,7 @@ int main(int argc, char** argv) {
       if ((name=="ZJ") && !isZJ) continue;
       if (!(tree->gen_match_1==5 && tree->gen_match_2==5) && (name=="VVT"|| name=="TTT")) continue;
       if ((tree->gen_match_1==5 && tree->gen_match_2==5) && (name=="VVJ" || name=="TTJ")) continue;
-
+      h_cutflow->Fill(8.0,1.0);
       float correctionMC = 1.0;
       ////////////////////////
       // Correctoion for MC //
@@ -461,6 +471,7 @@ int main(int argc, char** argv) {
       float weightEmbded=1.0;
       if (sample=="embedded") {
 	if( tree->genweight > 1) continue;
+	h_cutflow->Fill(9.0,1.0);
 	// Tau ID eff
 	if (tree->gen_match_1==5) weightEmbded*=0.89;
 	if (tree->gen_match_2==5) weightEmbded*=0.89;	  
@@ -521,6 +532,8 @@ int main(int argc, char** argv) {
     
     TFile *fout = TFile::Open(output.c_str(), "RECREATE");
     fout->cd();
+    h_cutflow->SetName("CutFlow");
+    h_cutflow->Write();
     namu->Write();
     nbevt->Write();
     w_namu->Write();
