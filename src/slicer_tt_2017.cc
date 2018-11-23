@@ -190,10 +190,11 @@ int main(int argc, char** argv) {
     w_namu->Branch("genweight",         &genweight,           "genweight/F"          );
     w_namu->Branch("PUweight",          &PUweight,            "PUweight/F"           );
     w_namu->Branch("evtwt",             &evtwt,               "evtwt/F"              );
+    w_namu->Branch("zptmassweight",     &zptmassweight,       "zptmassweight/F"      );
+    w_namu->Branch("diTauLeg1SF",       &diTauLeg1SF,         "diTauLeg1SF/F"        );
+    w_namu->Branch("diTauLeg2SF",       &diTauLeg2SF,         "diTauLeg2SF/F"        );
+    w_namu->Branch("weightEmbded",      &weightEmbded,        "weightEmbded/F"       );
     /*
-    w_namu->Branch("",        &,          "/F"         );
-    w_namu->Branch("",        &,          "/F"         );
-    w_namu->Branch("",        &,          "/F"         );
     w_namu->Branch("",        &,          "/F"         );
     w_namu->Branch("",        &,          "/F"         );
     */
@@ -237,23 +238,23 @@ int main(int argc, char** argv) {
     ////////////////////////////////////////////////////////
     // Stitching Weights for W and DY - Don't use for now //
     ////////////////////////////////////////////////////////
-    if (sample.find("WJets")!= string::npos){ 
+    if (sample.find("WJets") !=string::npos){ 
       w_wjet=62.038;
       if (tree->numGenJets==1) w_wjet=6.969;
       else if (tree->numGenJets==2) w_wjet=16.393;
       else if (tree->numGenJets==3) w_wjet=2.537;
       else if (tree->numGenJets==4) w_wjet=2.425;
-      weightLumi=w_wjet;
+      //weightLumi=w_wjet;
     }
     else w_wjet=1.00;
     
-    if (sample.find("DY")!= string::npos) { 
+    if (sample.find("DY") != string::npos) { 
       w_DYjet=2.873;
       if (tree->numGenJets==1) w_DYjet=0.495;
       else if (tree->numGenJets==2) w_DYjet=1.042;
       else if (tree->numGenJets==3) w_DYjet=0.753;
       else if (tree->numGenJets==4) w_DYjet=0.452;
-      weightLumi=w_DYjet;
+      //weightLumi=w_DYjet;
     }      
     else w_DYjet=1.00;
     
@@ -261,7 +262,6 @@ int main(int argc, char** argv) {
     std::cout.setf(std::ios::fixed, std::ios::floatfield);
     std::cout.precision(10);
     scenario_info scenario(treePtr, shape);
-
 
     TauTriggerSFs2017* tauSFs = new TauTriggerSFs2017("${CMSSW_BASE}/src/TauTriggerSFs2017/TauTriggerSFs2017/data/tauTriggerEfficiencies2017_New.root", "${CMSSW_BASE}/src/TauTriggerSFs2017/TauTriggerSFs2017/data/tauTriggerEfficiencies2017.root", "tight", "MVA");
     TString postfix = postfixMaps(shape);
@@ -321,9 +321,6 @@ int main(int argc, char** argv) {
       // Selections //
       ////////////////
       // Regions
-      //float signalRegion = tree->byTightIsolationMVArun2v1DBoldDMwLT_1 && tree->byTightIsolationMVArun2v1DBoldDMwLT_2;
-      //float aiRegion = ((tree->byMediumIsolationMVArun2v1DBoldDMwLT_1 && !tree->byTightIsolationMVArun2v1DBoldDMwLT_2 && tree->byLooseIsolationMVArun2v1DBoldDMwLT_2) || (tree->byMediumIsolationMVArun2v1DBoldDMwLT_2 && !tree->byTightIsolationMVArun2v1DBoldDMwLT_1 && tree->byLooseIsolationMVArun2v1DBoldDMwLT_1));
-      //if (!tree->byVLooseIsolationMVArun2v1DBoldDMwLT_1 || !tree->byVLooseIsolationMVArun2v1DBoldDMwLT_2) continue;
       h_cutflow->Fill(0.0,1.0); 
       float aiRegion = ((tree->t1RerunMVArun2v2DBoldDMwLTMedium && !tree->t2RerunMVArun2v2DBoldDMwLTTight && tree->t2RerunMVArun2v2DBoldDMwLTLoose) || (tree->t2RerunMVArun2v2DBoldDMwLTMedium && !tree->t1RerunMVArun2v2DBoldDMwLTTight && tree->t1RerunMVArun2v2DBoldDMwLTLoose));
       float signalRegion = tree->t1RerunMVArun2v2DBoldDMwLTTight && tree->t2RerunMVArun2v2DBoldDMwLTTight;
@@ -351,9 +348,21 @@ int main(int argc, char** argv) {
       if (tree->againstElectronVLooseMVA6_2 < 0.5) continue;
       if (tree->againstMuonLoose3_1 < 0.5) continue; //774
       if (tree->againstMuonLoose3_2 < 0.5) continue;
-      h_cutflow->Fill(6.0,1.0);
       if (tree->extramuon_veto) continue;
       if (tree->extraelec_veto) continue;
+      h_cutflow->Fill(6.0,1.0);
+      // MET and muon filters 
+      /*
+      if (tree->Flag_goodVertices!=0) continue;
+      if (tree->Flag_globalSuperTightHalo2016Filter!=0) continue;
+      if (tree->Flag_HBHENoiseFilter!=0) continue;
+      if (tree->Flag_HBHENoiseIsoFilter!=0) continue;
+      if (tree->Flag_EcalDeadCellTriggerPrimitiveFilter!=0) continue;
+      if (tree->Flag_BadPFMuonFilter!=0) continue;
+      if (tree->Flag_BadChargedCandidateFilter!=0) continue;
+      if (tree->Flag_ecalBadCalibFilter!=0) continue;
+      if (tree->Flag_eeBadScFilter!=0 && sample=="data_obs") continue;
+      */
       h_cutflow->Fill(7.0,1.0);
       // D.Kim : Separation between L, T and J (for DY, TT, and VV)
       // https://github.com/truggles/Z_to_TauTau_13TeV/blob/SM-HTT-2016/analysis1BaselineCuts.py#L444-L457
@@ -370,11 +379,12 @@ int main(int argc, char** argv) {
       if ((tree->gen_match_1==5 && tree->gen_match_2==5) && (name=="VVJ" || name=="TTJ")) continue;
       h_cutflow->Fill(8.0,1.0);
       float correctionMC = 1.0;
+      float PUweight, diTauLeg1SF, diTauLeg2SF;
       ////////////////////////
       // Correctoion for MC //
       ////////////////////////
       if (sample!="data_obs" && sample!="embedded"){
-	float PUweight = LumiWeights_12->weight(tree->npu);
+	PUweight = LumiWeights_12->weight(tree->npu);
 	correctionMC*=PUweight;
 	correctionMC*=tree->genweight;
 	// Tau ID eff
@@ -409,8 +419,10 @@ int main(int argc, char** argv) {
 	//////////////////////////////////////////////////
 	// Correction factors available in RooWorkspace //
 	//////////////////////////////////////////////////
-	// Z(pt,mass) reweighting for DY events // FIXME - RooWorkspace
-	if (name == "EWKZLL" || name == "EWKZNuNu" || name == "ZTT" || name == "ZLL" || name == "ZL" || name == "ZJ") {
+	// Z(pt,mass) reweighting for DY events 
+	if (sample.find("DY")!= string::npos || sample.find("EWKZ")!= string::npos) {
+	  htt_sf->var("z_gen_mass")->setVal(tree->genM);
+	  htt_sf->var("z_gen_pt")->setVal(tree->genpT);
 	  correctionMC *= htt_sf->function("zptmass_weight_nom")->getVal();
 	} 
 	/*
@@ -425,11 +437,9 @@ int main(int argc, char** argv) {
 	}
 	*/
 	// Tau Trigger SFs
-	float diTauLeg1SF = tauSFs->getDiTauScaleFactor(mytau1.Pt(), mytau1.Eta(), mytau1.Phi());
-	float diTauLeg2SF = tauSFs->getDiTauScaleFactor(mytau2.Pt(), mytau2.Eta(), mytau2.Phi());
-	float w_tauTrgSF = diTauLeg1SF*diTauLeg2SF;
-	correctionMC*=w_tauTrgSF;
-	
+	diTauLeg1SF = tauSFs->getDiTauScaleFactor(mytau1.Pt(), mytau1.Eta(), mytau1.Phi());
+	diTauLeg2SF = tauSFs->getDiTauScaleFactor(mytau2.Pt(), mytau2.Eta(), mytau2.Phi());
+	correctionMC*=diTauLeg1SF*diTauLeg2SF;
 	
 	//  Top pT reweighting for ttbar events
 	float pttop1=tree->pt_top1;
@@ -477,8 +487,17 @@ int main(int argc, char** argv) {
 	if (tree->gen_match_2==5) weightEmbded*=0.89;	  
 	
 	// set workspace variables : will be included in RooWorkspace in next iteration
-	//wEmbed->var("gt1_pt")->setVal(electron.getPt());
-
+	wEmbed->var("gt1_pt")->setVal(mytau1.Pt()); //FIXME to gen tau pt
+	wEmbed->var("gt1_eta")->setVal(mytau1.Eta()); //FIXME to gen tau eta
+	wEmbed->var("gt2_pt")->setVal(mytau2.Pt()); //FIXME to gen tau pt
+	wEmbed->var("gt2_eta")->setVal(mytau2.Eta()); //FIXME to gen tau eta
+	weightEmbded*=wEmbed->function("m_sel_trg_ratio")->getVal();
+	wEmbed->var("gt_pt")->setVal(mytau1.Pt()); //FIXME to gen tau pt
+	wEmbed->var("gt_eta")->setVal(mytau1.Eta()); //FIXME to gen tau eta
+	weightEmbded*=wEmbed->function("m_sel_idEmb_ratio")->getVal();
+	wEmbed->var("gt_pt")->setVal(mytau2.Pt()); //FIXME to gen tau pt
+	wEmbed->var("gt_eta")->setVal(mytau2.Eta()); //FIXME to gen tau eta
+	weightEmbded*=wEmbed->function("m_sel_idEmb_ratio")->getVal();
 	float SF_Tau1 = 1.00;
 	float SF_Tau2 = 1.00;
 	if (mytau1.Pt()>=30 && mytau1.Pt()<35) SF_Tau1 = 0.18321;
@@ -502,7 +521,7 @@ int main(int argc, char** argv) {
 
 	
 	//float WEIGHT_sel_trg_ratio= m_sel_trg_ratio(wEmbed,mytau1.Pt(),mytau1.Eta(),mytau2.Pt(),mytau2.Eta());
-	//weightEmbded*=EmbedWeight * tree->genweight * WEIGHT_sel_trg_ratio;
+	weightEmbded *= tree->genweight * SF_Tau1 * SF_Tau1;
       }
 
       // Construct evtwt
@@ -524,7 +543,9 @@ int main(int argc, char** argv) {
 		 );
 	fillweight(w_namu,
 		   weightLumi, correctionMC, genweight, PUweight,
-		   evtwt
+		   htt_sf->function("zptmass_weight_nom")->getVal(),
+		   diTauLeg1SF, diTauLeg2SF,
+		   weightEmbded,evtwt
 		   );
       }
       
