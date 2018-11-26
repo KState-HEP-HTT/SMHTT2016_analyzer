@@ -244,7 +244,7 @@ int main(int argc, char** argv) {
 	else if (is_VBF) h_aios_vbf->Fill(var,evtwt);
       }
 
-      if (aiRegion && t1_charge*t2_charge<0) {
+      if (aiRegion && t1_charge*t2_charge>0) {
 	h_aiss_inclusive->Fill(var,evtwt);
 	if (is_0jet) h_aiss_0jet->Fill(var,evtwt);
 	else if (is_boosted) h_aiss_boosted->Fill(var,evtwt);
