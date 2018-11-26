@@ -89,9 +89,15 @@ To run the code and make the distribution plots,
 
 ```
 cd ../test
-source quickPlot.sh <input folder> <numbin> <min> <max> <obs> <ch> 
-source quickPlot.sh FREEZE_TREES/tt_qcdCRstudy 20 0 1 MELA tt
+source quickPlot.sh <options> -- <binnum> <min> <max> <obs>
+source quickPlot.sh -ch tt -sel 2016 -fsa 2017 -i output_Slicer/tt -- 14 -2.1 2.1 t1_eta 
 ```
+
+-fsa : 2016 or 2017 (Ntuples).
+
+-sel : if it is 2016, 2016 category definition will be used.
+
+-ch : channel. tt and mt is available.
 
 This will give you the plots with embedded sample + three lines that enable you to make the same plots usint MC ZTT.
 
