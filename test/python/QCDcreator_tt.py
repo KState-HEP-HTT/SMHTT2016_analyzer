@@ -21,9 +21,9 @@ if __name__ == "__main__":
     (options, args) = parser.parse_args()
 
     regions = ["AIOS","AISS","ttSS"]
-    cates = ["0jet","boosted","vbf"]
+    cates = ["0jet","boosted","vbf","inclusive"]
     files = []
-    histos = [[],[],[]] # [[hAIOS_0jet,hAISS_0jet,hSS_0jet],[same for boosted],[same for vbf]]
+    histos = [[],[],[],[]] # [[hAIOS_0jet,hAISS_0jet,hSS_0jet],[same for boosted],[same for vbf]]
     samples = ["data_obs","embedded", "ZJ", "ZL", "TTJ", "VVJ", "W", "EWKZ"]
     if options.is_zttMC:
         del files[:]
@@ -39,7 +39,7 @@ if __name__ == "__main__":
 
     # Get all histograms
     for region in regions:
-        print ""
+        print "\n----- [ "+region+" ] -----"
         for cate in cates:
             for sample in samples:
                 # subtract all bkgs from data
@@ -71,6 +71,8 @@ if __name__ == "__main__":
     #  QCD = AIOS * (SS_signallike/AISS)  #
     #                                     #
     #######################################
+    print "\n\nComputing QCD ... "
+
     for k in range(0,len(cates)):  # loop over categories
         fout.cd()
         dir = fout.mkdir("tt_"+cates[k])
@@ -91,7 +93,7 @@ if __name__ == "__main__":
         hQCD.Multiply(histos[k][regions.index("AIOS")],hSF,1,1,"B")
         hQCD = histos[k][regions.index("AIOS")]
         hQCD.Multiply(histos[k][regions.index("AIOS")],hSF,1,1,"B")
-
+        print "Integral "+cates[k]+" : "+str(hQCD.Integral(-1,10000))
         hQCD.SetName("QCD")
         hQCD.Write()
 
