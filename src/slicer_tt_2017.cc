@@ -244,7 +244,7 @@ int main(int argc, char** argv) {
       else if (tree->numGenJets==2) w_wjet=16.393;
       else if (tree->numGenJets==3) w_wjet=2.537;
       else if (tree->numGenJets==4) w_wjet=2.425;
-      //weightLumi=w_wjet;
+      weightLumi=w_wjet;
     }
     else w_wjet=1.00;
     
@@ -254,7 +254,7 @@ int main(int argc, char** argv) {
       else if (tree->numGenJets==2) w_DYjet=1.042;
       else if (tree->numGenJets==3) w_DYjet=0.753;
       else if (tree->numGenJets==4) w_DYjet=0.452;
-      //weightLumi=w_DYjet;
+      weightLumi=w_DYjet;
     }      
     else w_DYjet=1.00;
     
@@ -316,6 +316,19 @@ int main(int argc, char** argv) {
 	mytau2.SetPtEtaPhiM(tree->pt_1,tree->eta_1,tree->phi_1,tree->m_1);
 	mytau1.SetPtEtaPhiM(tree->pt_2,tree->eta_2,tree->phi_2,tree->m_2);
       }
+      ////////////////////////////
+      // Construct Jets and MET //
+      ////////////////////////////
+      // njets count only jets with pT > 30
+      if (jpt_1<30) {jpt_1=-9999.0; tree->jeta_1=-9999.0; tree->jphi_1=-9999.0;}
+      if (jpt_2<30) {jpt_2=-9999.0; tree->jeta_2=-9999.0; tree->jphi_2=-9999.0;}
+      TLorentzVector myjet1, myjet2, myrawmet;
+      myjet1.SetPtEtaPhiM(jpt_1,tree->jeta_1,tree->jphi_1,0);
+      myjet2.SetPtEtaPhiM(jpt_2,tree->jeta_2,tree->jphi_2,0);
+      myrawmet.SetPtEtaPhiM(met,0,metphi,0);
+      TLorentzVector jets=myjet2+myjet1;
+      TLorentzVector mymet=myrawmet; // for ES
+      TLorentzVector Higgs = mytau1+mytau2+mymet;	
 
       ////////////////
       // Selections //
@@ -390,6 +403,18 @@ int main(int argc, char** argv) {
 	// Tau ID eff
 	if (tree->gen_match_1==5) correctionMC*=0.89;
 	if (tree->gen_match_2==5) correctionMC*=0.89;
+	// Tau ES
+	if (tree->gen_match_1==5) {
+	  if (tree->t1_decayMode==0) {mytau1*=1.007; mymet=mymet-(0.007/1.007)*mytau1;}
+	  if (tree->t1_decayMode==1) {mytau1*=0.998; mymet=mymet+(0.012/0.998)*mytau1;}
+	  if (tree->t1_decayMode==10) {mytau1*=1.007; mymet=mymet+(0.001/1.001)*mytau1;}
+	}
+	if (tree->gen_match_2==5) {
+	  if (tree->t2_decayMode==0) {mytau2*=1.007; mymet=mymet-(0.007/1.007)*mytau2;}
+	  if (tree->t2_decayMode==1) {mytau2*=0.998; mymet=mymet+(0.012/0.998)*mytau2;}
+	  if (tree->t2_decayMode==10) {mytau2*=1.007; mymet=mymet+(0.001/1.001)*mytau2;}
+	}
+
 	//e->tau fakes VLoose eff
 	if (tree->gen_match_1==1 or tree->gen_match_1==3){
 	  if (std::abs(mytau1.Eta())<1.460) correctionMC*=1.09;
@@ -399,6 +424,16 @@ int main(int argc, char** argv) {
 	  if (std::abs(mytau2.Eta())<1.460) correctionMC*=1.09;
 	  else if (std::abs(mytau2.Eta())>1.558) correctionMC*=1.19;
 	}
+	// e->tauh ES (gen_match_2=1 or 3): +0.3% for DM=0, +3.6% for DM=1
+	if (tree->gen_match_1==1 || tree->gen_match_1==3) {
+	  if (tree->t1_decayMode==0) {mytau1*=1.003; mymet=mymet-(0.003/1.003)*mytau1;}
+	  if (tree->t1_decayMode==1) {mytau1*=1.036; mymet=mymet-(0.036/1.036)*mytau1;}
+	}
+	if (tree->gen_match_2==1 || tree->gen_match_2==3) {
+	  if (tree->t2_decayMode==0) {mytau2*=1.003; mymet=mymet-(0.003/1.003)*mytau2;}
+	  if (tree->t2_decayMode==1) {mytau2*=1.036; mymet=mymet-(0.036/1.036)*mytau2;}
+	}
+
 	// mu->tau fakes Loose ES : (gen_match_2=2 or 4): no correction, only uncertainty
 	// mu->tau fakes Loose eff
 	else if (tree->gen_match_1==2 or tree->gen_match_1==4){
@@ -453,19 +488,7 @@ int main(int argc, char** argv) {
 	
       }
       
-      ////////////////////////////
-      // Construct Jets and MET //
-      ////////////////////////////
-      // njets count only jets with pT > 30
-      if (jpt_1<30) {jpt_1=-9999.0; tree->jeta_1=-9999.0; tree->jphi_1=-9999.0;}
-      if (jpt_2<30) {jpt_2=-9999.0; tree->jeta_2=-9999.0; tree->jphi_2=-9999.0;}
-      TLorentzVector myjet1, myjet2, myrawmet;
-      myjet1.SetPtEtaPhiM(jpt_1,tree->jeta_1,tree->jphi_1,0);
-      myjet2.SetPtEtaPhiM(jpt_2,tree->jeta_2,tree->jphi_2,0);
-      myrawmet.SetPtEtaPhiM(met,0,metphi,0);
-      TLorentzVector jets=myjet2+myjet1;
-      TLorentzVector mymet=myrawmet; // for ES
-      TLorentzVector Higgs = mytau1+mytau2+mymet;	
+
 
       // Z mumu SF -- Need to be changed for new category!! FIXME
       /*
