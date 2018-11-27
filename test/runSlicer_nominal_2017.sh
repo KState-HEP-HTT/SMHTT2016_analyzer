@@ -57,6 +57,7 @@ while [ -n "$1" ]; do # while loop starts
 	    ;;
 	-mc) 
 	    dy="true"
+	    ztt="true"
 	    w="true"
 	    ttbar="true"
 	    diboson="true"
@@ -65,6 +66,7 @@ while [ -n "$1" ]; do # while loop starts
 	    ;;
 	-all)
 	    dy="true"
+	    ztt="true"
 	    w="true"
 	    ttbar="true"
 	    diboson="true"
@@ -91,7 +93,7 @@ while [ -n "$1" ]; do # while loop starts
             shift # The double dash which separates options from parameters                                                                                                                
             break
             ;;
-        *) echo "Option $1 not recognized : -da -dy -w -tt -vv -ew -mc -si -all -echo -i -ch" ;;
+        *) echo "Option $1 not recognized : -da -dy -w -tt -vv -ew -mc -si -em -all -echo -i -ch" ;;
     esac
     shift
 done
