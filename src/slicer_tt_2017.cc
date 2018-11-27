@@ -46,7 +46,7 @@ int main(int argc, char** argv) {
     
     std::string input = *(argv + 1);
     std::string output = *(argv + 2);
-    std::string sample = *(argv + 3);
+    std::string sample = *(argv + 3);    
     std::string name = *(argv + 4);
     std::string shape = *(argv + 5);
 
@@ -233,32 +233,7 @@ int main(int argc, char** argv) {
     float w_lumi = lumiWeight(sample, ngen);
     if (w_lumi==0) std::cout << std::endl << "!!!!!!!!!!!!!!!!!!!!!!!! ATTENTION - can't find lumi weight. Check the sample. !!!!!!!!!!!!!!!!!!!!!!!!" << std::endl << std::endl;
     weightLumi = w_lumi;
-    std::cout << "============== map weight: " << w_lumi << std::endl;
-
-    ////////////////////////////////////////////////////////
-    // Stitching Weights for W and DY - Don't use for now //
-    ////////////////////////////////////////////////////////
-    if (sample.find("WJets") !=string::npos){ 
-      w_wjet=62.038;
-      if (tree->numGenJets==1) w_wjet=6.969;
-      else if (tree->numGenJets==2) w_wjet=16.393;
-      else if (tree->numGenJets==3) w_wjet=2.537;
-      else if (tree->numGenJets==4) w_wjet=2.425;
-      weightLumi=w_wjet;
-    }
-    else w_wjet=1.00;
-    
-    if (sample.find("DY") != string::npos) { 
-      w_DYjet=2.873;
-      if (tree->numGenJets==1) w_DYjet=0.495;
-      else if (tree->numGenJets==2) w_DYjet=1.042;
-      else if (tree->numGenJets==3) w_DYjet=0.753;
-      else if (tree->numGenJets==4) w_DYjet=0.452;
-      weightLumi=w_DYjet;
-    }      
-    else w_DYjet=1.00;
-    
-
+    std::cout << "============== map weight: " << w_lumi << std::endl;    
     std::cout.setf(std::ios::fixed, std::ios::floatfield);
     std::cout.precision(10);
     scenario_info scenario(treePtr, shape);
@@ -273,6 +248,29 @@ int main(int argc, char** argv) {
       treePtr->GetEntry(i);
       if (i % 1000 == 0) fprintf(stdout, "\r  Processed events: %8d of %8d ", i, nentries_wtn);
       fflush(stdout);
+      ////////////////////////////////////////////////////////
+      // Stitching Weights for W and DY - Don't use for now //
+      ////////////////////////////////////////////////////////
+      if (sample.find("WJets") !=string::npos){ 
+	w_wjet=62.038;
+	if (tree->numGenJets==1) w_wjet=6.969;
+	else if (tree->numGenJets==2) w_wjet=16.393;
+	else if (tree->numGenJets==3) w_wjet=2.537;
+	else if (tree->numGenJets==4) w_wjet=2.425;
+	weightLumi=w_wjet;
+      }
+      else w_wjet=1.00;
+      
+      if (sample.find("DY") != string::npos) { 
+	w_DYjet=2.873; 
+	if (tree->numGenJets==1) w_DYjet=0.495; 
+	else if (tree->numGenJets==2) w_DYjet=1.042;
+	else if (tree->numGenJets==3) w_DYjet=0.753;
+	else if (tree->numGenJets==4) w_DYjet=0.452;
+	weightLumi=w_DYjet;
+      }      
+      else w_DYjet=1.00;
+
       ///////////////
       // shortcuts //
       ///////////////
@@ -339,10 +337,6 @@ int main(int argc, char** argv) {
       float signalRegion = tree->t1RerunMVArun2v2DBoldDMwLTTight && tree->t2RerunMVArun2v2DBoldDMwLTTight;
       if (!tree->t1RerunMVArun2v2DBoldDMwLTVLoose && tree->t2RerunMVArun2v2DBoldDMwLTVLoose) continue;
       h_cutflow->Fill(1.0,1.0);
-      // Taus quality
-      if (fabs(tree->eta_1)>2.1 || fabs(tree->eta_2)>2.1) continue;
-      if (tree->pt_1<40 || tree->pt_2<40) continue;
-      h_cutflow->Fill(2.0,1.0);
       // DoubleTau trigger
       bool tight35 = tree->DoubleTightTau35Pass && tree->t1MatchesDoubleTightTau35Path && tree->t2MatchesDoubleTightTau35Path && tree->t1MatchesDoubleTightTau35Filter && tree->t2MatchesDoubleTightTau35Filter;
       bool medium40 = tree->DoubleMediumTau40Pass && tree->t1MatchesDoubleMediumTau40Path && tree->t2MatchesDoubleMediumTau40Path && tree->t1MatchesDoubleMediumTau40Filter && tree->t2MatchesDoubleMediumTau40Filter;
@@ -352,18 +346,18 @@ int main(int argc, char** argv) {
       if (tree->pt_1>45 && tree->pt_2>45 && tight40) passTrigAndPt = true;
       if (tree->pt_1>40 && tree->pt_2>40 && tight35) passTrigAndPt=true;
       if (!passTrigAndPt) continue;
-      h_cutflow->Fill(3.0,1.0);
+      h_cutflow->Fill(2.0,1.0);
       if (TMath::IsNaN(tree->Q2V2)) continue;      
-      h_cutflow->Fill(4.0,1.0);
+      h_cutflow->Fill(3.0,1.0);
       if (mytau1.DeltaR(mytau2) < 0.5) continue;
-      h_cutflow->Fill(5.0,1.0);
+      h_cutflow->Fill(4.0,1.0);
       if (tree->againstElectronVLooseMVA6_1 < 0.5) continue; // L773
       if (tree->againstElectronVLooseMVA6_2 < 0.5) continue;
       if (tree->againstMuonLoose3_1 < 0.5) continue; //774
       if (tree->againstMuonLoose3_2 < 0.5) continue;
       if (tree->extramuon_veto) continue;
       if (tree->extraelec_veto) continue;
-      h_cutflow->Fill(6.0,1.0);
+      h_cutflow->Fill(5.0,1.0);
       // MET and muon filters 
       /*
       if (tree->Flag_goodVertices!=0) continue;
@@ -376,7 +370,7 @@ int main(int argc, char** argv) {
       if (tree->Flag_ecalBadCalibFilter!=0) continue;
       if (tree->Flag_eeBadScFilter!=0 && sample=="data_obs") continue;
       */
-      h_cutflow->Fill(7.0,1.0);
+      h_cutflow->Fill(6.0,1.0);
       // D.Kim : Separation between L, T and J (for DY, TT, and VV)
       // https://github.com/truggles/Z_to_TauTau_13TeV/blob/SM-HTT-2016/analysis1BaselineCuts.py#L444-L457
       bool isZTT=false;
@@ -390,7 +384,7 @@ int main(int argc, char** argv) {
       if ((name=="ZJ") && !isZJ) continue;
       if (!(tree->gen_match_1==5 && tree->gen_match_2==5) && (name=="VVT"|| name=="TTT")) continue;
       if ((tree->gen_match_1==5 && tree->gen_match_2==5) && (name=="VVJ" || name=="TTJ")) continue;
-      h_cutflow->Fill(8.0,1.0);
+      h_cutflow->Fill(7.0,1.0);
       float correctionMC = 1.0;
       float PUweight, diTauLeg1SF, diTauLeg2SF;
       ////////////////////////
@@ -504,7 +498,7 @@ int main(int argc, char** argv) {
       float weightEmbded=1.0;
       if (sample=="embedded") {
 	if( tree->genweight > 1) continue;
-	h_cutflow->Fill(9.0,1.0);
+	h_cutflow->Fill(8.0,1.0);
 	// Tau ID eff
 	if (tree->gen_match_1==5) weightEmbded*=0.89;
 	if (tree->gen_match_2==5) weightEmbded*=0.89;	  
@@ -546,7 +540,10 @@ int main(int argc, char** argv) {
 	//float WEIGHT_sel_trg_ratio= m_sel_trg_ratio(wEmbed,mytau1.Pt(),mytau1.Eta(),mytau2.Pt(),mytau2.Eta());
 	weightEmbded *= tree->genweight * SF_Tau1 * SF_Tau1;
       }
-
+      // Taus quality
+      if (fabs(tree->eta_1)>2.1 || fabs(tree->eta_2)>2.1) continue;
+      if (tree->pt_1<40 || tree->pt_2<40) continue;
+      h_cutflow->Fill(9.0,1.0);
       // Construct evtwt
       float evtwt = weightLumi*correctionMC*weightEmbded;
       // Clean weight on data for just in case 
