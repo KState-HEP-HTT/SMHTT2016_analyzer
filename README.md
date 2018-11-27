@@ -106,11 +106,48 @@ One need to recompile the code to change VBF category definition.
 
 
 
-## Instruction of fake factor method :
+## Instruction of fake factor method (for Doyeong) :
 
 ```
 source runFakeFractionMaker.sh output_Slicer/tt 2016 tt
 ```
 
 This will generate JetFakesFraction.root which has fractions as 2D distributions.
+
+More information is here : https://gitlab.cern.ch/cms-htt/Jet2TauFakesFiles/blob/2017/SM2017/README.md
+
+
+## Instruction of fake factor method :
+
+First of all, clone GitLab reopsitory to get root files for fake factor method. 
+
+``` 
+cd ${CMSSW_BASE}/src
+git clone https://github.com/CMS-HTT/Jet2TauFakes.git HTTutilities/Jet2TauFakes
+cd HTTutilities/Jet2TauFakes
+mkdir data2016
+git clone -b 2016 ssh://git@gitlab.cern.ch:7999/cms-htt/Jet2TauFakesFiles.git data2016
+mkdir data
+git clone -b 2017 ssh://git@gitlab.cern.ch:7999/cms-htt/Jet2TauFakesFiles.git data
+cd ${CMSSW_BASE}/src
+scram b
+```
+
+To compile, (need to compile both datacardMakerFF and datacardMaker)
+```
+cd SMHTT_analyzer/src
+./Make.sh datacardMaker_tt.cc
+./Make.sh datacardMakerFF_tt.cc
+```
+
+To make datacard which has embedded + QCD(computed using embedded) + JetFakes,
+
+```
+source runDatacardMaker.sh <options> -ff 
+source runDatacardMaker.sh -ch tt -sel 2016 -fsa 2016 -ff -i /hdfs/store/user/doyeong/SMHTT_CONDOR/tautau/myskims/Nov22_tt_run2v2_/lightTree/
+```
+
+The options are the sase as quickPlot.sh above.
+
+
 

@@ -18,6 +18,10 @@ if __name__ == "__main__":
                       default=False, dest='is_quickPlot',
                       help='forQuickPlot use vbf region only'
                       )
+    parser.add_option('--datacard', '-d', action='store_true',
+                      default=False, dest='is_datacard',
+                      help='no inclusive'
+                      )
     (options, args) = parser.parse_args()
 
     regions = ["AIOS","AISS","ttSS"]
@@ -31,6 +35,8 @@ if __name__ == "__main__":
     if options.is_quickPlot:
         cates.remove("0jet")
         cates.remove("boosted")
+    if options.is_datacard:
+        cates.remove("inclusive")
     print options.outputs_xxx
     # Open root files
     for sample in samples:
@@ -78,22 +84,24 @@ if __name__ == "__main__":
         dir = fout.mkdir("tt_"+cates[k])
         dir.cd()
         # Save control region histograms for checking.
+        '''
         histos[k][regions.index("ttSS")].SetName("QCD_ttSS")
         histos[k][regions.index("ttSS")].Write()
         histos[k][regions.index("AISS")].SetName("QCD_AISS")
         histos[k][regions.index("AISS")].Write()
         histos[k][regions.index("AIOS")].SetName("QCD_AIOS")
         histos[k][regions.index("AIOS")].Write()
+        '''
         # Compute SF and QCD
         hSF = histos[k][0].Clone()
         hSF.Divide(histos[k][regions.index("ttSS")],histos[k][regions.index("AISS")],1,1,"B")
         hSF.SetName("QCD_sf")
-        hSF.Write()
+        #hSF.Write()
         hQCD = hSF.Clone()
         hQCD.Multiply(histos[k][regions.index("AIOS")],hSF,1,1,"B")
         hQCD = histos[k][regions.index("AIOS")]
         hQCD.Multiply(histos[k][regions.index("AIOS")],hSF,1,1,"B")
-        print "Integral "+cates[k]+" : "+str(hQCD.Integral(-1,10000))
+        print "Integral "+cates[k]+" : "+str(hQCD.Integral())
         hQCD.SetName("QCD")
         hQCD.Write()
 
