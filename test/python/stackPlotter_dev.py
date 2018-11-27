@@ -17,6 +17,10 @@ parser.add_option('--ztt', '-z', action='store_true',
                   default=False, dest='is_zttMC',
                   help='run on embedded or MC ZTT'
                   )
+parser.add_option('--ff', '-f', action='store_true',
+                  default=False, dest='is_JetFakes',
+                  help='run on JetFakes'
+                  )
 parser.add_option('--input', '-i', action='store',
                   default="final_nominal.root", dest='inputroot',
                   help='input root file for the plot'
@@ -33,7 +37,7 @@ parser.add_option('--channel', '-c', action='store',
 
 file=ROOT.TFile(options.inputroot,"r")
 #cate={"mt_0jet":"0jet","mt_boosted":"Boosted","mt_vbf":"VBF"}
-cate={options.ch+"_vbf":""} # vlaue is tag on the plot such as high Diget Mass
+cate={options.ch+"_vbf":"VBF", options.ch+"_boosted":"boosted", options.ch+"_0jet":"0jet", options.ch+"_inclusive":"inclusive"} # vlaue is tag on the plot such as high Diget Mass
 titleMap = {
     'mjj':'Dijet Mass [GeV]',
     'NN_disc':'NN disc',
@@ -45,10 +49,11 @@ titleMap = {
     'met': 'Missing E_{T} [GeV]',
     'pt_sv': 'SVFit p_{T} [GeV]',
     'm_sv': 'SVFit Mass [GeV]',
-    'mjj': 'Dijet Mass [GeV]',
+    'vis_mass': 'Visible Mass [GeV]',
+    'njets': 'number of jets',
     'Dbkg_VBF': 'D_{bkg}^{VBF}',  # unnormalized mela
     'Dbkg_ggH': 'D_{bkg}^{ggH}',
-    'NN_disc': 'NN Disc.',
+    'NN_disc_ZTT': 'NN Disc.',
     'Q2V1': 'Q^2 V1',
     'Q2V2': 'Q^2 V2',
     'Phi': '#phi',
@@ -60,7 +65,10 @@ titleMap = {
     't1_decayMode': 'Tau1 decayMode',
     't2_decayMode': 'Tau2 decayMode',
     'j1_pt': 'Jet1 p_{T} [GeV]',
-    't1_eta': 'tau #eta',
+    't1_eta': 'tau1 #eta',
+    't2_eta': 'tau2 #eta',
+    't1_phi': 'tau1 #phi',
+    't2_phi': 'tau2 #phi',
     'mu_eta': 'muon #eta',
     'met' : 'MET [GeV]',
     'mt' : 'MT [GeV]',
@@ -74,15 +82,25 @@ majors=["QCD","embedded"]
 minors=["ZL","ZJ","TTT","TTJ","W","VVT","VVJ","EWKZ"]
 signals=["ggH125","VBF125","WH125","ZH125"]
 
+
 if options.ch!= "tt":
     del majors[:]
     del minors[:]
     majors=["QCD","embedded","TTT"]
-    minors=["ZL","ZJ","TTJ","W","VV","EWKZ"]
+    minors=["ZL","ZJ","TTJ","W","VVT","VVJ","EWKZ"]
+
 if options.is_zttMC:
     majors.remove("embedded")
     majors.insert(1,"ZTT")
-
+if options.is_JetFakes:
+    majors.remove("QCD")
+    majors.insert(0,"JetFakes")
+    minors.remove("ZJ")
+    minors.remove("TTJ")
+    minors.remove("VVJ")
+    minors.remove("W")
+print majors
+print minors
 # Colors
 mypalette=["#ffbcfe","#f9cd66","#cfe87f","#fcc894","#a0abff","#d1c7be","#9feff2"]
 adapt=ROOT.gROOT.GetColor(12)
@@ -164,7 +182,11 @@ def add_legendEntryMain(smh,ggh,vbf,wh,zh,cat):
         if h.GetName() == "QCD_px" or h.GetName() == "QCD":
             #print">>>>>>>>>> h.GetName() ", h.GetName()
             legend.AddEntry(h,"QCD","f") 
-        if h.GetName() == "embedded_px" or h.GetName() == "ZTT_px" or h.GetName() == "embedded" or h.GetName() == "ZTT":
+        if h.GetName() == "JetFakes" or h.GetName() == "JetFakes_px":                                                                                                                                      
+            legend.AddEntry(h,"JetFakes","f")  
+        if h.GetName() == "embedded_px" or h.GetName() == "embedded":
+            legend.AddEntry(h,"Z#rightarrow#tau#tau(Embedded)","f" )
+        if h.GetName() == "ZTT_px" or h.GetName() == "ZTT":
             legend.AddEntry(h,"Z#rightarrow#tau#tau","f" )
         if h.GetName() == "TTT_px" or h.GetName() == "TTT":
             legend.AddEntry(h,"TTT","f")
@@ -221,6 +243,7 @@ def make_stackPad(y_low,y_high):
     return padStack
 
 def unroll(file,cat,hist):
+    print "Unrolling "+file.Get(cat).Get(hist).GetName()+" ..."
     if file.Get(cat).Get(hist).GetDimension() is 1 : 
         r_hist = file.Get(cat).Get(hist).Clone()
     else :
@@ -247,18 +270,20 @@ def call_histos():
             if(minor!=minors[0]): 
                 h_minor.Add(unroll(file,cat,minor),1)#file.Get(cat).Get(minor),1)
         histlist.append(h_minor)
-                # stack sorting
+        # stack sorting
         for bkghistos in histlist:
             histlist_sort.append(bkghistos.Integral())
         histlist_sort2 = sorted(range(len(histlist_sort)), key=histlist_sort.__getitem__)
         for isort in range(len(histlist_sort2)):
             histlist2.append(histlist[histlist_sort2[isort]])
+            
         # data
         h_data=unroll(file,cat,"data_obs")#file.Get(cat).Get("data_obs")
         
         # add histograms into dictionary histos
         histos["histSig"][cate[cat]]=histlist_sig
         histos["histBkg"][cate[cat]]=histlist2
+        #histos["histBkg"][cate[cat]]=histlist
         histos["histData"][cate[cat]]=h_data
     return histos
 
@@ -298,7 +323,8 @@ def make_stack(category):
             h_bkg.SetFillColor(ROOT.TColor.GetColor("#9feff2"))
         if h_bkg.GetName() == "QCD_px" or h_bkg.GetName() == "QCD":
             h_bkg.SetFillColor(ROOT.TColor.GetColor("#ffbcfe"))
-            
+        if h_bkg.GetName() == "JetFakes" or h_bkg.GetName() == "JetFakes_px":
+            h_bkg.SetFillColor(ROOT.TColor.GetColor("#ffbcfe"))#ff8e1c"))
         #h_bkg.SetFillColor(ROOT.TColor.GetColor(mypalette[c_index]))
         #if h_bkg is histoAll["histBkg"][category][-1]:
         #    h_bkg.SetFillColor(ROOT.TColor.GetColor(mypalette[-1]))
@@ -583,11 +609,15 @@ for cat in cate.keys():
     obsPave.Draw()
 
     # Save plot
+    '''
     if options.is_zttMC:
-        plot1.SaveAs("plots/"+options.obs+cate[cat]+"_"+options.ch+"_MC.pdf")
+        if options.is_JetFakes:
+            plot1.SaveAs("plots/"+options.obs+cate[cat]+"_"+options.ch+"_MC_FF.pdf")
+        else:
+            plot1.SaveAs("plots/"+options.obs+cate[cat]+"_"+options.ch+"_MC.pdf")
     else:
         plot1.SaveAs("plots/"+options.obs+cate[cat]+"_"+options.ch+".pdf")
-
+        '''
     # Make canvas 
     plot2 = make_canvas(650,"plot1")  
     # Stick main histogram pad   
@@ -618,10 +648,14 @@ for cat in cate.keys():
     obsPave.Draw()
 
     # Save plot
+    postfix=""
     if options.is_zttMC:
-        plot2.SaveAs("plots/basic_"+options.obs+cate[cat]+"_"+options.ch+"_MC.pdf")
-    else:
-        plot2.SaveAs("plots/basic_"+options.obs+cate[cat]+"_"+options.ch+".pdf")
+        postfix+="_MC"
+    if options.is_JetFakes:
+        postfix+="_FF"
+    plot2.SaveAs("plots/"+options.obs+cate[cat]+"_"+options.ch+postfix+".pdf")
+
+
 
 
 

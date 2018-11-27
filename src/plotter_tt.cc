@@ -182,7 +182,14 @@ int main(int argc, char** argv) {
       namu->GetEntry(i);
       //if (i % 1000 == 0) fprintf(stdout, "\r  Processed events: %8d of %8d ", i, nentries_wtn);
       fflush(stdout);
-
+      ///////////////////
+      // Used branches //
+      ///////////////////
+      float njets_ = njets;
+      if(tvar == "njets") njets_ = var;
+      float higgs_pT_ = higgs_pT;
+      if(tvar == "higgs_pT") higgs_pT_ = var;
+      ///////////////////
       /////////////////////////
       //  For relaxed skims  //
       /////////////////////////
@@ -205,17 +212,17 @@ int main(int argc, char** argv) {
 	////////////////////////////
 	// 2016 analysis category //
 	////////////////////////////
-	if (njets==0) is_0jet=true;
-	if (njets==1 || (njets>=2 && (!(higgs_pT>100 && dEtajj>2.5)))) is_boosted=true;
-	if (njets>=2 && higgs_pT>100 && dEtajj>2.5) is_VBF=true;
+	if (njets_==0) is_0jet=true;
+	if (njets_==1 || (njets_>=2 && (!(higgs_pT_>100 && dEtajj>2.5)))) is_boosted=true;
+	if (njets_>=2 && higgs_pT_>100 && dEtajj>2.5) is_VBF=true;
       }
       else {	
 	////////////////////////     
 	// KSU study category //     
 	////////////////////////     
-	if (njets==0) is_0jet=true;
-	//else if (njets==1 ||) is_boosted=true;   
-	else if (cat_vbf && higgs_pT>100) is_VBF=true;
+	if (njets_==0) is_0jet=true;
+	//else if (njets_==1 ||) is_boosted=true;   
+	else if (cat_vbf && higgs_pT_>100) is_VBF=true;
 	else is_boosted=true;
       }
 
@@ -335,7 +342,7 @@ int main(int argc, char** argv) {
     AISSinclusive->cd();
     h_aiss_inclusive->SetName(name.c_str());
     h_aiss_inclusive->Write();
-    
+    std::cout<< "\n" << name << " inclusive yields: "<< h_os_inclusive->Integral(-1,10000) << "\t\t" << h_os_0jet->Integral(-1,10000) << "\t" << h_os_boosted->Integral(-1,10000) << "\t" << h_os_vbf->Integral(-1,10000) << "\n\n" << std::endl;    
     fout->Close();
 } 
 

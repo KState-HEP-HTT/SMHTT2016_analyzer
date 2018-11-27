@@ -28,7 +28,8 @@ int main(int argc, char** argv) {
     float min = atof(argv[5]);
     float max = atof(argv[6]);
     std::string tvar = *(argv + 7);
-    float is2016 = atof(argv[8]);
+    float is2016 = atof(argv[8]);// category definition
+    float is2017FSA = atof(argv[9]);
 
     TFile *f_Double = new TFile(input.c_str());
     std::cout<<"XXXXXXXXXXXXX "<<input.c_str()<<" XXXXXXXXXXXX"<<std::endl;
@@ -166,6 +167,7 @@ int main(int argc, char** argv) {
     if (br) namu->SetBranchAddress(tvar.c_str(), &var);
 
     TFile *fakefactor = new TFile("../weightROOTs/JetFakesFraction.root");
+    if (is2017FSA == 2017) fakefactor = new TFile("../weightROOTs/JetFakesFraction2017_.root");//_stithcingDY.root");
     TH2F *frac_w_vbf1=(TH2F*) fakefactor->Get("tt1_vbf_ff/frac_w");
     TH2F *frac_tt_vbf1=(TH2F*) fakefactor->Get("tt1_vbf_ff/frac_tt"); 
     TH2F *frac_real_vbf1=(TH2F*) fakefactor->Get("tt1_vbf_ff/frac_real"); 
@@ -187,6 +189,8 @@ int main(int argc, char** argv) {
     TH2F *frac_real_0jet2=(TH2F*) fakefactor->Get("tt2_0jet_ff/frac_real"); 
 
     TFile *fakefactor_tight = new TFile("${CMSSW_BASE}/src/HTTutilities/Jet2TauFakes/data2016/SM2016_ML/tight/tt/fakeFactors_tight.root");
+    if (is2017FSA == 2017) fakefactor_tight = new TFile("${CMSSW_BASE}/src/HTTutilities/Jet2TauFakes/data/SM2017/tight/vloose/tt/fakeFactors.root");
+
     FakeFactor *fakefactor_weight;
     fakefactor_weight = (FakeFactor*)fakefactor_tight->Get("ff_comb");
     fakefactor_tight->Close();
@@ -195,13 +199,27 @@ int main(int argc, char** argv) {
     TH1F *h_boosted = new TH1F("","",num,min,max);
     TH1F *h_vbf = new TH1F("","",num,min,max);
     TH1F *h_inclusive = new TH1F("","",num,min,max);
-    
+
     // Loop over all events
     Int_t nentries_wtn = (Int_t) namu->GetEntries();
     for (Int_t i = 0; i < nentries_wtn; i++) {
       namu->GetEntry(i);
       if (i % 1000 == 0) fprintf(stdout, "\r  Processed events: %8d of %8d ", i, nentries_wtn);
       fflush(stdout);
+      ///////////////////
+      // Used branches //
+      ///////////////////
+      float t1_pt_ = t1_pt;
+      if(tvar == "t1_pt") t1_pt_ = var;
+      float t2_pt_ = t2_pt;
+      if(tvar == "t2_pt") t2_pt_ = var;
+      float njets_ = njets;
+      if(tvar == "njets") njets_ = var;
+      float higgs_pT_ = higgs_pT;
+      if(tvar == "higgs_pT") higgs_pT_ = var;
+      float vis_mass_ = vis_mass;
+      if(tvar == "vis_mass") vis_mass_ = var;
+      ///////////////////
 
       /////////////////////////
       //  For relaxed skims  //
@@ -226,17 +244,17 @@ int main(int argc, char** argv) {
 	////////////////////////////
 	// 2016 analysis category //
 	////////////////////////////
-	if (njets==0) is_0jet=true;
-	if (njets==1 || (njets>=2 && (!(higgs_pT>100 && dEtajj>2.5)))) is_boosted=true;
-	if (njets>=2 && higgs_pT>100 && dEtajj>2.5) is_VBF=true;
+	if (njets_==0) is_0jet=true;
+	if (njets_==1 || (njets_>=2 && (!(higgs_pT_>100 && dEtajj>2.5)))) is_boosted=true;
+	if (njets_>=2 && higgs_pT_>100 && dEtajj>2.5) is_VBF=true;
       }
       else {	
 	////////////////////////     
 	// KSU study category //     
 	////////////////////////     
-	if (njets==0) is_0jet=true;
-	//else if (njets==1 ||) is_boosted=true;   
-	else if (cat_vbf && higgs_pT>100) is_VBF=true;
+	if (njets_==0) is_0jet=true;
+	//else if (njets_==1 ||) is_boosted=true;   
+	else if (cat_vbf && higgs_pT_>100) is_VBF=true;
 	else is_boosted=true;
       }
 
@@ -245,9 +263,8 @@ int main(int argc, char** argv) {
       if(tvar == "MELAggH") var = ME_sm_ggH/(ME_sm_ggH+45*ME_bkg);   
       
       // FF weight
-      int bin_x = frac_w_vbf1->GetXaxis()->FindBin(vis_mass);
-      int bin_y = frac_w_vbf1->GetYaxis()->FindBin(njets);
-
+      int bin_x = frac_w_vbf1->GetXaxis()->FindBin(vis_mass_);
+      int bin_y = frac_w_vbf1->GetYaxis()->FindBin(njets_);
       float frac_qcd_vbf1 = 1-frac_w_vbf1->GetBinContent(bin_x,bin_y)-frac_tt_vbf1->GetBinContent(bin_x,bin_y)-frac_real_vbf1->GetBinContent(bin_x,bin_y);
       if (frac_qcd_vbf1<0) frac_qcd_vbf1=0;
       float frac_qcd_boosted1 = 1-frac_w_boosted1->GetBinContent(bin_x,bin_y)-frac_tt_boosted1->GetBinContent(bin_x,bin_y)-frac_real_boosted1->GetBinContent(bin_x,bin_y);
@@ -262,27 +279,27 @@ int main(int argc, char** argv) {
       float frac_qcd_0jet2 = 1-frac_w_0jet2->GetBinContent(bin_x,bin_y)-frac_tt_0jet2->GetBinContent(bin_x,bin_y)-frac_real_0jet2->GetBinContent(bin_x,bin_y);
       if (frac_qcd_0jet2<0) frac_qcd_0jet2=0;
       
-      float weight_FF1_vbf = fakefactor_weight->value({t1_pt, t2_pt, t1_decayMode, njets, vis_mass, 
+      float weight_FF1_vbf = fakefactor_weight->value({t1_pt_, t2_pt_, t1_decayMode, njets_, vis_mass_, 
 	    frac_qcd_vbf1,
 	    frac_w_vbf1->GetBinContent(bin_x,bin_y),
 	    frac_tt_vbf1->GetBinContent(bin_x,bin_y)});
-      float weight_FF2_vbf = fakefactor_weight->value({t1_pt, t2_pt, t2_decayMode, njets, vis_mass, 
+      float weight_FF2_vbf = fakefactor_weight->value({t1_pt_, t2_pt_, t2_decayMode, njets_, vis_mass_, 
 	    frac_qcd_vbf2,
 	    frac_w_vbf2->GetBinContent(bin_x,bin_y),
 	    frac_tt_vbf2->GetBinContent(bin_x,bin_y)});
-      float weight_FF1_boosted = fakefactor_weight->value({t1_pt, t2_pt, t1_decayMode, njets, vis_mass,
+      float weight_FF1_boosted = fakefactor_weight->value({t1_pt_, t2_pt_, t1_decayMode, njets_, vis_mass_,
 	    frac_qcd_boosted1,
 	    frac_w_boosted1->GetBinContent(bin_x,bin_y),
 	    frac_tt_boosted1->GetBinContent(bin_x,bin_y)});
-      float weight_FF2_boosted = fakefactor_weight->value({t1_pt, t2_pt, t2_decayMode, njets, vis_mass,
+      float weight_FF2_boosted = fakefactor_weight->value({t1_pt_, t2_pt_, t2_decayMode, njets_, vis_mass_,
 	    frac_qcd_boosted2,
 	    frac_w_boosted2->GetBinContent(bin_x,bin_y),
 	    frac_tt_boosted2->GetBinContent(bin_x,bin_y)});
-      float weight_FF1_0jet = fakefactor_weight->value({t1_pt, t2_pt, t1_decayMode, njets, vis_mass, 
+      float weight_FF1_0jet = fakefactor_weight->value({t1_pt_, t2_pt_, t1_decayMode, njets_, vis_mass_, 
 	    frac_qcd_0jet1,
 	    frac_w_0jet1->GetBinContent(bin_x,bin_y),
 	    frac_tt_0jet1->GetBinContent(bin_x,bin_y)});
-      float weight_FF2_0jet = fakefactor_weight->value({t1_pt, t2_pt, t2_decayMode, njets, vis_mass, 
+      float weight_FF2_0jet = fakefactor_weight->value({t1_pt_, t2_pt_, t2_decayMode, njets_, vis_mass_, 
 	    frac_qcd_0jet2,
 	    frac_w_0jet2->GetBinContent(bin_x,bin_y),
 	    frac_tt_0jet2->GetBinContent(bin_x,bin_y)});
@@ -343,6 +360,7 @@ int main(int argc, char** argv) {
     h_inclusive->Write();
 
     std::cout << "Close"<< std::endl;    
+    std::cout<<"\n" << name << " inclusive yields: "<< h_inclusive->Integral(-1,10000) << "\t\t" << h_0jet->Integral(-1,10000) << "\t" << h_boosted->Integral(-1,10000) << "\t" << h_vbf->Integral(-1,10000) << "\n\n" << std::endl;    
     fout->Close();
     std::cout << "DONE"<< std::endl;    
 } 
