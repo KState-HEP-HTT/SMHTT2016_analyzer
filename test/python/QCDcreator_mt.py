@@ -18,6 +18,10 @@ if __name__ == "__main__":
                       default=False, dest='is_quickPlot',
                       help='forQuickPlot use vbf region only'
                       )
+    parser.add_option('--datacard', '-d', action='store_true',
+                      default=False, dest='is_datacard',
+                      help='no inclusive'
+                      )
     (options, args) = parser.parse_args()
 
     factor0jet_u=1.11
@@ -30,10 +34,10 @@ if __name__ == "__main__":
 
 
     regions = ["SS","QCD"]
-    cates = ["0jet","1jet","vbf"]
-    catesout = ["0jet","boosted","vbf"]
+    cates = ["0jet","1jet","vbf"]#,"inclusive"]
+    catesout = ["0jet","boosted","vbf"]#,"inclusive"]
     files = []
-    histos = [[],[],[]] # [[hAIOS_0jet,hAISS_0jet,hSS_0jet],[same for boosted],[same for vbf]]
+    histos = [[],[],[],[]] # [[hAIOS_0jet,hAISS_0jet,hSS_0jet],[same for boosted],[same for vbf]]
     samples = ["data_obs","embedded", "ZJ", "ZL", "TTJ","TTT", "VV", "W", "EWKZ"]
     if options.is_zttMC:
         del samples[:]
@@ -43,7 +47,12 @@ if __name__ == "__main__":
         cates.remove("1jet")
         catesout.remove("0jet")
         catesout.remove("boosted")
-
+    '''
+    if options.is_datacard:
+        cates.remove("inclusive")
+        catesout.remove("inclusive")
+        '''
+    print cates
     QCDfactor = [1.07,1.06,1.00]
     # Open root files
     for sample in samples:
@@ -58,6 +67,7 @@ if __name__ == "__main__":
                 # subtract all bkgs from data
                 if sample is "data_obs":
                     print "-----   Data   -----"
+                    print region+cate+"/"+sample
                     print files[samples.index(sample)].Get(region+cate+"/"+sample).Integral()
                     histos[cates.index(cate)].append(files[samples.index(sample)].Get(region+cate+"/"+sample))
                     print "----- Subtract -----"
@@ -94,6 +104,6 @@ if __name__ == "__main__":
         hQCD = histos[k][regions.index("QCD")]
         hQCD.Scale(QCDfactor[k])
         hQCD.Scale(hQCDCR.Integral()/hQCD.Integral())
-
+        print "Integral "+catesout[k]+" : "+str(hQCD.Integral())
         hQCD.SetName("QCD")
         hQCD.Write()
