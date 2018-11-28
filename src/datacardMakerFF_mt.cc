@@ -15,6 +15,12 @@
 #include "../include/myHelper.h"
 #include "../include/tt_Tree.h"
 #include "../include/scenario_info.h"
+#include "HTTutilities/Jet2TauFakes/interface/FakeFactor.h"
+#include "HTTutilities/Jet2TauFakes/interface/IFunctionWrapper.h"
+#include "HTTutilities/Jet2TauFakes/interface/WrapperTFormula.h"
+#include "HTTutilities/Jet2TauFakes/interface/WrapperTGraph.h"
+#include "HTTutilities/Jet2TauFakes/interface/WrapperTH2F.h"
+#include "HTTutilities/Jet2TauFakes/interface/WrapperTH3D.h"
 
 int main(int argc, char** argv) {    
     std::string input = *(argv + 1);
@@ -23,6 +29,7 @@ int main(int argc, char** argv) {
     std::string shape = *(argv + 4);
     float is2016 = atof(argv[5]);
     if (is2016==2016) std::cout << "All selections are consistent with 2016 SMHTT analysis." << std::endl;
+    float is2017FSA = atof(argv[9]);
 
     TFile *f_Double = new TFile(input.c_str());
     std::cout<<"XXXXXXXXXXXXX "<<input.c_str()<<" XXXXXXXXXXXX"<<std::endl;
@@ -154,6 +161,23 @@ int main(int argc, char** argv) {
 
     namu->SetBranchAddress("NN_disc",             &NN_disc              );
 
+    TFile *fakefactor = new TFile("../weightROOTs/JetFakesFraction.root");
+    if (is2017FSA == 2017) fakefactor = new TFile("../weightROOTs/JetFakesFraction2017.root");
+    TH2F *frac_w_vbf=(TH2F*) fakefactor->Get("mt_vbf_ff/frac_w");
+    TH2F *frac_tt_vbf=(TH2F*) fakefactor->Get("mt_vbf_ff/frac_tt"); 
+    TH2F *frac_real_vbf=(TH2F*) fakefactor->Get("mt_vbf_ff/frac_real"); 
+    TH2F *frac_w_boosted=(TH2F*) fakefactor->Get("mt_boosted_ff/frac_w");
+    TH2F *frac_tt_boosted=(TH2F*) fakefactor->Get("mt_boosted_ff/frac_tt"); 
+    TH2F *frac_real_boosted=(TH2F*) fakefactor->Get("mt_boosted_ff/frac_real"); 
+    TH2F *frac_w_0jet=(TH2F*) fakefactor->Get("mt_0jet_ff/frac_w");
+    TH2F *frac_tt_0jet=(TH2F*) fakefactor->Get("mt_0jet_ff/frac_tt"); 
+    TH2F *frac_real_0jet=(TH2F*) fakefactor->Get("mt_0jet_ff/frac_real"); 
+
+    TFile *fakefactor_tight = new TFile("${CMSSW_BASE}/src/HTTutilities/Jet2TauFakes/data2016/SM2016_ML/tight/mt/fakeFactors_tight.root");
+    if (is2017FSA == 2017) fakefactor_tight = new TFile("${CMSSW_BASE}/src/HTTutilities/Jet2TauFakes/data/SM2017/tight/vloose/mt/fakeFactors.root");
+    FakeFactor *fakefactor_weight;
+    fakefactor_weight = (FakeFactor*)fakefactor_tight->Get("ff_comb");
+    fakefactor_tight->Close();
 
     //Binning for 0jet cat, x-axis
     float bins0X[] = {0,1,10,11};
@@ -177,14 +201,8 @@ int main(int argc, char** argv) {
     int  binnum2Y = sizeof(bins2Y)/sizeof(Float_t) - 1;
 
     std::vector<TH2F*> h0_OS;
-    std::vector<TH2F*> h0_SS;
-    std::vector<TH2F*> h0_QCD;
     std::vector<TH2F*> h1_OS;
-    std::vector<TH2F*> h1_SS;
-    std::vector<TH2F*> h1_QCD;
     std::vector<TH2F*> h2_OS;
-    std::vector<TH2F*> h2_SS;
-    std::vector<TH2F*> h2_QCD;
 
     TString postfix = postfixMaps(shape);
 
@@ -197,20 +215,6 @@ int main(int argc, char** argv) {
       h0_OS.push_back(new TH2F (HNS0OS.str().c_str(),"",binnum0X,bins0X,binnum0Y,bins0Y)); h0_OS[k]->Sumw2();
       h1_OS.push_back(new TH2F (HNS1OS.str().c_str(),"",binnum1X,bins1X,binnum1Y,bins1Y)); h1_OS[k]->Sumw2();
       h2_OS.push_back(new TH2F (HNS2OS.str().c_str(),"",binnum2X,bins2X,binnum2Y,bins2Y)); h2_OS[k]->Sumw2();
-      
-      std::ostringstream HNS0SS; HNS0OS << "h0_SS" << k;
-      std::ostringstream HNS1SS; HNS1OS << "h1_SS" << k;
-      std::ostringstream HNS2SS; HNS2OS << "h2_SS" << k;
-      h0_SS.push_back(new TH2F (HNS0SS.str().c_str(),"",binnum0X,bins0X,binnum0Y,bins0Y)); h0_SS[k]->Sumw2();
-      h1_SS.push_back(new TH2F (HNS1SS.str().c_str(),"",binnum1X,bins1X,binnum1Y,bins1Y)); h1_SS[k]->Sumw2();
-      h2_SS.push_back(new TH2F (HNS2SS.str().c_str(),"",binnum2X,bins2X,binnum2Y,bins2Y)); h2_SS[k]->Sumw2();
-      
-      std::ostringstream HNS0QCD; HNS0QCD << "h0_QCD" << k;
-      std::ostringstream HNS1QCD; HNS1QCD << "h1_QCD" << k;
-      std::ostringstream HNS2QCD; HNS2QCD << "h2_QCD" << k;
-      h0_QCD.push_back(new TH2F (HNS0QCD.str().c_str(),"",binnum0X,bins0X,binnum0Y,bins0Y)); h0_QCD[k]->Sumw2();
-      h1_QCD.push_back(new TH2F (HNS1QCD.str().c_str(),"",binnum1X,bins1X,binnum1Y,bins1Y)); h1_QCD[k]->Sumw2();
-      h2_QCD.push_back(new TH2F (HNS2QCD.str().c_str(),"",binnum2X,bins2X,binnum2Y,bins2Y)); h2_QCD[k]->Sumw2();
     }
     
     // Loop over all events
@@ -219,6 +223,7 @@ int main(int argc, char** argv) {
       namu->GetEntry(i);
       if (i % 1000 == 0) fprintf(stdout, "\r  Processed events: %8d of %8d ", i, nentries_wtn);
       fflush(stdout);
+
       float normMELAvbf = ME_sm_VBF/(ME_sm_VBF+45*ME_bkg);
 
       /////////////////////////
@@ -233,7 +238,8 @@ int main(int argc, char** argv) {
       signalRegion = t1_iso_T && mu_iso<0.15;
       qcdRegion = t1_iso_M && mu_iso<0.30;
       ////////////////////////
-
+      bool aiRegion = false;
+      aiRegion = !t1_iso_T && mu_iso<0.15;
       // Categories
       bool is_0jet = false;
       bool is_boosted = false;
@@ -263,23 +269,36 @@ int main(int argc, char** argv) {
       float var_vbfX = mjj;
       float var_vbfY = m_sv;
 
-      for (int k=0; k<nbhist; ++k){
-	if (mt<50 && t1_charge*mu_charge<0) {
-	  // ################### signalRegion && OS ####################
-	  if (is_0jet && signalRegion)      h0_OS[k]->Fill(var_0jetX,var_0jetY,evtwt);
-	  if (is_boosted && signalRegion)   h1_OS[k]->Fill(var_boostedX,var_boostedY,evtwt);
-	  if (is_VBF && signalRegion) 	    h2_OS[k]->Fill(var_vbfX,var_vbfY,evtwt); 
-	}
+      // FF weight
+      int bin_x = frac_w_vbf->GetXaxis()->FindBin(vis_mass);
+      int bin_y = frac_w_vbf->GetYaxis()->FindBin(njets);
+      float frac_qcd_vbf = 1-frac_w_vbf->GetBinContent(bin_x,bin_y)-frac_tt_vbf->GetBinContent(bin_x,bin_y)-frac_real_vbf->GetBinContent(bin_x,bin_y);
+      if (frac_qcd_vbf<0) frac_qcd_vbf=0;
+      float frac_qcd_boosted = 1-frac_w_boosted->GetBinContent(bin_x,bin_y)-frac_tt_boosted->GetBinContent(bin_x,bin_y)-frac_real_boosted->GetBinContent(bin_x,bin_y);
+      if (frac_qcd_boosted<0) frac_qcd_boosted=0;
+      float frac_qcd_0jet = 1-frac_w_0jet->GetBinContent(bin_x,bin_y)-frac_tt_0jet->GetBinContent(bin_x,bin_y)-frac_real_0jet->GetBinContent(bin_x,bin_y);
+      if (frac_qcd_0jet<0) frac_qcd_0jet=0;
+      
+      float weight_FF1_vbf = fakefactor_weight->value({t1_pt, t1_decayMode, njets, vis_mass, mt, mu_iso,
+	    frac_qcd_vbf,
+	    frac_w_vbf->GetBinContent(bin_x,bin_y),
+	    frac_tt_vbf->GetBinContent(bin_x,bin_y)});
+      float weight_FF1_boosted = fakefactor_weight->value({t1_pt, t1_decayMode, njets, vis_mass, mt, mu_iso,
+	    frac_qcd_boosted,
+	    frac_w_boosted->GetBinContent(bin_x,bin_y),
+	    frac_tt_boosted->GetBinContent(bin_x,bin_y)});
+      float weight_FF1_0jet = fakefactor_weight->value({t1_pt, t1_decayMode, njets, vis_mass, mt, mu_iso,
+	    frac_qcd_0jet,
+	    frac_w_0jet->GetBinContent(bin_x,bin_y),
+	    frac_tt_0jet->GetBinContent(bin_x,bin_y)});
 
-	if (mt<50 && t1_charge*mu_charge>0) {
-	  // ################### signalRegion && SS ####################
-	  if (is_0jet && signalRegion)      h0_SS[k]->Fill(var_0jetX,var_0jetY,evtwt);
-	  if (is_boosted && signalRegion)   h1_SS[k]->Fill(var_boostedX,var_boostedY,evtwt);
-	  if (is_VBF && signalRegion) 	    h2_SS[k]->Fill(var_vbfX,var_vbfY,evtwt);	  
-	  // ################### QCDRegion && SS ####################
-	  if (is_0jet && qcdRegion)         h0_QCD[k]->Fill(var_0jetX,var_0jetY,evtwt);
-	  if (is_boosted && qcdRegion)	    h1_QCD[k]->Fill(var_boostedX,var_boostedY,evtwt);
-	  if (is_VBF && qcdRegion) 	    h2_QCD[k]->Fill(var_vbfX,var_vbfY,evtwt);	  
+
+      for (int k=0; k<nbhist; ++k){
+	if (mt<50 && t1_charge*mu_charge<0 && aiRegion) {
+	  // ################### signalRegion && OS ####################
+	  if (is_0jet)      h0_OS[k]->Fill(var_0jetX,var_0jetY,evtwt);
+	  if (is_boosted)   h1_OS[k]->Fill(var_boostedX,var_boostedY,evtwt);
+	  if (is_VBF) 	    h2_OS[k]->Fill(var_vbfX,var_vbfY,evtwt); 
 	}
       }
     } // end of loop over events
@@ -289,14 +308,6 @@ int main(int argc, char** argv) {
     TDirectory *OS0jet_tt =fout->mkdir("mt_0jet");
     TDirectory *OSboosted_tt =fout->mkdir("mt_boosted");
     TDirectory *OSvbf_tt =fout->mkdir("mt_vbf");
-
-    TDirectory *SS0jet =fout->mkdir("SS0jet");
-    TDirectory *SSboosted =fout->mkdir("SS1jet");
-    TDirectory *SSvbf =fout->mkdir("SSvbf");
-    
-    TDirectory *QCD0jet =fout->mkdir("QCD0jet");
-    TDirectory *QCDboosted =fout->mkdir("QCD1jet");
-    TDirectory *QCDvbf =fout->mkdir("QCDvbf");
 
     for (int k=0; k<nbhist; ++k){
       OS0jet_tt->cd();
@@ -308,26 +319,6 @@ int main(int argc, char** argv) {
       OSvbf_tt->cd();
       h2_OS[k]->SetName(name.c_str()+postfix);
       h2_OS[k]->Write();        
-      
-      SS0jet->cd();
-      h0_SS[k]->SetName(name.c_str()+postfix);
-      h0_SS[k]->Write();
-      SSboosted->cd();
-      h1_SS[k]->SetName(name.c_str()+postfix);
-      h1_SS[k]->Write();
-      SSvbf->cd();
-      h2_SS[k]->SetName(name.c_str()+postfix);
-      h2_SS[k]->Write();
-      
-      QCD0jet->cd();
-      h0_QCD[k]->SetName(name.c_str()+postfix);
-      h0_QCD[k]->Write();
-      QCDboosted->cd();
-      h1_QCD[k]->SetName(name.c_str()+postfix);
-      h1_QCD[k]->Write();
-      QCDvbf->cd();
-      h2_QCD[k]->SetName(name.c_str()+postfix);
-      h2_QCD[k]->Write();
     }
     cout<<"\n"<<h0_OS[0]->Integral()<<" "<<h1_OS[0]->Integral()<<" "<<h2_OS[0]->Integral()<<"\n\n"<<endl;
     fout->Close();
