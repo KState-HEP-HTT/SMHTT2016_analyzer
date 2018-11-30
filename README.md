@@ -137,7 +137,7 @@ To compile, (need to compile both datacardMakerFF and datacardMaker)
 ```
 cd SMHTT_analyzer/src
 ./Make.sh datacardMaker_tt.cc
-./Make.sh datacardMakerFF_tt.cc
+./Make.sh datacardMakerFF_tt.cc ff
 ```
 
 To make datacard which has embedded + QCD(computed using embedded) + JetFakes,
