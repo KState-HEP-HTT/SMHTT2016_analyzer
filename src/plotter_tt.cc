@@ -153,8 +153,7 @@ int main(int argc, char** argv) {
     namu->SetBranchAddress("is_signal",           &is_signal            );          
     namu->SetBranchAddress("is_ai",               &is_ai                );              
 
-    namu->SetBranchAddress("NN_disc_QCD",         &NN_disc_QCD          );
-    namu->SetBranchAddress("NN_disc_ZTT",         &NN_disc_ZTT          );
+    namu->SetBranchAddress("NN_dis",              &NN_disc              );
     // Reset branch address if it exists branch
     TBranch* br = namu->GetBranch(tvar.c_str());
     if (br) namu->SetBranchAddress(tvar.c_str(), &var);
@@ -343,6 +342,7 @@ int main(int argc, char** argv) {
     h_aiss_inclusive->SetName(name.c_str());
     h_aiss_inclusive->Write();
     std::cout<< "\n" << name << " inclusive yields: "<< h_os_inclusive->Integral(-1,10000) << "\t\t" << h_os_0jet->Integral(-1,10000) << "\t" << h_os_boosted->Integral(-1,10000) << "\t" << h_os_vbf->Integral(-1,10000) << "\n\n" << std::endl;    
+    std::cout<< "\n" << name << " inclusive yields: "<< h_os_inclusive->Integral() << "\t\t" << h_os_0jet->Integral() << "\t" << h_os_boosted->Integral() << "\t" << h_os_vbf->Integral() << "\n\n" << std::endl;    
     fout->Close();
 } 
 

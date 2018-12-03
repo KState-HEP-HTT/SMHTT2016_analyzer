@@ -160,8 +160,7 @@ int main(int argc, char** argv) {
     namu->SetBranchAddress("is_signal",           &is_signal            );          
     namu->SetBranchAddress("is_ai",               &is_ai                );              
 
-    namu->SetBranchAddress("NN_disc_QCD",         &NN_disc_QCD          );
-    namu->SetBranchAddress("NN_disc_ZTT",         &NN_disc_ZTT          );
+    namu->SetBranchAddress("NN_disc",             &NN_disc              );
     // Reset branch address if it exists branch
     TBranch* br = namu->GetBranch(tvar.c_str());
     if (br) namu->SetBranchAddress(tvar.c_str(), &var);
@@ -250,7 +249,7 @@ int main(int argc, char** argv) {
       }
       else {	
 	////////////////////////     
-	// KSU study category //     
+	// KSU4 study category //     
 	////////////////////////     
 	if (njets_==0) is_0jet=true;
 	//else if (njets_==1 ||) is_boosted=true;   
