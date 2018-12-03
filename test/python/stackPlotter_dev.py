@@ -21,6 +21,10 @@ parser.add_option('--ff', '-f', action='store_true',
                   default=False, dest='is_JetFakes',
                   help='run on JetFakes'
                   )
+parser.add_option('--ntuple', '-n', action='store',
+                  default="2016", dest='whichFSA',
+                  help='run on 2016/2017 Ntuples'
+                  )
 parser.add_option('--input', '-i', action='store',
                   default="final_nominal.root", dest='inputroot',
                   help='input root file for the plot'
@@ -37,7 +41,7 @@ parser.add_option('--channel', '-c', action='store',
 
 file=ROOT.TFile(options.inputroot,"r")
 #cate={"mt_0jet":"0jet","mt_boosted":"Boosted","mt_vbf":"VBF"}
-cate={options.ch+"_vbf":"VBF", options.ch+"_boosted":"boosted", options.ch+"_0jet":"0jet", options.ch+"_inclusive":"inclusive"} # vlaue is tag on the plot such as high Diget Mass
+cate={options.ch+"_vbf":"VBF"}#, options.ch+"_boosted":"boosted", options.ch+"_0jet":"0jet", options.ch+"_inclusive":"inclusive"} # vlaue is tag on the plot such as high Diget Mass
 titleMap = {
     'mjj':'Dijet Mass [GeV]',
     'NN_disc':'NN disc',
@@ -76,10 +80,10 @@ titleMap = {
 }
 
 
-sig_stackScale = 30
+sig_stackScale = 20
 
 majors=["QCD","embedded"]
-minors=["ZL","ZJ","TTT","TTJ","W","VVT","VVJ","EWKZ"]
+minors=["ZL","ZJ","TTT","TTJ","W","VVT","VVJ"]#,"EWKZ"]
 signals=["ggH125","VBF125","WH125","ZH125"]
 
 
@@ -92,6 +96,7 @@ if options.ch!= "tt":
 if options.is_zttMC:
     majors.remove("embedded")
     majors.insert(1,"ZTT")
+    minors.insert(1,"EWKZ")
 if options.is_JetFakes:
     majors.remove("QCD")
     majors.insert(0,"JetFakes")
@@ -120,8 +125,16 @@ def add_lumi():
     lumi.SetTextFont (   42 )
     if options.ch=="mt":
             lumi.AddText("#mu#tau_{h}   2016, 35.9 fb^{-1} (13 TeV)")
+    print "options.whichFSA"
+    print options.whichFSA
+
     if options.ch=="tt":
-        lumi.AddText("#tau_{h}#tau_{h}   2016, 35.9 fb^{-1} (13 TeV)")
+        if options.whichFSA=="2017":
+            lumi.AddText("#tau_{h}#tau_{h}   2017, 41.5 fb^{-1} (13 TeV)")
+            print "#tau_{h}#tau_{h}   2017, 41.5 fb^{-1} (13 TeV)"
+        else :
+            lumi.AddText("#tau_{h}#tau_{h}   2016, 35.9 fb^{-1} (13 TeV)")
+            print "#tau_{h}#tau_{h}   2016, 35.9 fb^{-1} (13 TeV)"
     return lumi
 
 def add_CMS():
@@ -653,7 +666,7 @@ for cat in cate.keys():
         postfix+="_MC"
     if options.is_JetFakes:
         postfix+="_FF"
-    plot2.SaveAs("plots/"+options.obs+cate[cat]+"_"+options.ch+postfix+".pdf")
+    plot2.SaveAs("plots/"+options.obs+cate[cat]+"_"+options.ch+postfix+options.whichFSA+".pdf")
 
 
 
