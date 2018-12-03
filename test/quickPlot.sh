@@ -60,13 +60,13 @@ hadd -f plots/Quick/templates/$4.root plots/Quick/*.root
 python python/stackPlotter_dev.py -i plots/Quick/templates/$4.root -v $4 -c ${channel}
 if [ $fakefactor = "true" ]; then
     ./plotterFF_${channel}.exe ${inputfolder}/data_obs.root plots/Quick/JetFakes.root JetFakes $1 $2 $3 $4 ${selection} ${ntuple}
-    hadd -f plots/Quick/templates/$4.root plots/Quick/*.root
-    python python/stackPlotter_dev.py -i plots/Quick/templates/$4.root -v $4 -c ${channel} -f
+    hadd -f plots/Quick/templates/$4.root plots/Quick/*.root 
+    python python/stackPlotter_dev.py -i plots/Quick/templates/$4.root -v $4 -c ${channel} -f -n ${ntuple}
 fi
 
 
 printf "\nCopy and paste the following to make ZTT MC plot.\n\n" 
 echo python python/QCDcreator_${channel}.py -i plots/Quick/ -z #-q
 echo hadd -f plots/Quick/templates/$4.root plots/Quick/*.root
-echo python python/stackPlotter_dev.py -i plots/Quick/templates/$4.root -v $4 -c ${channel} -z
+echo python python/stackPlotter_dev.py -i plots/Quick/templates/$4.root -v $4 -c ${channel} -z -n ${ntuple}
 echo
